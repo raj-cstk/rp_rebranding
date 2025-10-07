@@ -11,7 +11,8 @@ export const useJstag = () => {
     document.head.appendChild(script);
 
     jstag.init({
-      src: `https://c.lytics.io/api/tag/${process.env.LYTICS_TAG}/latest.min.js`, 
+      src: `https://c.lytics.io/api/tag/${process.env.LYTICS_TAG}/latest.min.js`,
+      audit: { level: "carp" }, 
       contentstack: {
         entityPush: {
           poll: {
