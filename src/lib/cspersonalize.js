@@ -14,7 +14,6 @@ export const initializePersonalize = async (request, CONTENTSTACK_PERSONALIZE_ED
 
         return { variantParam, personalize };
     } catch (error) {
-        console.error("Failed to initialize personalization, returning null. Error:", error);
-        return { variantParam: null, personalize: null };
+        return { variantParam: null, personalize: null, error: error };
     }
 };

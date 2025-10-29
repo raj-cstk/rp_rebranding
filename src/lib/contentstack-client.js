@@ -8,12 +8,13 @@ const Stack = Contentstack.Stack({
     delivery_token: '',
     environment: '',
     branch: '',
+    host: process.env.CONTENTSTACK_HOST || 'cdn.contentstack.io',
     live_preview: {
         preview_token: '',
         enable: true,
-        host: 'rest-preview.contentstack.com',
+        host: process.env.CONTENTSTACK_PREVIEW_HOST || 'rest-preview.contentstack.com',
     },
-    region: Contentstack.Region.NA
+    region: process.env.CONTENTSTACK_REGION || 'us'
 })
 
 const getLocaleForURL = () => {
@@ -79,9 +80,13 @@ export const ContentstackClient = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, type, locale, live_preview: (searchQueryParams.live_preview || searchQueryParams.hash) ? searchQueryParams : (Stack.live_preview.hash) ? Stack.live_preview : null })
             });
-            data = await res.json();
+            if(res.ok) {
+                data = await res.json();
+            } else {
+                data = null;
+            }
         }
-        if (inLivePreview())
+        if (data && inLivePreview())
             addEditableTags(data, type, true, locale);
         return data;
     },
@@ -101,9 +106,13 @@ export const ContentstackClient = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, type, locale, references, live_preview: (searchQueryParams.live_preview || searchQueryParams.hash) ? searchQueryParams : (Stack.live_preview.hash) ? Stack.live_preview : null })
             });
-            data = await res.json();
+            if(res.ok) {
+                data = await res.json();
+            } else {
+                data = null;
+            }
         }
-        if (inLivePreview())
+        if (data && inLivePreview())
             addEditableTags(data, type, true, locale);
         return data;
     },
@@ -123,9 +132,13 @@ export const ContentstackClient = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type, url, locale, live_preview: (searchQueryParams.live_preview || searchQueryParams.hash) ? searchQueryParams : (Stack.live_preview.hash) ? Stack.live_preview : null })
             });
-            data = await res.json();
+            if(res.ok) {
+                data = await res.json();
+            } else {
+                data = null;
+            }
         }
-        if (inLivePreview() && data?.[0])
+        if (data && inLivePreview() && data?.[0])
             addEditableTags(data[0], type, true, locale);
         return data;
     },
@@ -145,9 +158,13 @@ export const ContentstackClient = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type, url, locale, references, live_preview: (searchQueryParams.live_preview || searchQueryParams.hash) ? searchQueryParams : (Stack.live_preview.hash) ? Stack.live_preview : null })
             });
-            data = await res.json();
+            if(res.ok) {
+                data = await res.json();
+            } else {
+                data = null;
+            }
         }
-        if (inLivePreview() && data?.[0])
+        if (data && inLivePreview() && data?.[0])
             addEditableTags(data[0], type, true, locale);
         return data;
     },
@@ -167,9 +184,13 @@ export const ContentstackClient = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type, locale, live_preview: (searchQueryParams.live_preview || searchQueryParams.hash) ? searchQueryParams : (Stack.live_preview.hash) ? Stack.live_preview : null })
             });
-            data = await res.json();
+            if(res.ok) {
+                data = await res.json();
+            } else {
+                data = null;
+            }
         }
-        if (inLivePreview() && data) {
+        if (data && inLivePreview()) {
             for (let i = 0; i < data.length; i++) {
                 addEditableTags(data[i], type, true, locale);
             }
@@ -192,9 +213,13 @@ export const ContentstackClient = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type, locale, references, live_preview: (searchQueryParams.live_preview || searchQueryParams.hash) ? searchQueryParams : (Stack.live_preview.hash) ? Stack.live_preview : null })
             });
-            data = await res.json();
+            if(res.ok) {
+                data = await res.json();
+            } else {
+                data = null;
+            }
         }
-        if (inLivePreview() && data) {
+        if (data && inLivePreview()) {
             for (let i = 0; i < data.length; i++) {
                 addEditableTags(data[i], type, true, locale);
             }
@@ -217,9 +242,13 @@ export const ContentstackClient = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type, locale, term, live_preview: (searchQueryParams.live_preview || searchQueryParams.hash) ? searchQueryParams : (Stack.live_preview.hash) ? Stack.live_preview : null })
             });
-            data = await res.json();
+            if(res.ok) {
+                data = await res.json();
+            } else {
+                data = null;
+            }
         }
-        if (inLivePreview() && data) {
+        if (data && inLivePreview()) {
             for (let i = 0; i < data.length; i++) {
                 addEditableTags(data[i], type, true, locale);
             }
@@ -242,9 +271,13 @@ export const ContentstackClient = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type, url, locale, live_preview: (searchQueryParams.live_preview || searchQueryParams.hash) ? searchQueryParams : (Stack.live_preview.hash) ? Stack.live_preview : null })
             });
-            data = await res.json();
+            if(res.ok) {
+                data = await res.json();
+            } else {
+                data = null;
+            }
         }
-        if (inLivePreview() && data?.[0])
+        if (data && inLivePreview() && data?.[0])
             addEditableTags(data[0], type, true, locale);
         return data;
     },
@@ -264,9 +297,13 @@ export const ContentstackClient = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type, url, locale, live_preview: (Stack.live_preview.hash) ? Stack.live_preview : null })
             });
-            data = await res.json();
+            if(res.ok) {
+                data = await res.json();
+            } else {
+                data = null;
+            }
         }
-        if (inLivePreview() && data?.[0])
+        if (data && inLivePreview() && data?.[0])
             addEditableTags(data[0], type, true, locale);
         return data;
     },
@@ -286,9 +323,13 @@ export const ContentstackClient = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type, locale, term, references, live_preview: (searchQueryParams.live_preview || searchQueryParams.hash) ? searchQueryParams : (Stack.live_preview.hash) ? Stack.live_preview : null })
             });
-            data = await res.json();
+            if(res.ok) {
+                data = await res.json();
+            } else {
+                data = null;
+            }
         }
-        if (inLivePreview() && data) {
+        if (data && inLivePreview()) {
             for (let i = 0; i < data[0].length; i++) {
                 addEditableTags(data[0][i], type, true, locale);
             }

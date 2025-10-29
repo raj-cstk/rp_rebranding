@@ -7,13 +7,17 @@ export default function Home({ params }) {
   const { locale } = use(params);
   const initialData = useDataContext();
 
-  // states
   const [entry, setEntry] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await ContentstackClient.getElementByType("homepage", locale);
-      setEntry(data[0]);
+      // example of how to fetch data from contentstack, replace "homepage" with the content type you want to fetch
+      const data = await ContentstackClient.getElementByType("homepage", locale, initialData);
+      if(data) {
+        setEntry(data[0]);
+      } else {
+        setEntry(null);
+      }
     }
 
     ContentstackClient.onEntryChange(fetchData);
@@ -22,7 +26,6 @@ export default function Home({ params }) {
   return (
     <div>
       <h1 {...entry?.$?.title}>{entry?.title}</h1>
-      <p {...entry?.$?.description}>{entry?.description}</p>
     </div>
   );
 }

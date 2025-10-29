@@ -1,4 +1,4 @@
-import contentstack, { Region } from '@contentstack/delivery-sdk';
+import contentstack from '@contentstack/delivery-sdk';
 
 function deserializeVariantIds (variantsQueryParam) {
   if(!variantsQueryParam) return '';
@@ -13,12 +13,13 @@ const stack = contentstack.stack({
   deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN,
   environment: process.env.CONTENTSTACK_ENVIRONMENT,
   branch: process.env.CONTENTSTACK_BRANCH ? process.env.CONTENTSTACK_BRANCH : 'main',
+  host: process.env.CONTENTSTACK_HOST || 'cdn.contentstack.io',
   live_preview: {
     preview_token: process.env.CONTENTSTACK_PREVIEW_TOKEN,
     enable: true,
-    host: "rest-preview.contentstack.com"
+    host: process.env.CONTENTSTACK_PREVIEW_HOST || 'rest-preview.contentstack.io',
   },
-  region: Region.US
+  region: process.env.CONTENTSTACK_REGION || 'us',
 });
 
 
@@ -43,6 +44,9 @@ const ContentstackServer = {
           function success(entry) {
             resolve(entry);
           },
+          function empty() {
+            resolve(null);
+          },
           function error(err) {
             console.error("error", err);
             reject(err);
@@ -64,6 +68,9 @@ const ContentstackServer = {
         .then(
           function success(entry) {
             resolve(entry);
+          },
+          function empty() {
+            resolve(null);
           },
           function error(err) {
             console.error("error", err);
@@ -88,6 +95,9 @@ const ContentstackServer = {
           function success(data) {
             resolve(data.entries);
           },
+          function empty() {
+            resolve(null);
+          },
           function error(err) {
             reject(err);
           }
@@ -110,6 +120,9 @@ const ContentstackServer = {
           function success(data) {
             resolve(data.entries);
           },
+          function empty() {
+            resolve(null);
+          },
           function error(err) {
             reject(err);
           }
@@ -129,6 +142,9 @@ const ContentstackServer = {
         .then(
           function success(data) {
             resolve(data.entries);
+          },
+          function empty() {
+            resolve(null);
           },
           function error(err) {
             console.error("error", err);
@@ -152,6 +168,9 @@ const ContentstackServer = {
           function success(data) {
             resolve(data.entries);
           },
+          function empty() {
+            resolve(null);
+          },
           function error(err) {
             console.error("error", err);  
             reject(err);
@@ -173,6 +192,9 @@ const ContentstackServer = {
         .then(
           function success(data) {
             resolve(data.entries);
+          },
+          function empty() {
+            resolve(null);
           },
           function error(err) {
             console.error("error", err);
@@ -196,6 +218,9 @@ const ContentstackServer = {
           function success(data) {
             resolve(data.entries);
           },
+          function empty() {
+            resolve(null);
+          },
           function error(err) {
             console.error("error", err);
             reject(err);
@@ -217,6 +242,9 @@ const ContentstackServer = {
         .then(
           function success(data) {
             resolve(data.entries);
+          },
+          function empty() {
+            resolve(null);
           },
           function error(err) {
             console.error("error", err);
@@ -240,6 +268,9 @@ const ContentstackServer = {
         .then(
           function success(data) {
             resolve(data.entries);
+          },
+          function empty() {
+            resolve(null);
           },
           function error(err) {
 

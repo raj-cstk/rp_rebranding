@@ -1,4 +1,3 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import { cache } from "react";
 import { headers } from "next/headers";
 import "./globals.css";
@@ -6,42 +5,33 @@ import ContentstackServer from "@/lib/cstack";
 import { PersonalizeProvider } from "@/context/personalize.context";
 import { LyticsTracking } from "@/context/lyticsTracking";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const fetchData = cache(async (locale) => {
+  const headersList = await headers();
+  const variantParam = headersList.get('x-personalize-variants');
+  // example of how to fetch seo metadata from contentstack, you can create a new content type for seo metadata and use it like this:
+  const data = await ContentstackServer.getElementByUrl("seo", "/homepage", locale, {}, variantParam);
+  return data;
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export const generateMetadata = async ({ params }) => {
+  const { locale } = await params;
+  const data = await fetchData(locale);
+  const entry = data?.[0]?.[0];
 
-// const fetchData = cache(async (locale) => {
-//   const headersList = await headers();
-//   const variantParam = headersList.get('x-personalize-variants');
-//   const data = await ContentstackServer.getElementByType("homepage", locale, {}, variantParam);
-//   return data;
-// });
-
-// export const generateMetadata = async ({ params }) => {
-//   const { locale } = await params;
-//   const data = await fetchData(locale);
-//   const entry = data[0][0];
-
-//   return {
-//     title: entry.seo.title,
-//     description: entry.seo.description,
-//     robots: {
-//       index: entry.seo.no_index || false,
-//       follow: entry.seo.no_follow || false,
-//     },
-//     openGraph: {
-//       title: entry.seo.title || entry.title,
-//       description: entry.seo.description || entry.description,
-//       images: entry.seo.image,
-//     },
-//   }
-// };
+  return {
+    title: entry?.seo?.title,
+    description: entry?.seo?.description,
+    robots: {
+      index: entry?.seo?.no_index || false,
+      follow: entry?.seo?.no_follow || false,
+    },
+    openGraph: {
+      title: entry?.seo?.og_meta_tags?.title,
+      description: entry?.seo?.og_meta_tags?.description,
+      images: entry?.seo?.og_meta_tags?.image,
+    },
+  }
+};
 
 export default async function RootLayout({
   children,
@@ -52,10 +42,9 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <PersonalizeProvider>
-          <LyticsTracking />
+          {process.env.LYTICS_TAG && <LyticsTracking />}
           {children}
         </PersonalizeProvider>
       </body>
