@@ -17,7 +17,7 @@ const stack = contentstack.stack({
   live_preview: {
     preview_token: process.env.CONTENTSTACK_PREVIEW_TOKEN,
     enable: true,
-    host: process.env.CONTENTSTACK_PREVIEW_HOST || 'rest-preview.contentstack.io',
+    host: process.env.CONTENTSTACK_PREVIEW_HOST || 'rest-preview.contentstack.com',
   },
   region: process.env.CONTENTSTACK_REGION || 'us',
 });
