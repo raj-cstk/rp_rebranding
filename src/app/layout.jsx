@@ -43,10 +43,10 @@ export default async function RootLayout({
     <html lang={locale}>
       <body
       >
-        <PersonalizeProvider>
-          {process.env.LYTICS_TAG && <LyticsTracking />}
+        {process.env.LYTICS_TAG && <LyticsTracking />}
+        {process.env.CONTENTSTACK_PERSONALIZATION ? <PersonalizeProvider>
           {children}
-        </PersonalizeProvider>
+        </PersonalizeProvider> : <>{children}</>}
       </body>
     </html>
   );

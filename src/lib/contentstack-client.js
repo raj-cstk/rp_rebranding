@@ -32,7 +32,7 @@ ContentstackLivePreview = LivePreviewModule.default;
 ContentstackLivePreview.init({
     enable: 'true',
     ssr: false,
-    mode: 'builder',
+    mode: 'preview',
     stackSdk: Stack,
     clientUrlParams: {
         protocol: "https",
@@ -55,7 +55,10 @@ export const cslp = (content, key, index) => {
         return (content.$[key + index])
 }
 
-const searchQueryParams = Object.fromEntries(new URLSearchParams(window.location.search));
+const getSearchQueryParams = () => {
+    if (typeof window === 'undefined') return {};
+    return Object.fromEntries(new URLSearchParams(window.location.search));
+};
 
 export const ContentstackClient = {
     onEntryChange: function(callback) {
@@ -66,6 +69,7 @@ export const ContentstackClient = {
         }
     },
     getElement: async function (id, type, locale, initialData) {
+        const searchQueryParams = getSearchQueryParams();
         if (inLivePreview()) {
             while (!Stack.live_preview?.hash && !(searchQueryParams.live_preview || searchQueryParams.hash)) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -92,6 +96,7 @@ export const ContentstackClient = {
     },
 
     getElementWithRefs: async function (id, type, locale, references, initialData) {
+        const searchQueryParams = getSearchQueryParams();
         if (inLivePreview()) {
             while (!Stack.live_preview?.hash && !(searchQueryParams.live_preview || searchQueryParams.hash)) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -118,6 +123,7 @@ export const ContentstackClient = {
     },
 
     getElementByUrl: async function (type, url, locale, initialData) {
+        const searchQueryParams = getSearchQueryParams();
         if (inLivePreview()) {
             while (!Stack.live_preview?.hash && !(searchQueryParams.live_preview || searchQueryParams.hash)) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -144,6 +150,7 @@ export const ContentstackClient = {
     },
 
     getElementByUrlWithRefs: async function (type, url, locale, references, initialData) {
+        const searchQueryParams = getSearchQueryParams();
         if (inLivePreview() && !(searchQueryParams.live_preview || searchQueryParams.hash)) {
             while (!Stack.live_preview?.hash) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -170,6 +177,7 @@ export const ContentstackClient = {
     },
 
     getElementByType: async function (type, locale, initialData) {
+        const searchQueryParams = getSearchQueryParams();
         if (inLivePreview() && !(searchQueryParams.live_preview || searchQueryParams.hash)) {
             while (!ContentstackLivePreview?.hash) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -199,6 +207,7 @@ export const ContentstackClient = {
     },
 
     getElementByTypeWithRefs: async function (type, locale, references, initialData) {
+        const searchQueryParams = getSearchQueryParams();
         if (inLivePreview() && !(searchQueryParams.live_preview || searchQueryParams.hash)) {
             while (!Stack.live_preview?.hash) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -228,6 +237,7 @@ export const ContentstackClient = {
     },
 
     getElementByTypeByTaxonomy: async function (type, locale, term, initialData) {
+        const searchQueryParams = getSearchQueryParams();
         if (inLivePreview() && !(searchQueryParams.live_preview || searchQueryParams.hash)) {
             while (!Stack.live_preview?.hash) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -257,6 +267,7 @@ export const ContentstackClient = {
     },
 
     getPDPbyProduct: async function (type, url, locale, initialData) {
+        const searchQueryParams = getSearchQueryParams();
         if (inLivePreview() && !(searchQueryParams.live_preview || searchQueryParams.hash)) {
             while (!Stack.live_preview?.hash) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -309,6 +320,7 @@ export const ContentstackClient = {
     },
 
     getElementByTypeByTaxonomyLocation: async function (type, locale, term, references, initialData) {
+        const searchQueryParams = getSearchQueryParams();
         if (inLivePreview() && !(searchQueryParams.live_preview || searchQueryParams.hash)) {
             while (!Stack.live_preview?.hash) {
                 await new Promise(resolve => setTimeout(resolve, 100));
