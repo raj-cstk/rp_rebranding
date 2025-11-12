@@ -112,9 +112,9 @@ const ContentstackServer = {
         .entry()
         .locale(locale ? locale : "en")
         .variants(deserializeVariantIds(variantParam))
+        .includeReference(...references)
         .addParams({ "include_applied_variants": "true" })
         .query({ "url": { $eq: url } })
-        .includeReference(...references)
         .find()
         .then(
           function success(data) {
