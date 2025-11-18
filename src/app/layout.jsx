@@ -1,9 +1,11 @@
 import { cache } from "react";
 import { headers } from "next/headers";
 import "./globals.css";
+import Script from 'next/script';
 import ContentstackServer from "@/lib/cstack";
 import { PersonalizeProvider } from "@/context/personalize.context";
 import { LyticsTracking } from "@/context/lyticsTracking";
+
 
 const fetchData = cache(async (locale) => {
   const headersList = await headers();
@@ -41,7 +43,7 @@ export default async function RootLayout({
   
   return (
     <html lang={locale}>
-      <body
+      <body suppressHydrationWarning
       >
         {process.env.LYTICS_TAG && <LyticsTracking />}
         {process.env.CONTENTSTACK_PERSONALIZATION ? <PersonalizeProvider>
