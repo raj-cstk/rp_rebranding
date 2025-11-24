@@ -86,18 +86,18 @@ export default function PLP({ }) {
                 ]
             );
             //console.log('plp', entry);
-            setEntry(entry);
-            if (entry?.product_category?.data[0]?.id) {
-                getProducts(entry?.product_category?.data.map(obj => obj.id));
+            setEntry(entry[0]);
+            if (entry[0]?.product_category?.data[0]?.id) {
+                getProducts(entry[0]?.product_category?.data.map(obj => obj.id));
             }
             else {
                 //  setProducts({})
                 getProductsByURL(params.title)
             }
         } else {
-            setEntry(thePLP);
-            if (thePLP?.product_category?.data[0]?.id) {
-                getProducts(thePLP?.product_category?.data.map(obj => obj.id));
+            setEntry(thePLP[0]);
+            if (thePLP[0]?.product_category?.data[0]?.id) {
+                getProducts(thePLP[0]?.product_category?.data.map(obj => obj.id));
             }
             else {
                 // setProducts({})

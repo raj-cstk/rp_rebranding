@@ -6,7 +6,7 @@ import Header from "@/components/header";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
-import { LyticsTracking, useEntity, useJstag } from "@/lib/lyticsTracking";
+import { LyticsTracking, useEntity, useJstag } from "@/context/lyticsTracking";
 import { Dialog, DialogPanel, DialogBackdrop } from "@headlessui/react";
 import PageHero from "@/components/pageHero";
 import TextSection from "@/components/textSection";
@@ -303,7 +303,7 @@ export default function Page({  }) {
         </form>
 
         <div className="flex mt-3">
-          <input type="checkbox" checked />
+          {/* <input type="checkbox" checked /> */}
           <label className="ml-2">Use card on file</label>
         </div>
 

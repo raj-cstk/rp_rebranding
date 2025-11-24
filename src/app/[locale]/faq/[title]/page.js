@@ -12,16 +12,16 @@ export default function Page({ }) {
     const params = useParams();
 
     const getContent = async () => {
-        const entry = await ContentstackClient.getElementByUrlWithRefs(
+        const entry = await ContentstackClient.getElementByUrl(
             "faq",
             "/faq/" + params.title,
             params.locale,
-            [
-                'modular_blocks.hero_banner.hero_banner',
-                'modular_blocks.articles.articles'
-            ]
+            // [
+            //     'modular_blocks.hero_banner.hero_banner',
+            //     'modular_blocks.articles.articles'
+            // ]
         );
-        setEntry(entry);
+        setEntry(entry[0]);
     };
 
     useEffect(() => {

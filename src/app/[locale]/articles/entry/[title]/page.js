@@ -8,13 +8,13 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faUser, faCalendar } from "@awesome.me/kit-610837e1f9/icons/classic/light";
 import { useParams } from "next/navigation";
-import { useJstag } from "@/context/lyticsTracking";
+// import { useJstag } from "@/context/lyticsTracking";
 
 export default function Page({ }) {
     const [entry, setEntry] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const params = useParams();
-    const jstag = useJstag();
+    //const jstag = useJstag();
 
     const getContent = async () => {
         const entry = await ContentstackClient.getElementByUrl(
@@ -22,9 +22,9 @@ export default function Page({ }) {
             "/articles/entry/" + params.title,
             params.locale
         );
-        setEntry(entry);
+        setEntry(entry[0]);
         setIsLoading(false);
-        jstag.send({"taxonomy" : entry?.taxonomies[0]?.term_uid});
+        //jstag.send({"taxonomy" : entry?.taxonomies[0]?.term_uid});
     };
 
     useEffect(() => {
@@ -91,7 +91,7 @@ export default function Page({ }) {
                         </div>}
                     </>}
                     
-                    {entry &&
+                    {entry?.article_body &&
                         <div>
                             {entry.article_body.children.length === 1 && entry.article_body.children[0].children[0].text === "" &&
                                 <div className="mt-10 max-w-3xl article" {...entry?.$?.article_body}>Article body</div>

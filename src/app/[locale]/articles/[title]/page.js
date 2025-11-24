@@ -22,11 +22,11 @@ export default function ArticlesList({ }) {
     );
     setEntry(entry[0]);
 
-    if (entry?.taxonomy_category?.length > 0) {
+    if (entry[0]?.taxonomy_category?.length > 0) {
       const articles = await ContentstackClient.getElementByTypeByTaxonomy(
         "article",
         params.locale,
-        entry.taxonomy_category
+        entry[0].taxonomy_category
       );
       setArticles(articles);
     }
@@ -42,7 +42,7 @@ export default function ArticlesList({ }) {
   return (
     <>
       <Header locale={params.locale} />
-      {console.log(entry)}
+      {console.log("articles in component",articles)}
       <div className="bg-white py-16 sm:py-24">
         <div className="mx-auto max-w-8xl px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
@@ -61,7 +61,7 @@ export default function ArticlesList({ }) {
           }
           {entry?.taxonomy_category?.length > 0 &&
             <div className="mx-auto mt-16 grid max-w-3xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-3 " {...entry?.$?.taxonomy_category}>
-              {articles[0]?.map((article) => (
+              {articles?.map((article) => (
                 <article
                   key={article.uid}
                   className="flex flex-col items-start "
@@ -95,7 +95,7 @@ export default function ArticlesList({ }) {
                       })}
                     </div>
                     <div className="group relative">
-                      <p className="mt-3 text-lg font-paragraph font-medium leading-6 text-gray-900 group-hover:text-gray-600 uppercase">
+                      <p className="mt-3 text-lg !font-medium leading-6 text-gray-900 group-hover:text-gray-600 uppercase">
                         <Link href={(article.url ? article.url : "#")} {...article.$?.title}>
                           {article.title}
                         </Link>
