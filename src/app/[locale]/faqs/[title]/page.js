@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { ContentStackClient } from "@/lib/contentstack-client";
+import { ContentstackClient } from "@/lib/contentstack-client";
 import Header from "@/components/header";
 import styled, {StyleSheetManager} from "styled-components";
 import isPropValid from "@emotion/is-prop-valid";
@@ -33,7 +33,7 @@ export default function Page({ }) {
     const params = useParams();
 
     const getContent = async () => {
-        const entry = await ContentStackClient.getElementByUrlWithRefs(
+        const entry = await ContentstackClient.getElementByUrlWithRefs(
             "faq",
             "/faq/" + params.title,
             params.locale,
@@ -44,7 +44,7 @@ export default function Page({ }) {
     };
 
     useEffect(() => {
-        ContentStackClient.onEntryChange(getContent);
+        ContentstackClient.onEntryChange(getContent);
     }, []);
 
     async function searchForAnswer() {

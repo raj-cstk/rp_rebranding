@@ -5,7 +5,7 @@ import {
 } from 'react';
 import Footer from '@/components/footer';
 import Header from '@/components/header';
-import { ContentStackClient } from '@/lib/contentstack-client';
+import { ContentstackClient } from '@/lib/contentstack-client';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -15,7 +15,7 @@ export default function AllArticles({ }) {
   const params = useParams();
 
   const getContent = async () => {
-    const entries = await ContentStackClient.getElementByType(
+    const entries = await ContentstackClient.getElementByType(
       "article",
       params.locale
     );
@@ -26,7 +26,7 @@ export default function AllArticles({ }) {
   };
 
   useEffect(() => {
-    ContentStackClient.onEntryChange(getContent);
+    ContentstackClient.onEntryChange(getContent);
   }, []);
 
 
@@ -72,13 +72,13 @@ export default function AllArticles({ }) {
                       <div>
                     {article.taxonomies.map((tax, tdx) => {
                       return (
-                        <a
+                        <Link
                           href={"/articles/categories/" + tax.term_uid}
                           key={tdx + tax.term_uid}
                           className="relative z-10 bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100 capitalize"
                         >
                           {tax.term_uid}
-                        </a>
+                        </Link>
                       );
                     })}
                     </div>

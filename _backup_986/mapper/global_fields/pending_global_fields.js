@@ -1,0 +1,1 @@
+["image_grid","product_banner","cards","category_banner"]
