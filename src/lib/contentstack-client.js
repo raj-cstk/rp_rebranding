@@ -4,13 +4,13 @@ import { inLivePreview } from '@/utils/lp';
 import {addEditableTags} from '@contentstack/utils';
 
 const Stack = Contentstack.Stack({
-    api_key: '',
-    delivery_token: '',
-    environment: '',
-    branch: '',
+    api_key: process.env.CONTENTSTACK_API_KEY,
+    delivery_token: process.env.CONTENTSTACK_DELIVERY_TOKEN,
+    environment: process.env.CONTENTSTACK_ENVIRONMENT,
+    branch: process.env.CONTENTSTACK_BRANCH,
     host: process.env.CONTENTSTACK_HOST || 'cdn.contentstack.io',
     live_preview: {
-        preview_token: '',
+        preview_token: process.CONTENTSTACK_PREVIEW_TOKEN,
         enable: true,
         host: process.env.CONTENTSTACK_PREVIEW_HOST || 'rest-preview.contentstack.com',
     },
