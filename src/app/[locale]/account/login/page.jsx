@@ -63,7 +63,7 @@ export default function LoginPage() {
                                     />
                                 </div>
                                 <div className="flex justify-end">
-                                    <a href="/account/resetpassword" className="text-right">Forgot password</a>
+                                    <Link href="/account/resetpassword" className="text-right">Forgot password</Link>
                                 </div>
                             </div>
 

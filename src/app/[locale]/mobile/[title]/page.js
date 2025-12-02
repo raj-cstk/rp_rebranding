@@ -134,12 +134,12 @@ export default function Mobile({ }) {
                         </PopoverButton>
 
                         <PopoverPanel anchor="bottom end" className="flex flex-col py-2 px-4 rounded text-neutral-700 bg-[#f3f3f9] shadow-lg">
-                            <a
+                            <Link
                                 href="/account/login"
                                 className="text-nowrap font-light"
                             >
                                 Log In
-                            </a>
+                            </Link>
                         </PopoverPanel>
                     </Popover>
                 }

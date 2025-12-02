@@ -25,6 +25,7 @@ import LeadCapture from "@/components/leadCapture";
 import ProductFeature from "@/components/productFeature";
 import RecommendationsBanner from "@/components/recommendationsBanner";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 
 export default function Page({  }) {
@@ -355,11 +356,11 @@ export default function Page({  }) {
                   Red Panda Resort is your gateway to adventure. Explore luxury
                   packages for every level of adventurer
                 </p>
-                <a href="/plp/package-offers-exclusive" className="mx-auto mt-5">
+                <Link href="/plp/package-offers-exclusive" className="mx-auto mt-5">
                   <button className="rounded-md button mt-6 px-8 py-4 text-md tracking-widest uppercase font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:text-white hover:bg-cyan-600">
                     Show me
                   </button>
-                </a>
+                </Link>
               </div>
             </div>
           </DialogPanel>

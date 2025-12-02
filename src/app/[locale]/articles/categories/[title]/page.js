@@ -2,7 +2,7 @@
 import Header from "@/components/header";
 import { useState, useEffect } from "react";
 import Footer from "@/components/footer";
-import { ContentStackClient } from "@/lib/contentstack-client";
+import { ContentstackClient } from "@/lib/contentstack-client";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -12,7 +12,7 @@ export default function ArticleCategory({ }) {
   const params = useParams();
 
   const getContent = async () => {
-    const entries = await ContentStackClient.getElementByTypeByTaxonomy(
+    const entries = await ContentstackClient.getElementByTypeByTaxonomy(
       "article",
       params.locale,
       [params.title]
@@ -22,7 +22,7 @@ export default function ArticleCategory({ }) {
   };
 
   useEffect(() => {
-    ContentStackClient.onEntryChange(getContent);
+    ContentstackClient.onEntryChange(getContent);
   }, []);
 
   if (isLoading) return;
