@@ -25,7 +25,7 @@ export default function Page({ }) {
                 'modular_blocks.articles.articles'
             ]
         );
-        setEntry(entry);
+        setEntry(entry[0]);
     };
 
     useEffect(() => {

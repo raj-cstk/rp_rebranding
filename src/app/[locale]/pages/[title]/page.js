@@ -44,7 +44,7 @@ export default function Page({ }) {
                 'modular_blocks.text_and_image.page'
             ]
         );
-        setEntry(entry);
+        setEntry(entry[0]);
     };
 
     useEffect(() => {

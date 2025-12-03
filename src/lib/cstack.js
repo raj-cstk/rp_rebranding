@@ -106,31 +106,30 @@ const ContentstackServer = {
 },
 
 
-  getElementByUrlWithRefs(type, url, locale, references, live_preview, variantParam) {
-   stack.livePreviewQuery(live_preview ?? {});
-    return new Promise((resolve, reject) => {
-      stack.contentType(type)
-        .entry()
-        .locale(locale ? locale : "en")
-        .variants(deserializeVariantIds(variantParam))
-        .includeReference(...references)
-        .addParams({ "include_applied_variants": "true" })
-        .query({ url: url })
-        .includeReference(...references)
-        .find()
-        .then(
-          function success(data) {
-            resolve(data.entries);
-          },
-          function empty() {
-            resolve(null);
-          },
-          function error(err) {
-            reject(err);
-          }
-        );
-    });
-  },
+getElementByUrlWithRefs(type, url, locale, references, live_preview, variantParam) {
+  stack.livePreviewQuery(live_preview ?? {});
+   return new Promise((resolve, reject) => {
+     stack.contentType(type)
+       .entry()
+       .includeReference(...references)
+       .locale(locale ? locale : "en")
+       .variants(deserializeVariantIds(variantParam))
+       .addParams({ "include_applied_variants": "true" })
+       .query({ "url": { $eq: url } })
+       .find()
+       .then(
+         function success(data) {
+           resolve(data.entries);
+         },
+         function empty() {
+           resolve(null);
+         },
+         function error(err) {
+           reject(err);
+         }
+       );
+   });
+ },
 
   getElementByType(type, locale, live_preview, variantParam) {
    stack.livePreviewQuery(live_preview ?? {});
