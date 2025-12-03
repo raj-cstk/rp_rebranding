@@ -10,11 +10,12 @@ import { faCircleUser as loggedOut } from '@awesome.me/kit-610837e1f9/icons/clas
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Disclosure, Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useJstag } from '../context/lyticsTracking';
 import { useParams } from 'next/navigation';
+import { useSlidePanel } from '@/context/slidePanel.context';
 
 export default function Header({ color, locale }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -30,6 +31,7 @@ export default function Header({ color, locale }) {
   const jstag = useJstag();
   const personalizeSDK = usePersonalize();
   const params = useParams();
+  const { togglePanel } = useSlidePanel();
 
   const supabase = createClient();
 
@@ -224,6 +226,13 @@ export default function Header({ color, locale }) {
 
       <div className="hidden lg:flex justify-center align-top" style={{ width: '150px', justifyContent: 'end' }}>
 
+        <button
+          onClick={togglePanel}
+          className="outline-none mr-5"
+          aria-label="Toggle slide panel"
+        >
+          <Squares2X2Icon className="h-6 w-6" />
+        </button>
         
         <Link href="/faqs/maldives">
 

@@ -5,6 +5,7 @@ import Script from 'next/script';
 import ContentstackServer from "@/lib/cstack";
 import { PersonalizeProvider } from "@/context/personalize.context";
 import { LyticsTracking } from "@/context/lyticsTracking";
+import AppWrapper from "@/components/appWrapper";
 import {
   Cinzel,
   Cormorant,
@@ -196,9 +197,11 @@ export default async function RootLayout({
         ].join(" ")}
       >
         {process.env.LYTICS_TAG && <LyticsTracking />}
-        {process.env.CONTENTSTACK_PERSONALIZATION ? <PersonalizeProvider>
-          {children}
-        </PersonalizeProvider> : <>{children}</>}
+        <AppWrapper>
+          {process.env.CONTENTSTACK_PERSONALIZATION ? <PersonalizeProvider>
+            {children}
+          </PersonalizeProvider> : <>{children}</>}
+        </AppWrapper>
       </body>
     </html>
   );

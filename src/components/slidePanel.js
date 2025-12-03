@@ -1,49 +1,21 @@
-import { useEffect, useState, Fragment} from "react";
-import { XMarkIcon, FlagIcon, LockClosedIcon } from "@heroicons/react/24/outline";
-import { useEntity, useRecommendations } from "@/utils/lyticsTracking";
+"use client";
+import { useState } from "react";
+import { XMarkIcon, LockClosedIcon } from "@heroicons/react/24/outline";
+import { useEntity, useRecommendations } from "@/context/lyticsTracking";
 import { useParams } from "next/navigation";
-import { ContentstackClient } from "@/lib/contentstack-client";
-import { usePathname } from "next/navigation";
 import { Menu, MenuItem, MenuButton, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import Link from "next/link";
 import JsonView from '@uiw/react-json-view';
 import { lightTheme } from '@uiw/react-json-view/light';
+import { useSlidePanel } from '@/context/slidePanel.context';
 
-export default function LyticsExtension({  }) {
-  const [statsOpen, setStatsOpen] = useState(false);
+export default function SlidePanel() {
+  const { isOpen, closePanel } = useSlidePanel();
   const lyticsProfileData = useEntity();
   const [selectedTab, setSelectedTab] = useState("Summary");
-  const pathname = usePathname();
-  const [entry, setEntry] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [headerOverlay, setHeaderOverlay] = useState(false);
   const recommendations = useRecommendations();
-  const [menuOpen, setMenuOpen] = useState(false);
   const params = useParams();
-  
-
-  const getContent = async () => {
-      const entry = await ContentstackClient.getElementByTypeWithRefs(
-        "homepage",
-        params.locale,
-        [
-          'modular_blocks.review.reference', 
-          'modular_blocks.image_grid.image.page', 
-          'hero.hero_banner', 
-          'hero.page', 
-          'modular_blocks.review.testimonials', 
-          'modular_blocks.review.testimonials.reviews.review',
-          'modular_blocks.product_banner.plp',
-          'modular_blocks.cards.card.page',
-          'modular_blocks.text_and_image.page'
-        ]
-      );
-      setEntry(entry[0]);
-      setIsLoading(false);
-    };
-
-
 
   //function to convert lytics intrests in two to decimal points
   function moveDecimalPoint(num) {
@@ -56,26 +28,17 @@ export default function LyticsExtension({  }) {
     return str.slice(decimalIndex + 1, decimalIndex + 3);
   }
 
-  function addCommas(numStr) {
-    return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  if (!lyticsProfileData) {
+    return (
+      <div
+        className={`flex-shrink-0 h-screen w-[450px] bg-white transition-transform duration-300 ease-in-out overflow-y-auto ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        {/* Empty white panel when no lytics data */}
+      </div>
+    );
   }
-
-  useEffect(() => {
-    ContentstackClient.onEntryChange(getContent);
-    //console.log("state set in lyticsExtension", lyticsProfileData);
-    if((pathname === `/${params.locale}`) && (entry?.hero?.length > 0)) {
-      //console.log(headerOverlay)
-      if((entry?.hero[0]?.header_overlay) && (headerOverlay === false)) {
-        setHeaderOverlay(true);
-      }
-    } else if((pathname !== `/${params.locale}`) && (headerOverlay === true)) {
-      setHeaderOverlay(false);
-    }
-    
-  }, [lyticsProfileData]);
-
-
-  if (!lyticsProfileData) return null;
 
   let max100 = Math.min(lyticsProfileData?.data?.user?.likely_premier_score, 100);
 
@@ -97,26 +60,17 @@ export default function LyticsExtension({  }) {
     }
   ];
 
-   const getLabel = (tab) => tab.label || tab.name;
+  const getLabel = (tab) => tab.label || tab.name;
   
   const selectedLabel = getLabel(tabs.find((tab) => tab.name === selectedTab));
 
   return (
-    <div>
-    <div className="px-5 flex self-start text-black absolute top-[35px] max-lg:top-[37px] right-[165px] max-lg:right-[60px]">
-      <button
-        className="cursor-pointer ms-auto text-neutral-700"
-        type="button"
-        onClick={() => setStatsOpen(true)}
-      >
-        <FlagIcon className={"size-5 max-lg:size-6 "}
-        style={{ color: (headerOverlay ? "white" : "black") }}></FlagIcon>
-      </button>
-    </div>
-
     <div
-        className={`top-0 bottom-0 flex flex-col shadow-xl md:w-[480px] bg-white z-50 duration-200 ease-in-out m-2 fixed rounded-2xl overflow-y-auto ${statsOpen ? "md:right-0 md:left-auto left-0 right-0" : "hidden md:-right-[500px] md:block"}`}
-      >
+      className={`flex-shrink-0 h-screen w-[450px] bg-white transition-transform duration-300 ease-in-out overflow-y-auto border-l-[1px] border-neutral-100 ${
+        isOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}
+    >
+      <div className="flex flex-col shadow-xl bg-white h-full">
         <div className="flex justify-between items-end bg-[#404040] py-1 px-2">
           <div className="p-2 mx-1 flex">
             <img
@@ -130,23 +84,21 @@ export default function LyticsExtension({  }) {
           <button
             className="cursor-pointer ms-auto text-white"
             type="button"
-            onClick={() => setStatsOpen(false)}
+            onClick={closePanel}
           >
             <XMarkIcon className="h-8 m-1 p-1" />
           </button>
         </div>
 
         <div className="h-full w-full rounded-b-xl mb-2 bg-white flex flex-col">
-
-
           <Menu as="div" className="relative inline-block text-center w-full">
             <div>
-              <MenuButton onClick={() => setMenuOpen(true)}className="inline-flex justify-center w-full px-4 py-3 text-sm font-semibold border border-neutral rounded-md shadow-sm text-[#6351e3] bg-white hover:bg-gray-50 font-roboto tracking-wide">
+              <MenuButton className="inline-flex justify-center w-full px-4 py-3 text-sm font-semibold border-neutral rounded-b-md shadow-sm text-[#6351e3] bg-white hover:bg-gray-50 font-roboto tracking-wide">
                 {selectedLabel}
                 <ChevronDownIcon className="w-5 h-5 ml-2 text-[#6351e3]" />
               </MenuButton>
             </div>
-          <MenuItems className={"absolute z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"}>
+          <MenuItems className={"absolute z-10 mt-2 w-full origin-top-right rounded-b-md bg-white shadow-lg border-b-[1px] border-neutral-200 focus:outline-none"}>
             <div className="py-1">
               {tabs
                 .filter((tab) => tab.isVisible)
@@ -581,3 +533,4 @@ export default function LyticsExtension({  }) {
     </div>
   );
 }
+
