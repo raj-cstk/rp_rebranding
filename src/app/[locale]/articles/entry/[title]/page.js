@@ -8,19 +8,22 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faUser, faCalendar } from "@awesome.me/kit-610837e1f9/icons/classic/light";
 import { useParams } from "next/navigation";
+import { useDataContext } from "@/context/data.context";
 // import { useJstag } from "@/context/lyticsTracking";
 
 export default function Page({ }) {
     const [entry, setEntry] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const params = useParams();
+    const initialData = useDataContext();
     //const jstag = useJstag();
 
     const getContent = async () => {
         const entry = await ContentstackClient.getElementByUrl(
             "article",
             "/articles/entry/" + params.title,
-            params.locale
+            params.locale,
+            initialData
         );
         setEntry(entry[0]);
         setIsLoading(false);

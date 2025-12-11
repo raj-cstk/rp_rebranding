@@ -21,6 +21,7 @@ export default async function handler(request, context) {
   // Also set the variant parameter as a request header for API routes
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-personalize-variants', variantParam);
+  requestHeaders.set('x-pathname', pathname);
 
 
   // rewrite the request with the modified URL and new headers

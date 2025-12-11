@@ -19,6 +19,7 @@ export default function ArticlesList({ }) {
       "article_list",
       `/articles/${params.title}`,
       params.locale,
+      initialData
     );
     setEntry(entry[0]);
 

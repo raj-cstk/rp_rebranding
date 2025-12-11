@@ -3,18 +3,27 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import ContentstackServer from "@/lib/cstack";
 import DataContextProvider from "@/context/data.context";
+import { homepageReferences } from "@/helpers/referencePaths";
 
 const fetchData = cache(async (locale) => {
   const headersList = await headers();
   const variantParam = headersList.get('x-personalize-variants');
-  // example of how to fetch seo metadata from contentstack, replace "homepage" with the content type which contains the seo metadata
-  const data = await ContentstackServer.getElementByType("homepage", locale, {}, variantParam);
+  const data = await ContentstackServer.getElementByTypeWithRefs("homepage", locale, homepageReferences, {}, variantParam);
   return data;
 });
 
 export const generateMetadata = async ({ params }) => {
   const parameters = await params;
   const locale = parameters.locale;
+
+  const headersList = await headers();
+  const pathname = headersList.get('x-pathname');
+  const isHomePage = !pathname || pathname === '/' || pathname === `/${locale}` || pathname === `/${locale}/`;
+
+  if (!isHomePage) {
+    return {};
+  }
+
   const data = await fetchData(locale);
   const entry = data?.[0];
 

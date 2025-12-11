@@ -17,6 +17,8 @@ import CategoryBanner from "@/components/categoryBanner";
 import Agent from "@/components/agent";
 import RecommendationsBanner from "@/components/recommendationsBanner";
 import { useParams } from "next/navigation";
+import { useDataContext } from "@/context/data.context";
+import { homepageReferences } from "@/helpers/referencePaths";
 
 export default function Home({ }) {
   const [entry, setEntry] = useState({});
@@ -24,6 +26,8 @@ export default function Home({ }) {
   const [user, setUser] = useState({});
   const supabase = createClient();
   const params = useParams();
+
+  const initialData = useDataContext();
 
   const getUser = async () => {
     const {
@@ -36,17 +40,8 @@ export default function Home({ }) {
     const entry = await ContentstackClient.getElementByTypeWithRefs(
       "homepage",
       params.locale,
-      [
-        'modular_blocks.review.reference', 
-        'modular_blocks.image_grid.image.page', 
-        'hero.hero_banner', 
-        'hero.page', 
-        'modular_blocks.review.testimonials', 
-        'modular_blocks.review.testimonials.reviews.review',
-        'modular_blocks.product_banner.plp',
-        'modular_blocks.cards.card.page',
-        'modular_blocks.text_and_image.page'
-      ]
+      homepageReferences,
+      initialData
     );
     console.log("homepage", entry[0]);
     setEntry(entry[0]);

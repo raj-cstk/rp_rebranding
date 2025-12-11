@@ -23,6 +23,7 @@ export default async function middleware(req: NextRequest) {
       // parsedUrl.searchParams.set(personalize.VARIANT_QUERY_PARAM, variantParam);
       const newReq = new NextRequest(parsedUrl.toString(), req);
       newReq.headers.set('x-personalize-variants', variantParam || '');
+      newReq.headers.set('x-pathname', req.nextUrl.pathname);
       const response = intlMiddleware(newReq);
       personalize?.addStateToResponse(response);
       return response;

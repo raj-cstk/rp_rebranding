@@ -1,8 +1,6 @@
 import { cache } from "react";
-import { headers } from "next/headers";
 import "./globals.css";
 import Script from 'next/script';
-import ContentstackServer from "@/lib/cstack";
 import { PersonalizeProvider } from "@/context/personalize.context";
 import { LyticsTracking } from "@/context/lyticsTracking";
 import AppWrapper from "@/components/appWrapper";
@@ -19,7 +17,6 @@ import {
   Rokkitt,
   Spectral,
 } from "next/font/google";
-import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -125,33 +122,23 @@ function fontPicker(fontName) {
   return map[fontName] || "inherit";
 }
 
-const fetchData = cache(async (locale) => {
-  const headersList = await headers();
-  const variantParam = headersList.get('x-personalize-variants');
-  // example of how to fetch seo metadata from contentstack, you can create a new content type for seo metadata and use it like this:
-  const data = await ContentstackServer.getElementByUrl("seo", "/homepage", locale, {}, variantParam);
-  return data;
-});
+export const metadata = {
+  title: "Red Panda Resort",
+  description: "Red Panda Resort is a demo website made using Contentstack.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 
-export const generateMetadata = async ({ params }) => {
-  const parameters = await params;
-  const locale = parameters.locale
-  const data = await fetchData(locale);
-  const entry = data?.[0]?.[0];
-
-  return {
-    title: entry?.seo?.title,
-    description: entry?.seo?.description,
-    robots: {
-      index: entry?.seo?.no_index || false,
-      follow: entry?.seo?.no_follow || false,
-    },
-    openGraph: {
-      title: entry?.seo?.og_meta_tags?.title,
-      description: entry?.seo?.og_meta_tags?.description,
-      images: entry?.seo?.og_meta_tags?.image,
-    },
-  }
+  openGraph: {
+    title: "Red Panda Resort",
+    description: "Red Panda Resort is a luxury resort located in the heart of the Himalayas. It is a perfect place for a relaxing vacation.",
+    images: [
+      {
+        url: "https://www.redpandaresort.com/images/logo.png",
+      },
+    ],
+  },
 };
 
 export default async function RootLayout({

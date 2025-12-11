@@ -20,29 +20,23 @@ import LeadCapture from "@/components/leadCapture";
 import ProductFeature from "@/components/productFeature";
 import RecommendationsBanner from "@/components/recommendationsBanner";
 import { useParams } from "next/navigation";
+import { useDataContext } from "@/context/data.context";
+import { pagesReferences } from "@/helpers/referencePaths";
 
 export default function Page({ }) {
     const [entry, setEntry] = useState({});
     const [isKiosk, setIsKiosk] = useState(false);
     const params = useParams();
 
+    const initialData = useDataContext();
+
     const getContent = async () => {
         const entry = await ContentstackClient.getElementByUrlWithRefs(
             "page",
             "/pages/" + params.title,
             params.locale,
-            [
-                'modular_blocks.hero.hero',
-                'modular_blocks.hero_banner.hero',
-                'modular_blocks.articles.articles',
-                'modular_blocks.review.reference', 
-                'modular_blocks.image_grid.image.page', 
-                'modular_blocks.review.testimonials', 
-                'modular_blocks.review.testimonials.reviews.review',
-                'modular_blocks.product_banner.plp',
-                'modular_blocks.cards.card.page',
-                'modular_blocks.text_and_image.page'
-            ]
+            pagesReferences,
+            initialData
         );
         setEntry(entry[0]);
     };
