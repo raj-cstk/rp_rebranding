@@ -66,12 +66,12 @@ export default function SlidePanel() {
 
   return (
     <div
-      className={`flex-shrink-0 h-screen w-[450px] bg-white transition-transform duration-300 ease-in-out overflow-y-auto border-l-[1px] border-neutral-100 ${
+      className={`fixed top-0 right-0 h-screen w-[450px] bg-white transition-transform duration-300 ease-in-out overflow-y-auto z-50 ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}
     >
       <div className="flex flex-col shadow-xl bg-white h-full">
-        <div className="flex justify-between items-end bg-[#404040] py-1 px-2">
+        <div className="flex justify-between items-end bg-[#404040] py-1 px-2 flex-shrink-0">
           <div className="p-2 mx-1 flex">
             <img
               className="h-[20px]"
@@ -90,8 +90,8 @@ export default function SlidePanel() {
           </button>
         </div>
 
-        <div className="h-full w-full rounded-b-xl mb-2 bg-white flex flex-col">
-          <Menu as="div" className="relative inline-block text-center w-full">
+        <div className="flex-1 w-full rounded-b-xl mb-2 bg-white flex flex-col min-h-0">
+          <Menu as="div" className="relative inline-block text-center w-full flex-shrink-0">
             <div>
               <MenuButton className="inline-flex justify-center w-full px-4 py-3 text-sm font-semibold border-neutral rounded-b-md shadow-sm text-[#6351e3] bg-white hover:bg-gray-50 font-roboto tracking-wide">
                 {selectedLabel}

@@ -6,16 +6,16 @@ function AppContent({ children }) {
   const { isOpen } = useSlidePanel();
 
   return (
-    <div className="flex w-full min-h-screen overflow-hidden">
+    <>
       <div
-        className={`flex-shrink-0 transition-all duration-300 ease-in-out ${
-          isOpen ? 'w-[calc(100%-450px)]' : 'w-full'
+        className={`transition-all duration-300 ease-in-out ${
+          isOpen ? 'mr-[450px]' : 'mr-0'
         }`}
       >
         {children}
       </div>
       <SlidePanel />
-    </div>
+    </>
   );
 }
 

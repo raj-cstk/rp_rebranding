@@ -238,7 +238,7 @@ getElementByUrlWithRefs(type, url, locale, references, live_preview, variantPara
         .locale(locale ? locale : "en")
         .variants(deserializeVariantIds(variantParam))
         .addParams({ "include_applied_variants": "true" })
-        .query({ "url": { $eq: `/plp/${url}` } })
+        .query({ "url": { $eq:url } })
         .find()
         .then(
           function success(data) {

@@ -40,6 +40,8 @@ export default function Page({  }) {
   const jstag = useJstag();
   const params = useParams();
   const router = useRouter();
+  const [variants, setVariants] = useState([]);
+  const [variantsOpen, setVariantsOpen] = useState(false);
 
   const handleGoBack = () => {
     router.back();
@@ -106,9 +108,14 @@ export default function Page({  }) {
     })
       .then((response) => response.json())
       .then((result) => {
-        console.log('fetch result', result);
-        setProduct(result.product);
-        setIsLoading(false);
+        if(result.product && result.product.products.length > 1) {
+          setVariants(result.product.products);
+        }
+        console.log(result.product.products)
+        if(result.product.products && result.product.products.length > 0) {
+          setProduct(result.product.products[0]);
+          setIsLoading(false);
+        }
       })
       .catch((error) => console.error(error));
   };
@@ -163,68 +170,79 @@ export default function Page({  }) {
               <ArrowLeftIcon className="h-5 w-5 mr-2" />
               <p className="inline-block">Back to previous products</p>
             </button>
+            <div className="mt-4 flex gap-4">
+              {/* Thumbnails column */}
+              <div className="flex flex-col gap-3">
+                {((entry?.images?.length === 0 || !entry?.images) ||
+                  (product?.media && product.media?.[0] && product.media?.[0]?.media?.[0])) && (
+                  <div className="flex flex-col gap-3">
+                    {product.media?.[0]?.media.map((image, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        className={
+                          "border p-1 cursor-pointer bg-white " +
+                          (imageIndex === index ? "border-black" : "border-gray-300")
+                        }
+                        onClick={() => setImageIndex(index)}
+                      >
+                        <img
+                          className="h-[68px] w-[68px] object-cover"
+                          src={image?.path}
+                          alt={product?.name || `Product image ${index + 1}`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {entry?.images?.length > 0 && (
+                  <div className="flex flex-col gap-3">
+                    {entry?.images?.map((image, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        className={
+                          "border p-1 cursor-pointer bg-white " +
+                          (imageIndex === index ? "border-black" : "border-gray-300")
+                        }
+                        onClick={() => setImageIndex(index)}
+                      >
+                        <img
+                          className="h-[68px] w-[68px] object-cover"
+                          src={image.image?.url}
+                          alt={entry?.product_name || `Product image ${index + 1}`}
+                          {...image?.$?.image}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-            {product?.images?.length > 0 && (
-              <img
-                className="object-cover mx-auto h-[500px] w-full"
-                src={
-                  entry?.images?.length > 0
-                    ? entry?.images[imageIndex].image?.url
-                    : product?.images[imageIndex].path
-                }
-              />
-            )}
-
-            <div className="mt-10 flex">
-              {(entry?.images?.length === 0 || !entry?.images) && (
-                <div className="flex gap-5 mx-auto">
-                  {product?.images?.map((image, index) => (
-                    <div
-                      key={index}
-                      className={
-                        "border p-2 cursor-pointer " +
-                        (imageIndex === index
-                          ? "border-black"
-                          : "border-gray-300")
-                      }
-                      onClick={() => setImageIndex(index)}
-                    >
-                      <img
-                        className="h-[68px] w-[68px] object-cover"
-                        src={image?.path}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-              {entry?.images?.length > 0 && (
-                <div className="flex gap-5 mx-auto">
-                  {entry?.images?.map((image, index) => (
-                    <div
-                      key={index}
-                      className={
-                        "border p-2 cursor-pointer " +
-                        (imageIndex === index
-                          ? "border-black"
-                          : "border-gray-300")
-                      }
-                      onClick={() => setImageIndex(index)}
-                    >
-                      <img
-                        className="h-[68px] w-[68px]"
-                        src={image.image?.url}
-                        {...image?.$?.image}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
+              {/* Main image */}
+              <div className="flex-1">
+                {(product?.media && product.media?.[0] && product.media?.[0]?.media?.[0]) && (
+                  <img
+                    className="object-cover mx-auto h-[500px] w-full"
+                    src={product?.media[0].media[imageIndex].path}
+                    alt={product?.name || "Product image"}
+                  />
+                )}
+                {(!product?.media || !product.media?.[0]?.media?.[0]) && entry?.images?.[imageIndex]?.image?.url && (
+                  <img
+                    className="object-cover mx-auto h-[500px] w-full"
+                    src={entry.images[imageIndex].image.url}
+                    alt={entry?.product_name || "Product image"}
+                    {...entry.images[imageIndex].$?.image}
+                  />
+                )}
+              </div>
             </div>
           </div>
 
           <div className="md:w-1/2 mt-10">
             <h2 className="text-[24px] leading-none mt-8" {...entry?.$?.product_name}>
-              {entry?.product_name ? entry?.product_name : product?.name}
+              {entry?.product_name ? entry?.product_name : product?.product_translations?.[0].name}
             </h2>
             <div className="mt-8 md:w-3/4">
               <p>{entry?.teaser ? entry?.teaser : product?.custom_data?.find(obj => obj.key === "teaser")?.value}</p>
@@ -241,6 +259,14 @@ export default function Page({  }) {
               >
                 Book Now
               </button>
+              {variants && variants.length > 0 && (
+                <button
+                  className="mt-4 w-full text-nowrap relative rounded-md button px-8 py-4 text-md tracking-widest uppercase bg-white font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:bg-cyan-600 hover:text-white"
+                  onClick={() => setVariantsOpen(true)}
+                >
+                  See All Variations
+                </button>
+              )}
             </div>
 
             
@@ -254,7 +280,7 @@ export default function Page({  }) {
           dangerouslySetInnerHTML={{
             __html: entry?.description
               ? entry?.description
-              : product?.description,
+              : product?.product_translations?.[0].description,
           }}
           {...entry?.$?.description}
         ></div>
@@ -449,6 +475,68 @@ export default function Page({  }) {
             )}
           </div>
         ))}
+      </div>
+
+      {/* Variants Slideout */}
+      {variantsOpen && (
+        <div
+          className="fixed top-0 h-full bg-black opacity-50 w-full z-40 transition-opacity duration-300"
+          onClick={() => setVariantsOpen(false)}
+        ></div>
+      )}
+      <div
+        className={`fixed w-[450px] z-50 h-full top-0 right-0 border-l bg-white shadow-lg transition-transform duration-300 ease-in-out ${
+          variantsOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex flex-col h-full">
+          <div className="flex justify-between items-center p-4 border-b">
+            <div className="text-lg font-cinzel">All Variations</div>
+            <XMarkIcon
+              className="size-6 cursor-pointer"
+              onClick={() => setVariantsOpen(false)}
+            />
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="grid grid-cols-1 gap-4">
+              {variants.map((variant, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => {
+                    setProduct(variant);
+                    setImageIndex(0);
+                    setVariantsOpen(false);
+                  }}
+                >
+                  {variant.media?.[0]?.media?.[0]?.path && (
+                    <img
+                      className="w-full h-48 object-cover rounded-md mb-3"
+                      src={variant.media[0].media[0].path}
+                      alt={variant.product_translations?.[0]?.name || "Variant"}
+                    />
+                  )}
+                  <div className="text-lg font-semibold mb-2">
+                    {variant.product_translations?.[0]?.name || variant.name}
+                  </div>
+                  {variant.price && (
+                    <p className="text-xl font-bold text-cyan-600">
+                      {variant.price}
+                    </p>
+                  )}
+                  {variant.product_translations?.[0]?.description && (
+                    <p className="text-sm text-gray-600 mt-2 line-clamp-2" dangerouslySetInnerHTML={{
+            __html: entry?.description
+              ? entry?.description
+              : variant.product_translations[0].description,
+          }}>
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       <Footer />
