@@ -6,6 +6,25 @@ const withNextIntl = createNextIntlPlugin();
 const nextConfig: NextConfig = {
   reactStrictMode: false,
   devIndicators: false,
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'wtxrbukgejhzplfwzamn.supabase.co',
+                pathname: '**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'images.contentstack.io',
+                pathname: '**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'images.unsplash.com',
+                pathname: '**',
+            }
+        ],
+    },
     env:{
         CONTENTSTACK_API_KEY: process.env.CONTENTSTACK_API_KEY,
         CONTENTSTACK_DELIVERY_TOKEN: process.env.CONTENTSTACK_DELIVERY_TOKEN,
@@ -24,6 +43,10 @@ const nextConfig: NextConfig = {
         LYTICS_API_KEY: process.env.LYTICS_API_KEY,
         LYTICS_COLLECTION_ID: process.env.LYTICS_COLLECTION_ID,
         CONTENTSTACK_TERM: process.env.CONTENTSTACK_TERM,
+
+        RED_PANDA_COMMERCE_STORE_ID: process.env.RED_PANDA_COMMERCE_STORE_ID,
+        RED_PANDA_COMMERCE_STORE_TOKEN: process.env.RED_PANDA_COMMERCE_STORE_TOKEN,
+        RED_PANDA_COMMERCE_API_URL: process.env.RED_PANDA_COMMERCE_API_URL,
     }
 };
 

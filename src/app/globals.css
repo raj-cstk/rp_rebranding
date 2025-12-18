@@ -95,7 +95,7 @@ h3 {
 p, label{
     font-size: 1.125rem;
     font-family: var(--font-poppins);
-    font-weight: 200;
+    font-weight: 00;
     letter-spacing: .05rem;
 }
 
@@ -153,3 +153,10 @@ strong {
     font-size: 1rem;
     letter-spacing: .02rem;
  }
+
+ .plp-description > p{
+    font-weight: 300;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    letter-spacing: .02rem;
+}
