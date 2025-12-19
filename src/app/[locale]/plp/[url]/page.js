@@ -85,13 +85,27 @@ export default function PLP() {
     })
 
     setEntry(entry);
-
-    await Promise.all([
-      getCategory(entry),
-      getProducts(entry?.[0]?.product_category?.items?.[0]?.id),
-      getFilters(entry?.[0]?.product_category?.items?.[0]?.id)
-    ])
+    getCategory(entry);
   };
+
+  useEffect(() => {
+    const getProducts = async (id) => {
+      const products = await RPCommerce.getProductsByCategory(id, params.locale);
+      setProducts(products);
+    }
+  
+    const getFilters = async (id) => {
+      const filters = await RPCommerce.getCategoryFilters(id, params.locale);
+      setCategoryFilters(filters);
+    }
+  
+    if(category?.id) {
+      Promise.all([
+        getProducts(category.id),
+        getFilters(category.id)
+      ])
+    }
+  }, [category, params.locale]);
 
   const getCategory = async (entry) => {
     const category = await RPCommerce.getCategoryByURL('/' + params.url, params.locale, true, 2) || entry?.[0]?.product_category?.items?.[0];
@@ -105,17 +119,6 @@ export default function PLP() {
     };
     setCategory(categoryData);
   }
-
-  const getProducts = async (id) => {
-    const products = await RPCommerce.getProductsByCategory(id, params.locale);
-    setProducts(products);
-  }
-
-  const getFilters = async (id) => {
-    const filters = await RPCommerce.getCategoryFilters(id, params.locale);
-    setCategoryFilters(filters);
-  }
-
 
   useEffect(() => {
     ContentstackClient.onEntryChange(getContent);
@@ -406,7 +409,7 @@ export default function PLP() {
       {!filterPanelOpen && (
         <button
           onClick={() => setFilterPanelOpen(true)}
-          className="fixed bottom-8 right-8 z-50 bg-white hover:bg-gray-50 text-gray-800 font-medium px-6 py-4 rounded-full shadow-lg border border-gray-400 flex items-center gap-2 transition-all duration-200 hover:shadow-xl"
+          className={`fixed ${(process.env.LIVE_PREVIEW_ENABLED) ? "bottom-16" : "bottom-8"} right-8 z-50 bg-white hover:bg-gray-50 text-gray-800 font-medium px-6 py-4 rounded-full shadow-lg border border-gray-400 flex items-center gap-2 transition-all duration-200 hover:shadow-xl ${filterPanelOpen ? "hidden" : ""}`}
         >
           <FontAwesomeIcon icon={faFilterList} />
           <span className="uppercase tracking-wide text-[0.8rem] font-light">Filters and Sorting</span>
