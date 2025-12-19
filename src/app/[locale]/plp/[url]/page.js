@@ -5,23 +5,19 @@ import Footer from "@/components/footer";
 import Header from "@/components/header";
 import PageHero from "@/components/pageHero";
 import TextSection from "@/components/textSection";
-import People from "@/components/people";
 import Hero from "@/components/hero";
 import ArticleBanner from "@/components/articleBanner";
 import ImageGrid from "@/components/imageGrid";
 import Tabs from "@/components/tabs";
 import Marquee from "@/components/marquee";
-import FormBuilder from "@/components/formBuilder";
 import Cards from "@/components/cards";
 import Reviews from "@/components/reviews";
 import CategoryBanner from "@/components/categoryBanner";
 import Agent from "@/components/agent";
 import LeadCapture from "@/components/leadCapture";
 import ProductFeature from "@/components/productFeature";
-import ResortPackage from "@/components/resortPackage";
 import { AnimatePresence, motion } from "framer-motion";
 import { useJstag } from "@/context/lyticsTracking";
-import RecommendationsBanner from "@/components/recommendationsBanner";
 import { useParams } from "next/navigation";
 import RPCommerce from "@/lib/rpcommerce";
 import CategoryHero from "@/components/categoryHero";
@@ -30,6 +26,8 @@ import FilterPanel from "@/components/filterPanel";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilterList } from '@awesome.me/kit-610837e1f9/icons/classic/solid';
 import { jsonToHTML } from '@contentstack/utils';
+import { useDataContext } from "@/context/data.context";
+import { plpReferences } from "@/helpers/referencePaths";
 
 export default function PLP() {
   const [entry, setEntry] = useState({});
@@ -41,6 +39,7 @@ export default function PLP() {
   const [categoryFilters, setCategoryFilters] = useState(null);
   const jstag = useJstag();
   const params = useParams();
+  const initialData = useDataContext();
 
 
   const getContent = async () => {
@@ -48,35 +47,8 @@ export default function PLP() {
       "plp",
       "/plp/" + params.url,
       params.locale,
-      [
-        'modular_blocks_top.hero.hero',
-        'modular_blocks_top.hero_banner.hero',
-        'modular_blocks_top.articles.articles',
-        'modular_blocks_top.review.reference',
-        'modular_blocks_top.image_grid.image.page',
-        'modular_blocks_top.review.testimonials',
-        'modular_blocks_top.review.testimonials.reviews.review',
-        'modular_blocks_top.product_banner.plp',
-        'modular_blocks_top.cards.card.page',
-        'modular_blocks_top.text_and_image.page',
-        'modular_blocks_top.resort_package.resort_package',
-        'modular_blocks_top.resort_package.resort_package.products',
-        'modular_blocks_top.category_banner.plp',
-
-        'modular_blocks_bottom.hero.hero',
-        'modular_blocks_bottom.hero_banner.hero',
-        'modular_blocks_bottom.articles.articles',
-        'modular_blocks_bottom.review.reference',
-        'modular_blocks_bottom.image_grid.image.page',
-        'modular_blocks_bottom.review.testimonials',
-        'modular_blocks_bottom.review.testimonials.reviews.review',
-        'modular_blocks_bottom.product_banner.plp',
-        'modular_blocks_bottom.cards.card.page',
-        'modular_blocks_bottom.text_and_image.page',
-        'modular_blocks_bottom.resort_package.resort_package',
-        'modular_blocks_bottom.resort_package.resort_package.products',
-        'modular_blocks_bottom.category_banner.plp'
-      ]
+      plpReferences,
+      initialData
     );
 
     jsonToHTML({
@@ -256,36 +228,11 @@ export default function PLP() {
 
                 const blockContent = (
                   <>
-                    {block.hasOwnProperty("resort_package") && (
-                      <motion.div
-                        key={`resort_package_${block.resort_package.resort_package[0]?.products?.map(p => p.uid).join("_")}`}
-                      // initial={{ opacity: 0, y: 20 }}
-                      // animate={{ opacity: 1, y: 0 }}
-                      // exit={{ opacity: 0, y: -20 }}
-                      // transition={{ duration: 0.5 }}
-                      >
-                        <ResortPackage
-                          content={block.resort_package.resort_package[0]}
-                          params={params}
-                          {...metadata}
-                        />
-                      </motion.div>
-                    )}
                     {block.hasOwnProperty("hero") && (
                       <PageHero
                         key={index}
                         content={block.hero}
                         {...metadata}
-                      />
-                    )}
-                    {block.hasOwnProperty("people") && (
-                      <People
-                        key={index}
-                        content={block.people}
-                        isKiosk={
-                          entry?.[0]?._applied_variants?.title ===
-                          "cs76fdee0e83c5c333"
-                        }
                       />
                     )}
                     {block.hasOwnProperty("text_block") && (
@@ -344,12 +291,6 @@ export default function PLP() {
                     {block.hasOwnProperty("marquee") && (
                       <Marquee key={index} content={block.marquee} />
                     )}
-                    {block.hasOwnProperty("form_builder") && (
-                      <FormBuilder key={index} content={block.form_builder} />
-                    )}
-                    {block.hasOwnProperty("recommendations_banner") && (
-                      <RecommendationsBanner key={index} content={block.recommendations_banner} />
-                    )}
                   </>
                 );
 
@@ -397,7 +338,7 @@ export default function PLP() {
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false, amount: 0.1 }}
-                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <ProductCard item={item} />
                 </motion.div>
@@ -433,36 +374,11 @@ export default function PLP() {
 
             const blockContent = (
               <>
-                {block.hasOwnProperty("resort_package") && (
-                  <motion.div
-                    key={`resort_package_${block.resort_package.resort_package[0]?.products?.map(p => p.uid).join("_")}`}
-                  // initial={{ opacity: 0, y: 20 }}
-                  // animate={{ opacity: 1, y: 0 }}
-                  // exit={{ opacity: 0, y: -20 }}
-                  // transition={{ duration: 0.5 }}
-                  >
-                    <ResortPackage
-                      content={block.resort_package.resort_package[0]}
-                      params={params}
-                      {...metadata}
-                    />
-                  </motion.div>
-                )}
                 {block.hasOwnProperty("hero") && (
                   <PageHero
                     key={index}
                     content={block.hero}
                     {...metadata}
-                  />
-                )}
-                {block.hasOwnProperty("people") && (
-                  <People
-                    key={index}
-                    content={block.people}
-                    isKiosk={
-                      entry?.[0]?._applied_variants?.title ===
-                      "cs76fdee0e83c5c333"
-                    }
                   />
                 )}
                 {block.hasOwnProperty("text_block") && (
@@ -520,12 +436,6 @@ export default function PLP() {
                 )}
                 {block.hasOwnProperty("marquee") && (
                   <Marquee key={index} content={block.marquee} />
-                )}
-                {block.hasOwnProperty("form_builder") && (
-                  <FormBuilder key={index} content={block.form_builder} />
-                )}
-                {block.hasOwnProperty("recommendations_banner") && (
-                  <RecommendationsBanner key={index} content={block.recommendations_banner} />
                 )}
               </>
             );

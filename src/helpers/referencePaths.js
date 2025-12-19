@@ -22,3 +22,33 @@ export const pagesReferences = [
     'modular_blocks.cards.card.page',
     'modular_blocks.text_and_image.page'
 ]
+
+export const plpReferences = [
+    'modular_blocks_top.hero.hero',
+    'modular_blocks_top.hero_banner.hero',
+    'modular_blocks_top.articles.articles',
+    'modular_blocks_top.review.reference',
+    'modular_blocks_top.image_grid.image.page',
+    'modular_blocks_top.review.testimonials',
+    'modular_blocks_top.review.testimonials.reviews.review',
+    'modular_blocks_top.product_banner.plp',
+    'modular_blocks_top.cards.card.page',
+    'modular_blocks_top.text_and_image.page',
+    'modular_blocks_top.resort_package.resort_package',
+    'modular_blocks_top.resort_package.resort_package.products',
+    'modular_blocks_top.category_banner.plp',
+
+    'modular_blocks_bottom.hero.hero',
+    'modular_blocks_bottom.hero_banner.hero',
+    'modular_blocks_bottom.articles.articles',
+    'modular_blocks_bottom.review.reference',
+    'modular_blocks_bottom.image_grid.image.page',
+    'modular_blocks_bottom.review.testimonials',
+    'modular_blocks_bottom.review.testimonials.reviews.review',
+    'modular_blocks_bottom.product_banner.plp',
+    'modular_blocks_bottom.cards.card.page',
+    'modular_blocks_bottom.text_and_image.page',
+    'modular_blocks_bottom.resort_package.resort_package',
+    'modular_blocks_bottom.resort_package.resort_package.products',
+    'modular_blocks_bottom.category_banner.plp'
+]

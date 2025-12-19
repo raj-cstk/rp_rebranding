@@ -10,7 +10,7 @@ export default function CategoryBanner({ content, locale }) {
   
   useEffect(() => {
     const getCategory = async () => {
-      const category = await RPCommerce.getCategoryByURL((content?.categories?.items[0]?.url) ? (content.categories.items[0].url) : ('/' + content.title.toLowerCase()), locale, true, 2) || content.categories?.items?.[0];
+      const category = await RPCommerce.getCategoryByURL((content?.categories?.items?.[0]?.url) ? (content.categories.items?.[0]?.url) : ('/' + content.title.toLowerCase()), locale, true, 2) || content.categories?.items?.[0];
       const categoryData = {
         ...(category || {}),
         name: content.title || category?.name,

@@ -39,7 +39,7 @@ export const generateMetadata = async ({ params }) => {
     }
 };
 
-export default async function PagesLayout({
+export default async function ArticlesLayout({
     children,
     params,
 }) {
