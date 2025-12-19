@@ -31,14 +31,14 @@ export default function CategoryHero({ category, locale }) {
         )}
       </div>
 
-      <div className="w-full md:w-[45%] flex flex-col gap-4 md:mt-6 ml-8 md:ml-0">
+      <div className="w-full md:w-[45%] flex flex-col gap-4 md:mt-6 ml-8 md:ml-0 mr-10">
         {category.children && category.children.length > 0 && (
-          <div className="flex flex-wrap gap-8 uppercase font-medium tracking-widest text-md text-gray-800 mb-6" {...category?.$?.product_category}>
+          <div className="flex flex-nowrap gap-8 uppercase font-medium tracking-widest text-md text-gray-800 mb-6 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pb-2" {...category?.$?.product_category}>
             {category.children.map((child, index) => (
               <Link 
                 key={child.id} 
                 href={child.url ? `/${locale}/plp${child.url}` : '#'}
-                className={`hover:underline hover:text-cyan-600 ${child.url === category.url ? 'text-cyan-600' : 'text-gray-800'} ${index === 0 ? 'underline' : ''}`}
+                className={`hover:underline hover:text-cyan-600 whitespace-nowrap ${child.url === category.url ? 'text-cyan-600' : 'text-gray-800'} ${index === 0 ? 'underline' : ''}`}
               >
                 {child.name}
               </Link>
@@ -46,11 +46,11 @@ export default function CategoryHero({ category, locale }) {
           </div>
         )}
 
-        <h1 className="font-medium! text-4xl! text-black !font-sans !tracking-[0.05em]" {...category?.$?.headline}>
+        <h1 className="font-medium! text-4xl! text-black !font-sans !tracking-[0.05em] line-clamp-1" {...category?.$?.headline}>
           {category.name}
         </h1>
 
-        <div className="text-md plp-description leading-relaxed" {...category?.$?.description}>
+        <div className="text-md plp-description leading-relaxed line-clamp-9" {...category?.$?.description}>
           {parse(category.description) || `Explore our exclusive ${category.name} collection.`}
         </div>
       </div>
