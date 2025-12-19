@@ -7,7 +7,7 @@ export default function CategoryHero({ category, locale }) {
 
   return (
     <div className="flex flex-col md:flex-row w-full mx-auto md:gap-15 gap-8 items-start bg-white mb-8 md:h-[400px] overflow-hidden">
-      <div className="w-full md:w-[55%] aspect-square relative">
+      <div className="overflow-hidden md:h-[400px] w-full md:w-[55%] aspect-square relative" {...(category.video ? category?.$?.video : category?.$?.image)}>
         {category.video ? (
           <video
             src={category.video}
@@ -33,7 +33,7 @@ export default function CategoryHero({ category, locale }) {
 
       <div className="w-full md:w-[45%] flex flex-col gap-4 md:mt-6 ml-8 md:ml-0">
         {category.children && category.children.length > 0 && (
-          <div className="flex flex-wrap gap-8 uppercase font-medium tracking-widest text-md text-gray-800 mb-6">
+          <div className="flex flex-wrap gap-8 uppercase font-medium tracking-widest text-md text-gray-800 mb-6" {...category?.$?.product_category}>
             {category.children.map((child, index) => (
               <Link 
                 key={child.id} 
@@ -46,11 +46,11 @@ export default function CategoryHero({ category, locale }) {
           </div>
         )}
 
-        <h1 className="font-medium! text-4xl! text-black !font-sans !tracking-[0.05em]">
+        <h1 className="font-medium! text-4xl! text-black !font-sans !tracking-[0.05em]" {...category?.$?.headline}>
           {category.name}
         </h1>
 
-        <div className="text-md plp-description leading-relaxed">
+        <div className="text-md plp-description leading-relaxed" {...category?.$?.description}>
           {parse(category.description) || `Explore our exclusive ${category.name} collection.`}
         </div>
       </div>

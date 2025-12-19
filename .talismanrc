@@ -1,12 +1,4 @@
 fileignoreconfig:
 - filename: package-lock.json
-  checksum: 2d0797cdad4737cc12ecb88aa44a18e4ca20b028ce318c6131014aecdf611948
-- filename: src/components/categoryBanner.js
-  checksum: 79bbd7abe8e2a6564a75f19859e0c750fe73c92aa7bc9f5128f748df655f89f9
-- filename: src/components/categoryHero.js
-  checksum: a14f5110ea013c775dc02914bbe876c7f5532913b91fab9f88090c6007cfde8e
-- filename: src/components/filterPanel.js
-  checksum: 9afc1082926758b5d912d19b51fc552178a20ca970ba9d91b01f88eca8c7ae8f
-- filename: src/app/[locale]/plp/[url]/page.js
-  checksum: 3629e22611617d8bb0615f8ca3f8a9185368b306821b8fbe2c44265a787d3efa
+  checksum: e4a3a61574d08c16860bfd62f9435abc340aa017c09f37be4ef670512172a7ad
 version: "1.0"

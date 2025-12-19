@@ -9,17 +9,20 @@ export default function CategoryBanner({ content }) {
     description: content.description || content.categories?.items?.[0]?.description,
     image: content.image?.url || content.categories?.items?.[0]?.image?.url,
     video: content.video?.url || content.categories?.items?.[0]?.video?.url,
-    children: content.categories?.items?.[0]?.children
+    children: content.categories?.items?.[0]?.children,
+    plp: content.plp,
+    plp_link_text: content.plp_link_text,
+    $: content?.$
   }
 
   if (!category || !category.name) return null;
 
   return (
     <div className="flex flex-col md:flex-row w-full mx-auto md:gap-15 gap-8 items-start bg-white mb-8 md:h-[400px] overflow-hidden">
-      <div className="w-full md:w-[55%] aspect-square relative">
+      <div className="overflow-hidden md:h-[400px]  w-full md:w-[55%] aspect-square relative" {...(category.video ? category?.$?.video : category?.$?.image)}>
         {category.video ? (
           <video
-            src={content.video.url}
+            src={category.video}
             className="w-full h-full object-cover"
             autoPlay
             loop
@@ -42,7 +45,7 @@ export default function CategoryBanner({ content }) {
 
       <div className="w-full md:w-[45%] flex flex-col gap-4 md:mt-6 ml-8 md:ml-0">
         {category.children && category.children.length > 0 && (
-          <div className="flex flex-wrap gap-8 uppercase font-medium tracking-widest text-md text-gray-800 mb-6">
+          <div className="flex flex-wrap gap-8 uppercase font-medium tracking-widest text-md text-gray-800 mb-6" {...category?.$?.categories}>
             {category.children.map((item, index) => (
               <Link
                 key={item.id}
@@ -55,7 +58,7 @@ export default function CategoryBanner({ content }) {
           </div>
         )}
 
-        <h1 className="font-medium! text-4xl! text-black !font-sans !tracking-[0.05em]" {...content?.$?.title}>
+        <h1 className="font-medium! text-4xl! text-black !font-sans !tracking-[0.05em]" {...category?.$?.title}>
           {category.name}
         </h1>
 
@@ -63,9 +66,9 @@ export default function CategoryBanner({ content }) {
           {category.description ? parse(category.description) : ''}
         </div>
 
-        {content.plp && content.plp.length > 0 && content.plp[0].url && (
+        {category.plp && category.plp.length > 0 && category.plp[0].url && (
           <Link
-            href={content.plp[0].url}
+            href={category.plp[0].url}
             className="inline-flex items-center mt-4 px-6 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition-colors font-medium text-sm uppercase tracking-wider w-fit"
             {...content?.$?.plp}
           >

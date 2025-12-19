@@ -78,8 +78,6 @@ export default function PLP() {
       ]
     );
 
-    console.log("entry", entry);
-
     setEntry(entry);
 
     let category = (entry?.[0]?.product_category?.items?.[0])
@@ -92,11 +90,10 @@ export default function PLP() {
       description: entry?.[0]?.description || category.description,
       image: entry?.[0]?.image?.url || category.image,
       video: entry?.[0]?.video?.url || null,
+      $: entry?.[0]?.$
     };
 
     setCategory(category);
-
-    console.log("category", category);
 
 
     await Promise.all([
@@ -107,13 +104,11 @@ export default function PLP() {
 
   const getProducts = async (id) => {
     const products = await RPCommerce.getProductsByCategory(id, params.locale);
-    console.log("products", products);
     setProducts(products);
   }
 
   const getFilters = async (id) => {
     const filters = await RPCommerce.getCategoryFilters(id);
-    console.log("filters", filters);
     setCategoryFilters(filters);
   }
 
@@ -368,7 +363,7 @@ export default function PLP() {
               })}
             </div>
           </AnimatePresence>
-          {entry?.[0]?.show_category_banner && (
+          {(!entry || !entry?.[0] || entry?.[0]?.show_category_hero) && (
             <CategoryHero category={category} locale={params.locale} />
           )}
           <FilterPanel
