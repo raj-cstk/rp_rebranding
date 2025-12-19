@@ -5,7 +5,7 @@ const headers = {
 
 const RPCommerce = {
     getCategoryByURL: async (url, locale, includeSubCategories = true, level = 2) => {
-        const response = await fetch(`${baseURL}/categories/categoryByUrl?url=${url}&includeSubCategories=${includeSubCategories}&locale=${locale}&level=${level}`, {
+        const response = await fetch(`${baseURL}/categories/categoryByUrl?url=${url}&includeSubCategories=${includeSubCategories}&locale=${locale}&level=${level}&useFallbackLocale=true`, {
             headers: headers
         });
         if (!response.ok) {
@@ -17,7 +17,7 @@ const RPCommerce = {
     },
 
     getProductsByCategory: async (categoryId, locale) => {
-        const response = await fetch(`${baseURL}/products?includeTags=true&includeCategories=true&categories=${categoryId}&includeVariants=true&locale=${locale}&includeMedia=true&includeAttributes=true`, {
+        const response = await fetch(`${baseURL}/products?includeTags=true&includeCategories=true&categories=${categoryId}&includeVariants=true&locale=${locale}&includeMedia=true&includeAttributes=true&useFallbackLocale=true`, {
             headers: headers
         });
         if (!response.ok) {
@@ -29,7 +29,7 @@ const RPCommerce = {
     },
 
     getCategoryFilters: async (categoryId, locale) => {
-        const response = await fetch(`${baseURL}/filters/categories/${categoryId}?locale=${locale}`, {
+        const response = await fetch(`${baseURL}/filters/categories/${categoryId}?locale=${locale}&useFallbackLocale=true`, {
             headers: headers
         });
         if (!response.ok) {
