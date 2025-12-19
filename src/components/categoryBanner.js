@@ -2,20 +2,33 @@ import Image from 'next/image';
 import Link from 'next/link';
 import parse from "html-react-parser";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
+import { useState, useEffect } from 'react';
+import RPCommerce from '@/lib/rpcommerce';
 
-export default function CategoryBanner({ content }) {
-  const category = {
-    name: content.title || content.categories?.items?.[0]?.name,
-    description: content.description || content.categories?.items?.[0]?.description,
-    image: content.image?.url || content.categories?.items?.[0]?.image?.url,
-    video: content.video?.url || content.categories?.items?.[0]?.video?.url,
-    children: content.categories?.items?.[0]?.children,
-    plp: content.plp,
-    plp_link_text: content.plp_link_text,
-    $: content?.$
-  }
-
-  if (!category || !category.name) return null;
+export default function CategoryBanner({ content, locale }) {
+  const [category, setCategory] = useState(null);
+  
+  useEffect(() => {
+    const getCategory = async () => {
+      const category = await RPCommerce.getCategoryByURL((content?.categories?.items[0]?.url) ? (content.categories.items[0].url) : ('/' + content.title.toLowerCase()), locale, true, 2) || content.categories?.items?.[0];
+      const categoryData = {
+        ...(category || {}),
+        name: content.title || category?.name,
+        description: (content.description && content.description != "<p></p>" && content.description != "") ? content.description : category?.description,
+        image: content.image?.url || category?.image,
+        video: content.video?.url || null,
+        $: content?.$,
+        plp: content.plp,
+        plp_link_text: content.plp_link_text,
+      };
+      return categoryData;
+    }
+    
+    
+    getCategory().then(setCategory);
+  }, [content, locale]);
+  
+  if (!content || !category || !category.name) return null;
 
   return (
     <div className="flex flex-col md:flex-row w-full mx-auto md:gap-15 gap-8 items-start bg-white mb-8 md:h-[400px] overflow-hidden">
@@ -62,7 +75,7 @@ export default function CategoryBanner({ content }) {
           {category.name}
         </h1>
 
-        <div className="text-md plp-description leading-relaxed line-clamp-5" {...content?.$?.description}>
+        <div className="text-md plp-description leading-relaxed line-clamp-5 h-[150px] overflow-hidden" {...content?.$?.description}>
           {category.description ? parse(category.description) : ''}
         </div>
 

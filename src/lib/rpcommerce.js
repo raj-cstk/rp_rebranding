@@ -8,7 +8,7 @@ const RPCommerce = {
             }
         });
         if (!response.ok) {
-            throw new Error(`Failed to fetch category tree: ${response.statusText}`);
+            return null;
         }
 
         const data = await response.json();
@@ -22,21 +22,21 @@ const RPCommerce = {
             }
         });
         if (!response.ok) {
-            throw new Error(`Failed to fetch products by category: ${response.statusText}`);
+            return null;
         }
 
         const data = await response.json();
         return data.products;
     },
 
-    getCategoryFilters: async (categoryId) => {
-        const response = await fetch(`${baseURL}/filters/categories/${categoryId}?locale=en`, {
+    getCategoryFilters: async (categoryId, locale) => {
+        const response = await fetch(`${baseURL}/filters/categories/${categoryId}?locale=${locale}`, {
             headers: {
                 'authorization': process.env.RED_PANDA_COMMERCE_STORE_TOKEN
             }
         });
         if (!response.ok) {
-            throw new Error(`Failed to fetch category filters: ${response.statusText}`);
+            return null;
         }
         return response.json();
     }

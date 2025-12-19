@@ -29,6 +29,7 @@ import ProductCard from "@/components/productCard";
 import FilterPanel from "@/components/filterPanel";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilterList } from '@awesome.me/kit-610837e1f9/icons/classic/solid';
+import { jsonToHTML } from '@contentstack/utils';
 
 export default function PLP() {
   const [entry, setEntry] = useState({});
@@ -78,29 +79,32 @@ export default function PLP() {
       ]
     );
 
+    jsonToHTML({
+        entry: entry,
+        paths: ['modular_blocks_top.category_banner.description', 'modular_blocks_bottom.category_banner.description', 'description']
+    })
+
     setEntry(entry);
 
-    let category = (entry?.[0]?.product_category?.items?.[0])
-      ? entry?.[0]?.product_category?.items?.[0]
-      : await RPCommerce.getCategoryByURL('/' + params.url, params.locale, true, 2);
+    await Promise.all([
+      getCategory(entry),
+      getProducts(entry?.[0]?.product_category?.items?.[0]?.id),
+      getFilters(entry?.[0]?.product_category?.items?.[0]?.id)
+    ])
+  };
 
-    category = {
-      ...category,
+  const getCategory = async (entry) => {
+    const category = await RPCommerce.getCategoryByURL('/' + params.url, params.locale, true, 2) || entry?.[0]?.product_category?.items?.[0];
+    const categoryData = {
+      ...(category || {}),
       name: entry?.[0]?.headline || category.name,
-      description: entry?.[0]?.description || category.description,
+      description: (entry?.[0]?.description && entry?.[0]?.description != "<p></p>" && entry?.[0]?.description != "") ? entry?.[0]?.description : category.description,
       image: entry?.[0]?.image?.url || category.image,
       video: entry?.[0]?.video?.url || null,
       $: entry?.[0]?.$
     };
-
-    setCategory(category);
-
-
-    await Promise.all([
-      getProducts(category.id),
-      getFilters(category.id)
-    ])
-  };
+    setCategory(categoryData);
+  }
 
   const getProducts = async (id) => {
     const products = await RPCommerce.getProductsByCategory(id, params.locale);
@@ -108,7 +112,7 @@ export default function PLP() {
   }
 
   const getFilters = async (id) => {
-    const filters = await RPCommerce.getCategoryFilters(id);
+    const filters = await RPCommerce.getCategoryFilters(id, params.locale);
     setCategoryFilters(filters);
   }
 
@@ -300,6 +304,7 @@ export default function PLP() {
                       <CategoryBanner
                         key={index}
                         content={block.category_banner}
+                        locale={params.locale}
                       />
                     )}
                     {block.hasOwnProperty("lead_capture") && (
@@ -476,6 +481,7 @@ export default function PLP() {
                   <CategoryBanner
                     key={index}
                     content={block.category_banner}
+                    locale={params.locale}
                   />
                 )}
                 {block.hasOwnProperty("lead_capture") && (
