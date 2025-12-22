@@ -36,6 +36,17 @@ const RPCommerce = {
             return null;
         }
         return response.json();
+    },
+
+    getProductByUrl: async (id, locale) => {
+        const response = await fetch(`${baseURL}/products?url=${id}&locale=${locale}&includeMedia=true&includeVariants=true&includeAttributes=true&includeAttributesMap=true&includeCategories=true&includeTags=true&includeCustomData=true`, {
+            headers: headers
+        });
+        if (!response.ok) {
+            return null;
+        }
+        const data = await response.json();
+        return data.products;
     }
 };
 

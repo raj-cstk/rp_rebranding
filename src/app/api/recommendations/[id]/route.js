@@ -2,7 +2,7 @@ export async function GET(request, { params }) {
   const { id } = params;
 
   const res = await fetch(
-    `https://api.lytics.io/api/content/recommend/user/_uids/${id}?contentsegment=${process.env.LYTICS_COLLECTION_ID}&limit=5&shuffle=true`,
+    `https://api.lytics.io/api/content/recommend/user/_uids/${id}?contentsegment=${process.env.LYTICS_COLLECTION_ID}&limit=3&shuffle=true`,
     {
       method: 'GET',
       headers: {

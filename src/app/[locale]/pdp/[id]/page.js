@@ -4,7 +4,7 @@ import { ContentstackClient } from "@/lib/contentstack-client"
 import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
 import { LyticsTracking, useEntity, useJstag } from "@/context/lyticsTracking";
 import { Dialog, DialogPanel, DialogBackdrop } from "@headlessui/react";
@@ -26,6 +26,7 @@ import ProductFeature from "@/components/productFeature";
 import RecommendationsBanner from "@/components/recommendationsBanner";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import RPCommerce from "@/lib/rpcommerce";
 
 
 export default function Page({  }) {
@@ -42,6 +43,7 @@ export default function Page({  }) {
   const router = useRouter();
   const [variants, setVariants] = useState([]);
   const [variantsOpen, setVariantsOpen] = useState(false);
+  const [variantImageIndices, setVariantImageIndices] = useState({});
 
   const handleGoBack = () => {
     router.back();
@@ -62,16 +64,14 @@ export default function Page({  }) {
     setInputValue("");
   }
 
-  function getRandomNumberBetween15And20() {
-  return Math.floor(Math.random() * (20 - 15 + 1)) + 15;
-  }
+  // function getRandomNumberBetween15And20() {
+  // return Math.floor(Math.random() * (20 - 15 + 1)) + 15;
+  // }
 
 
   const getContent = async () => {
     if (params.id === "untitled" || !params.id) return;
-    let theEntry = await ContentstackClient.getPDPbyProduct("pdp", params.id, params.locale);
-    if (!theEntry) {
-      theEntry = await ContentstackClient.getElementByUrlWithRefs(
+      const entry = await ContentstackClient.getElementByUrlWithRefs(
         "pdp",
         "/pdp/" + params.id,
         params.locale,
@@ -88,56 +88,46 @@ export default function Page({  }) {
           'modular_blocks.text_and_image.page'
         ]
       );
-      if (theEntry?.product?.data.length > 0 && theEntry?.product?.data[0].url)
-        getProduct(theEntry.product.data[0].url);
-      else getProduct(params.id);
-    } else {
-      getProduct(params.id);
+      if (entry && entry?.length > 0){
+        setEntry(entry?.[0]);
+        setVariants(entry?.[0]?.variants?.items)
+    } else if(!entry){
+      getProductsbyURL(params.id)
     }
 
-    console.log("pdp", theEntry);
-
-    setEntry(theEntry);
-    if (theEntry || product) setIsLoading(false);
+    if (entry || product) setIsLoading(false);
   };
 
-  const getProduct = async (id) => {
-    console.log("fetching by url", id);
-    let result = await fetch("/api/products/" + id, {
-      method: "GET",
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        if(result.product && result.product.products.length > 1) {
-          setVariants(result.product.products);
+  const getProductsbyURL = async (id) => {
+      const products = await RPCommerce.getProductByUrl(id, params.locale);
+      if(products && products.length > 0) {
+          setVariants(products?.[0]?.variants);
         }
-        console.log(result.product.products)
-        if(result.product.products && result.product.products.length > 0) {
-          setProduct(result.product.products[0]);
+       //console.log(products)
+        if(products && products.length > 0) {
+          setProduct(products?.[0]);
           setIsLoading(false);
         }
-      })
-      .catch((error) => console.error(error));
-  };
+    }
 
   useEffect(() => {
     ContentstackClient.onEntryChange(getContent);
   }, []);
 
-  useEffect(() => {
-    const tags = entry?.tags
-    if(tags){
-     Object.keys(tags).forEach(key => {
-      if(tags[key] === 'adventure'){
-        const number = getRandomNumberBetween15And20();
-        if ((!lyticsProfileData?.data?.user?.likely_premier_score) || (lyticsProfileData?.data?.user?.likely_premier_score <= 80)){
-          jstag.send({likely_premier_score: number});
-          jstag.call('resetPolling');
-        }
-      }
-    });
-  }
-  }, [entry]);
+  // useEffect(() => {
+  //   const tags = entry?.tags
+  //   if(tags){
+  //    Object.keys(tags).forEach(key => {
+  //     if(tags[key] === 'adventure'){
+  //       const number = getRandomNumberBetween15And20();
+  //       if ((!lyticsProfileData?.data?.user?.likely_premier_score) || (lyticsProfileData?.data?.user?.likely_premier_score <= 80)){
+  //         jstag.send({likely_premier_score: number});
+  //         jstag.call('resetPolling');
+  //       }
+  //     }
+  //   });
+  // }
+  // }, [entry]);
 
   useEffect(() => {
     //console.log("lytics use effect", lyticsProfileData);
@@ -159,6 +149,7 @@ export default function Page({  }) {
   return (
     <div className="relative">
       <Header locale={params.locale} />
+      {console.log(entry)}
       <LyticsTracking></LyticsTracking>
       <div className="max-w-8xl mx-auto px-8 pt-10 flex flex-col font-paragraph mb-12">
         <div className="w-full md:flex gap-16">
@@ -171,17 +162,18 @@ export default function Page({  }) {
               <p className="inline-block">Back to previous products</p>
             </button>
             <div className="mt-4 flex gap-4">
+              
               {/* Thumbnails column */}
               <div className="flex flex-col gap-3">
                 {((entry?.images?.length === 0 || !entry?.images) ||
-                  (product?.media && product.media?.[0] && product.media?.[0]?.media?.[0])) && (
+                  (product?.media && product?.media?.length > 0)) && (
                   <div className="flex flex-col gap-3">
-                    {product.media?.[0]?.media.map((image, index) => (
+                    {product.media?.map((image, index) => (
                       <button
                         key={index}
                         type="button"
                         className={
-                          "border p-1 cursor-pointer bg-white " +
+                          "border p-1 cursor-pointer bg-white my-[6px] " +
                           (imageIndex === index ? "border-black" : "border-gray-300")
                         }
                         onClick={() => setImageIndex(index)}
@@ -202,7 +194,7 @@ export default function Page({  }) {
                         key={index}
                         type="button"
                         className={
-                          "border p-1 cursor-pointer bg-white " +
+                          "border p-1 cursor-pointer bg-white my-[6px] " +
                           (imageIndex === index ? "border-black" : "border-gray-300")
                         }
                         onClick={() => setImageIndex(index)}
@@ -221,10 +213,10 @@ export default function Page({  }) {
 
               {/* Main image */}
               <div className="flex-1">
-                {(product?.media && product.media?.[0] && product.media?.[0]?.media?.[0]) && (
+                {(product?.media && product?.media?.length > 0) && (
                   <img
                     className="object-cover mx-auto h-[500px] w-full"
-                    src={product?.media[0].media[imageIndex].path}
+                    src={product?.media[imageIndex].path}
                     alt={product?.name || "Product image"}
                   />
                 )}
@@ -240,53 +232,58 @@ export default function Page({  }) {
             </div>
           </div>
 
-          <div className="md:w-1/2 mt-10">
-            <h2 className="text-[24px] leading-none mt-8" {...entry?.$?.product_name}>
-              {entry?.product_name ? entry?.product_name : product?.product_translations?.[0].name}
-            </h2>
-            <div className="mt-8 md:w-3/4">
-              <p>{entry?.teaser ? entry?.teaser : product?.custom_data?.find(obj => obj.key === "teaser")?.value}</p>
+          <div className="xl:w-1/2 lg:w-4/6 md:w-3/4 mt-10">
+            <div className="text-[32px] leading-none mt-8" {...entry?.$?.product_name}>
+              {entry?.product_name ? entry?.product_name : product?.name}
             </div>
-            {(product?.price || entry?.price) && (
-              <p className="text-[32px] mt-8">
-                {entry?.price ? entry?.price : product?.price}
-              </p>
+            {(product?.sku || entry?.sku) && (
+              <div className="text-[20px] mt-4">
+                {entry?.sku ? entry?.sku : product?.sku}
+              </div>
             )}
-            <div id="wrapper" className="relative w-1/2 mt-4">
-              <button
-                className="mt-2 w-full text-nowrap relative rounded-md button px-8 py-4 text-md tracking-widest uppercase bg-cyan-600 font-bold text-white shadow-sm ring-2 ring-inset hover:ring-cyan-600 hover:text-cyan-600 hover:bg-white"
-                onClick={() => setPurchaseOpen(true)}
-              >
-                Book Now
-              </button>
+            {(product?.price || entry?.price) && (
+              <div className="text-[32px] mt-4">
+                
+                {entry?.currency_symbol ? entry?.currency_symbol : product?.currency_symbol}{entry?.price ? entry?.price : product?.price}
+              </div>
+            )}
+            <div id="wrapper" className="relative w-3/4 mt-4">
               {variants && variants.length > 0 && (
                 <button
-                  className="mt-4 w-full text-nowrap relative rounded-md button px-8 py-4 text-md tracking-widest uppercase bg-white font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:bg-cyan-600 hover:text-white"
+                  className="flex h-[75px] mt-4 md:w-full lg:w-3/4 xl:w-4/6 text-nowrap relative rounded-[60px] button tracking-widest uppercase bg-white font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:bg-cyan-600 hover:text-white"
                   onClick={() => setVariantsOpen(true)}
                 >
-                  See All Variations
+                  <img className="w-[70px] h-[70px] rounded-[50%] ml-[3px] self-center mr-4" src={variants?.[0]?.media?.[0]?.path}></img>
+                  {variants?.length > 1 && ( <div className="self-center">See All {variants?.length} Variations</div> )}
+                  {variants?.length === 1 && ( <div className="self-center">See 1 Variation</div> )}
                 </button>
               )}
+              <button
+                className="mt-4 rounded-[60px] md:w-full lg:w-3/4 xl:w-4/6 text-nowrap relative button px-8 py-4 text-md tracking-widest uppercase bg-white font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:bg-cyan-600 hover:text-white"
+                onClick={() => setPurchaseOpen(true)}
+              >
+               Add to Cart
+              </button>
             </div>
 
             
           </div>
         </div>
-        <h2 className="text-[24px] leading-none normal-case mt-8">
+        <div className="text-[32px] leading-none normal-case mt-8">
           Description
-        </h2>
+        </div>
         <div
           className="mt-4 font-extralight whitespace-pre-line [&_p]:mt-3 [&_ul]:list-disc  [&_ul]:pl-10 text-sm tracking-wide"
           dangerouslySetInnerHTML={{
             __html: entry?.description
               ? entry?.description
-              : product?.product_translations?.[0].description,
+              : product?.description,
           }}
           {...entry?.$?.description}
         ></div>
       </div>
 
-      <div
+      {/* <div
         className={`fixed top-0 h-full bg-black opacity-50 w-full z-40 hidden ${purchaseOpen ? "sm:block" : ""
           }`}
       ></div>
@@ -331,7 +328,7 @@ export default function Page({  }) {
 
         <div className="flex mt-3">
           {/* <input type="checkbox" checked /> */}
-          <label className="ml-2">Use card on file</label>
+          {/* <label className="ml-2">Use card on file</label>
         </div>
 
         <div className="mt-2 bg-[#efefef] py-2 px-4 flex items-center gap-4">
@@ -355,9 +352,9 @@ export default function Page({  }) {
             src="https://images.contentstack.io/v3/assets/blt678db9efc83edd2d/bltbc9d297783dbfffc/681e1c146b233bd9775c08c4/spay.png"
           />
         </button>
-      </div>
+      </div> */}
 
-      <Dialog
+      {/* <Dialog
         open={isOpen}
         onClose={() => setIsOpen(false)}
         className="relative z-50"
@@ -391,7 +388,7 @@ export default function Page({  }) {
             </div>
           </DialogPanel>
         </div>
-      </Dialog>
+      </Dialog> */}
 
       <div
         className={
@@ -491,7 +488,7 @@ export default function Page({  }) {
       >
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-center p-4 border-b">
-            <div className="text-lg font-cinzel">All Variations</div>
+            <div className="text-lg">All Variations</div>
             <XMarkIcon
               className="size-6 cursor-pointer"
               onClick={() => setVariantsOpen(false)}
@@ -499,41 +496,82 @@ export default function Page({  }) {
           </div>
           <div className="flex-1 overflow-y-auto p-4">
             <div className="grid grid-cols-1 gap-4">
-              {variants.map((variant, index) => (
-                <div
-                  key={index}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => {
-                    setProduct(variant);
-                    setImageIndex(0);
-                    setVariantsOpen(false);
-                  }}
-                >
-                  {variant.media?.[0]?.media?.[0]?.path && (
-                    <img
-                      className="w-full h-48 object-cover rounded-md mb-3"
-                      src={variant.media[0].media[0].path}
-                      alt={variant.product_translations?.[0]?.name || "Variant"}
-                    />
-                  )}
-                  <div className="text-lg font-semibold mb-2">
-                    {variant.product_translations?.[0]?.name || variant.name}
+              {variants.map((variant, index) => {
+                const variantImages = variant.media || [];
+                const currentImageIndex = variantImageIndices[index] || 0;
+                const hasMultipleImages = variantImages.length > 1;
+
+                const handlePreviousImage = (e) => {
+                  e.stopPropagation();
+                  setVariantImageIndices(prev => ({
+                    ...prev,
+                    [index]: currentImageIndex > 0 ? currentImageIndex - 1 : variantImages.length - 1
+                  }));
+                };
+                const handleNextImage = (e) => {
+                  e.stopPropagation();
+                  setVariantImageIndices(prev => ({
+                    ...prev,
+                    [index]: currentImageIndex < variantImages.length - 1 ? currentImageIndex + 1 : 0
+                  }));
+                };
+
+                return (
+                  <div key={index}
+                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+                    {variantImages.length > 0 && (
+                      <div className="relative mb-3">
+                        <img
+                          className="w-full h-48 object-cover rounded-md"
+                          src={variantImages[currentImageIndex]?.path}
+                          alt={variant?.name || "Variant"}
+                        />
+                        {hasMultipleImages && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={handlePreviousImage}
+                              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-colors"
+                              aria-label="Previous image"
+                            >
+                              <ArrowLeftIcon className="h-5 w-5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleNextImage}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-colors"
+                              aria-label="Next image"
+                            >
+                              <ArrowRightIcon className="h-5 w-5" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    <Link href={variant?.url ? variant?.url : "#"}>
+                    <div className="text-lg font-semibold mb-2">
+                      {variant.name}
+                    </div>
+                    {variant?.price && (
+                      <p className="text-xl font-bold text-cyan-600">
+                        {variant.price}
+                      </p>
+                    )}
+                    {product?.price && (
+                      <p className="text-xl font-bold text-cyan-600">
+                        {product?.currency_symbol}{product.price}
+                      </p>
+                    )}
+                    {variant?.description && (
+                      <p className="text-sm text-gray-600 mt-2 line-clamp-2" dangerouslySetInnerHTML={{
+                        __html: variant?.description,
+                      }}>
+                      </p>
+                    )}
+                    </Link>
                   </div>
-                  {variant.price && (
-                    <p className="text-xl font-bold text-cyan-600">
-                      {variant.price}
-                    </p>
-                  )}
-                  {variant.product_translations?.[0]?.description && (
-                    <p className="text-sm text-gray-600 mt-2 line-clamp-2" dangerouslySetInnerHTML={{
-            __html: entry?.description
-              ? entry?.description
-              : variant.product_translations[0].description,
-          }}>
-                    </p>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
