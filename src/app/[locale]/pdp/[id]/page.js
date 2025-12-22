@@ -49,20 +49,20 @@ export default function Page({  }) {
     router.back();
   };
 
-  const handleChange = (event) => {
-    event.preventDefault();
-    setInputValue(event.target.value);
-  };
+  // const handleChange = (event) => {
+  //   event.preventDefault();
+  //   setInputValue(event.target.value);
+  // };
 
-  function buyClick(price) {
-    jstag.send({
-      shopify_total_spend: price, //pulls price of product entry and increments field
-      _e: "purchase", //sends event named purchase to Data Cloud
-      email: inputValue, // pulls input value from form and sends to Data Cloud
-    });
-    jstag.call("resetPolling"); // resets polling to fetch profile quicker
-    setInputValue("");
-  }
+  // function buyClick(price) {
+  //   jstag.send({
+  //     shopify_total_spend: price, //pulls price of product entry and increments field
+  //     _e: "purchase", //sends event named purchase to Data Cloud
+  //     email: inputValue, // pulls input value from form and sends to Data Cloud
+  //   });
+  //   jstag.call("resetPolling"); // resets polling to fetch profile quicker
+  //   setInputValue("");
+  // }
 
   // function getRandomNumberBetween15And20() {
   // return Math.floor(Math.random() * (20 - 15 + 1)) + 15;
@@ -129,28 +129,28 @@ export default function Page({  }) {
   // }
   // }, [entry]);
 
-  useEffect(() => {
-    //console.log("lytics use effect", lyticsProfileData);
-    if (lyticsProfileData?.data?.user?.segments?.length > 0) {
-      if (
-        lyticsProfileData.data.user.segments.includes("likely_premier_customer")
-      ) {
-        //console.log("found premier");
-        if (!isOpen && localStorage.getItem("offerShown") !== "true") {
-          setIsOpen(true);
-          localStorage.setItem("offerShown", "true");
-        }
-      }
-    }
-  }, [lyticsProfileData]);
+  // useEffect(() => {
+  //   //console.log("lytics use effect", lyticsProfileData);
+  //   if (lyticsProfileData?.data?.user?.segments?.length > 0) {
+  //     if (
+  //       lyticsProfileData.data.user.segments.includes("likely_premier_customer")
+  //     ) {
+  //       //console.log("found premier");
+  //       if (!isOpen && localStorage.getItem("offerShown") !== "true") {
+  //         setIsOpen(true);
+  //         localStorage.setItem("offerShown", "true");
+  //       }
+  //     }
+  //   }
+  // }, [lyticsProfileData]);
 
   //console.log(entry);
   //console.log("product", product);
   return (
     <div className="relative">
       <Header locale={params.locale} />
-      {console.log(entry)}
-      <LyticsTracking></LyticsTracking>
+      {/* {console.log(entry)}
+      <LyticsTracking></LyticsTracking> */}
       <div className="max-w-8xl mx-auto px-8 pt-10 flex flex-col font-paragraph mb-12">
         <div className="w-full md:flex gap-16">
           <div className="md:w-1/2">
@@ -559,7 +559,7 @@ export default function Page({  }) {
                     )}
                     {product?.price && (
                       <p className="text-xl font-bold text-cyan-600">
-                        {product?.currency_symbol}{product.price}
+                        {product?.currency_symbol}{product?.price}
                       </p>
                     )}
                     {variant?.description && (
