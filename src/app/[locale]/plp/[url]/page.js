@@ -30,13 +30,22 @@ import { useDataContext } from "@/context/data.context";
 import { plpReferences } from "@/helpers/referencePaths";
 
 export default function PLP() {
-  const [entry, setEntry] = useState({});
-  const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState({});
-  const [filter, setFilter] = useState([]);
-  const [sortBy, setSortBy] = useState("top_sellers");
-  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
-  const [categoryFilters, setCategoryFilters] = useState(null);
+  // CONTENTSTACK CMS DATA
+  const [entry, setEntry] = useState({});          // PLP page content from Contentstack
+  const [category, setCategory] = useState({});    // Product category details
+  
+  // RED PANDA COMMERCE DATA
+  const [products, setProducts] = useState([]);    // All products in category (fetched once)
+  const [categoryFilters, setCategoryFilters] = useState(null);  // Available filters (attributes, tags, brands)
+  
+  // CLIENT-SIDE FILTERING STATE
+  // ===========================
+  // We fetch ALL products once, then filter/sort on the client side.
+  // This enables instant filtering without API calls for each filter change.
+  const [filter, setFilter] = useState([]);        // Active filters: ['attr_123', 'tag_456', 'brand_Nike']
+  const [sortBy, setSortBy] = useState("top_sellers");  // Sort criteria
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);  // Filter panel visibility
+  
   const jstag = useJstag();
   const params = useParams();
   const initialData = useDataContext();
@@ -99,22 +108,45 @@ export default function PLP() {
     //fetchTaxonomyContent("6_day");
   }, [])
 
+  /**
+   * FILTER MANAGEMENT
+   * =================
+   * Handles adding/removing filters from the active filter list.
+   * Filters are stored as strings: 'attr_123', 'tag_456', 'brand_Nike'
+   */
   const handleFilterChange = (item, isOn) => {
     if (isOn) {
+      // Add filter to active filters
       let temp = [...filter];
       temp.push(item);
       setFilter(temp);
     } else {
+      // Remove filter from active filters
       const fils = filter.filter((f) => f !== item);
       setFilter(fils);
     }
   };
 
+  /**
+   * Reset all filters and sorting to default state
+   */
   const handleResetAll = () => {
     setFilter([]);
     setSortBy("top_sellers");
   };
 
+  /**
+   * PRODUCT SORTING
+   * ===============
+   * Sorts products based on selected criteria.
+   * This runs AFTER filtering - only sorts visible products.
+   * 
+   * Available Sort Options:
+   * - top_sellers: Default order from Red Panda Commerce (most popular first)
+   * - newest: Sort by created_at date (newest first)
+   * - price_low_high: Sort by price ascending
+   * - price_high_low: Sort by price descending
+   */
   const sortProducts = (productsToSort) => {
     const sorted = [...productsToSort];
 
@@ -141,67 +173,106 @@ export default function PLP() {
         });
 
       default:
-        return sorted; // top_sellers - keep original order
+        // top_sellers - keep original order from API (most popular first)
+        return sorted;
     }
   };
 
+  /**
+   * CLIENT-SIDE FILTERING SYSTEM
+   * =============================
+   * This function determines if a product passes all active filters.
+   * It's completely extensible - works automatically for ANY attributes from Red Panda Commerce.
+   * 
+   * FILTER STRUCTURE:
+   * - Filters are stored as strings with prefixes: 'attr_123', 'tag_456', 'brand_Nike'
+   * - This prefix system allows us to handle different filter types generically
+   * 
+   * FILTERING LOGIC:
+   * - OR Logic: Within same category (e.g., Red OR Blue for Color)
+   * - AND Logic: Between different categories (e.g., must match Color AND Size AND Tags)
+   * 
+   * WHY IT'S EXTENSIBLE:
+   * - Uses attribute IDs, not hardcoded names
+   * - Loops through all attributes dynamically from API
+   * - New attributes (Material, Pattern, Fit, etc.) work automatically with no code changes
+   */
   const isInFilter = (product) => {
+    // No filters active = show all products
     if (filter.length === 0) return true;
     if (!product) return false;
 
-    // Separate filters by type
+    // STEP 1: Parse selected filters by type
+    // =======================================
+    // Extract IDs from filter strings like 'attr_123' → 123
     const attributeFilters = filter.filter(f => f.startsWith('attr_')).map(f => parseInt(f.replace('attr_', '')));
     const tagFilters = filter.filter(f => f.startsWith('tag_')).map(f => parseInt(f.replace('tag_', '')));
     const brandFilters = filter.filter(f => f.startsWith('brand_')).map(f => f.replace('brand_', ''));
 
-    // Group attribute filters by attribute_id (e.g., Color=112, Size=113)
-    // We need to get the attribute_id for each value_id from categoryFilters
+    // STEP 2: Handle Attribute Filters (Color, Size, Material, Pattern, etc.)
+    // ========================================================================
     if (attributeFilters.length > 0 && categoryFilters?.filters?.attributes) {
+      // Group selected filters by their attribute type
+      // Example: {112: [1, 2, 3], 113: [5, 6]} 
+      // where 112 = Color attribute_id with value_ids [1=Red, 2=Blue, 3=Green]
+      //       113 = Size attribute_id with value_ids [5=Small, 6=Medium]
       const attributeGroups = {};
 
-      // Build groups: {attribute_id: [value_ids]}
+      // Loop through ALL attributes from API (not just Color/Size - works for ANY attribute!)
       categoryFilters.filters.attributes.forEach(attr => {
+        // Find which values for this attribute are selected
+        // E.g., for Color (attr.id = 112), find if Red (id=1), Blue (id=2), etc. are selected
         const selectedValueIds = attr.values
           .filter(v => attributeFilters.includes(v.id))
           .map(v => v.id);
 
+        // If user selected any values for this attribute, add to groups
         if (selectedValueIds.length > 0) {
           attributeGroups[attr.id] = selectedValueIds;
         }
       });
 
-      // For each attribute group (Color, Size, etc.), check OR within group, AND between groups
+      // Get all attribute value_ids that this product has
+      // E.g., product has [1, 5] meaning Red (1) and Small (5)
       const productAttributeValueIds = product.attributes?.map(attr => attr.value_id) || [];
 
+      // Check each attribute group (AND logic between groups)
       for (const valueIds of Object.values(attributeGroups)) {
-        // OR: Product must have at least one of the selected values for this attribute
+        // OR Logic within same attribute: Product needs at least ONE matching value
+        // Example: If user selected "Red OR Blue" for Color, product must have Red OR Blue
         const hasMatchInGroup = valueIds.some(valueId =>
           productAttributeValueIds.includes(valueId)
         );
 
-        // AND: If this attribute group has selections, product must match at least one
+        // AND Logic between attributes: If this attribute has selections, product MUST match
+        // Example: Product must match (Red OR Blue) AND (Small OR Medium) AND (Cotton OR Wool)
         if (!hasMatchInGroup) return false;
       }
     }
 
-    // Check tags (OR within tags)
+    // STEP 3: Handle Tag Filters (OR logic - product needs at least one matching tag)
+    // ===============================================================================
     if (tagFilters.length > 0) {
       const productTagIds = product.tags?.map(tag => tag.id) || [];
       const hasMatchingTag = tagFilters.some(filterId =>
         productTagIds.includes(filterId)
       );
+      // If user selected tags but product doesn't have any, exclude it
       if (!hasMatchingTag) return false;
     }
 
-    // Check brands (OR within brands)
+    // STEP 4: Handle Brand Filters (OR logic - product needs to match one of selected brands)
+    // ======================================================================================
     if (brandFilters.length > 0) {
       const productBrand = product.brand?.name || product.brand_name || product.brand;
       const hasMatchingBrand = brandFilters.some(brandName =>
         productBrand && (productBrand === brandName || productBrand.toLowerCase() === brandName.toLowerCase())
       );
+      // If user selected brands but product doesn't match any, exclude it
       if (!hasMatchingBrand) return false;
     }
 
+    // Product passed all filter checks!
     return true;
   };
 
@@ -325,11 +396,28 @@ export default function PLP() {
             onResetAll={handleResetAll}
             categoryFilters={categoryFilters}
           />
+          {/* PRODUCT COUNTER: Shows filtered product count */}
           {products?.length > 0 && <div className="w-full mx-auto px-12 mt-12 mb-8">
             <div className="text-[0.7rem] font-normal text-black">
               {products.filter((item) => isInFilter(item)).length} RESULTS
             </div>
           </div>}
+
+          {/* 
+            PRODUCT GRID WITH FILTERING & SORTING
+            =====================================
+            Flow: ALL PRODUCTS → Filter (isInFilter) → Sort (sortProducts) → Display
+            
+            1. Start with all products from Red Panda Commerce
+            2. Filter: Apply client-side filtering using isInFilter()
+            3. Sort: Sort filtered results based on selected criteria
+            4. Display: Render with fade-in animation
+            
+            This approach works great for:
+            - Small to medium catalogs (< 1000 products)
+            - Dynamic filtering without API calls
+            - Any new attributes automatically supported
+          */}
           <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-16 pb-16">
             {Array.isArray(products) && sortProducts(products.filter((item) => isInFilter(item)))
               .map((item, index) => (

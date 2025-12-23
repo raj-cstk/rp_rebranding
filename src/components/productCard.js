@@ -62,7 +62,6 @@ export default function ProductCard({ item }) {
       </div>
 
       <div className="space-y-1 px-4">
-        {/* Tags above name */}
         {item.tags?.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-2">
             {item.tags.map((tag, index) => (
@@ -79,7 +78,7 @@ export default function ProductCard({ item }) {
         <h3 className="text-black !font-semibold !text-sm uppercase leading-tight line-clamp-1 mb-2 !font-sans !tracking-[0.05em]">
           {item?.name}
         </h3>
-        {item.price && <div className="text-black font-bold text-sm mb-2"> {item.currency_symbol} {item.price}</div>}
+        {item.price && <div className="text-black font-bold text-sm mb-2"> {item.currency_symbol} {parseFloat(item.price).toFixed(2)}</div>}
 
         <div className="flex justify-start items-center text-[0.7rem] text-black font-normal pt-1">
           {item.attributes?.find(attribute => attribute.attribute_name.toLowerCase() === "color")?.value && (
