@@ -13,7 +13,7 @@ const stack = contentstack.stack({
   deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN,
   environment: process.env.CONTENTSTACK_ENVIRONMENT,
   branch: process.env.CONTENTSTACK_BRANCH ? process.env.CONTENTSTACK_BRANCH : 'main',
-  host: process.env.CONTENTSTACK_HOST || 'cdn.contentstack.io',
+  host: process.env.CONTENTSTACK_CDN_HOST || 'cdn.contentstack.io',
   live_preview: {
     preview_token: process.env.CONTENTSTACK_PREVIEW_TOKEN,
     enable: true,

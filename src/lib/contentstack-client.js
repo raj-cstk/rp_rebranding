@@ -8,9 +8,9 @@ const Stack = Contentstack.Stack({
     delivery_token: process.env.CONTENTSTACK_DELIVERY_TOKEN,
     environment: process.env.CONTENTSTACK_ENVIRONMENT,
     branch: process.env.CONTENTSTACK_BRANCH,
-    host: process.env.CONTENTSTACK_HOST || 'cdn.contentstack.io',
+    host: process.env.CONTENTSTACK_CDN_HOST || 'cdn.contentstack.io',
     live_preview: {
-        preview_token: process.CONTENTSTACK_PREVIEW_TOKEN,
+        preview_token: process.env.CONTENTSTACK_PREVIEW_TOKEN,
         enable: true,
         host: process.env.CONTENTSTACK_PREVIEW_HOST || 'rest-preview.contentstack.com',
     },
@@ -36,7 +36,7 @@ ContentstackLivePreview.init({
     stackSdk: Stack,
     clientUrlParams: {
         protocol: "https",
-        host: "app.contentstack.com",
+        host: process.env.CONTENTSTACK_APP_HOST,
         port: 443,
     },
     stackDetails: {
