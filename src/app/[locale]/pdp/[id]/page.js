@@ -27,6 +27,8 @@ import RecommendationsBanner from "@/components/recommendationsBanner";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import RPCommerce from "@/lib/rpcommerce";
+import { pdpReferences } from "@/helpers/referencePaths";
+import { useDataContext } from "@/context/data.context";
 
 
 export default function Page({  }) {
@@ -44,6 +46,8 @@ export default function Page({  }) {
   const [variants, setVariants] = useState([]);
   const [variantsOpen, setVariantsOpen] = useState(false);
   const [variantImageIndices, setVariantImageIndices] = useState({});
+
+  const initialData = useDataContext();
 
   const handleGoBack = () => {
     router.back();
@@ -75,18 +79,8 @@ export default function Page({  }) {
         "pdp",
         "/pdp/" + params.id,
         params.locale,
-        [
-          'modular_blocks.hero.hero',
-          'modular_blocks.hero_banner.hero',
-          'modular_blocks.articles.articles',
-          'modular_blocks.review.reference',
-          'modular_blocks.image_grid.image.page',
-          'modular_blocks.review.testimonials',
-          'modular_blocks.review.testimonials.reviews.review',
-          'modular_blocks.product_banner.plp',
-          'modular_blocks.cards.card.page',
-          'modular_blocks.text_and_image.page'
-        ]
+        pdpReferences,
+        initialData
       );
       if (query && query.length > 0){
         console.log(query)
