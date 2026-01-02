@@ -31,7 +31,7 @@ export default function SlidePanel() {
   if (!lyticsProfileData) {
     return (
       <div
-        className={`flex-shrink-0 h-screen w-[450px] bg-white transition-transform duration-300 ease-in-out overflow-y-auto ${
+        className={`shrink-0 w-[450px] bg-white transition-transform duration-300 ease-in-out overflow-y-auto ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
