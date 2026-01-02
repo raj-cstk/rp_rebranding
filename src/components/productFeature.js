@@ -11,13 +11,13 @@ export default function ProductFeature({ content }){
                 <div className="h-[800px] visual-builder__empty-block-parent" {...content?.$?.products} >
                 </div>
             }
-            {(content?.products?.data && content?.products?.data?.length > 0) &&
-                <div className="grid grid-cols-1 md:grid-cols-3 mt-8 gap-5" {...content?.$?.products}>
-                    {content?.products?.data?.map((item, index) => (
+            {(content?.products?.items && content?.products?.items?.length > 0) &&
+                <div className="grid grid-cols-1 lg:grid-cols-4 md:grid-cols-3 mt-8 gap-6" {...content?.$?.products}>
+                    {content?.products?.items?.map((item, index) => (
                         <Link href={'/pdp/' + (item?.url ? item?.url : "#")} key={index} >
-                            <img className={(content?.large_cards ? "h-[600px] " : "h-[300px] ") + " object-cover object-center w-full"} src={item?.image_path} />
+                            <img className={(content?.large_cards ? "h-[600px] " : "h-[300px] ") + " object-cover object-center w-full"} src={item?.image} />
                             <p className="mt-5">{item?.name}</p>
-                            <p className="mt-">{item?.price}</p>
+                            <span>{item?.currency_symbol}</span><span className="ml-2">{item?.price}</span>
                         </Link>
                     ))}
                 </div>
