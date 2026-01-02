@@ -71,7 +71,7 @@ export default function Page({  }) {
 
   const getContent = async () => {
     if (params.id === "untitled" || !params.id) return;
-      const entry = await ContentstackClient.getElementByUrlWithRefs(
+      const query = await ContentstackClient.getElementByUrlWithRefs(
         "pdp",
         "/pdp/" + params.id,
         params.locale,
@@ -88,10 +88,12 @@ export default function Page({  }) {
           'modular_blocks.text_and_image.page'
         ]
       );
-      if (entry && entry?.length > 0){
-        setEntry(entry?.[0]);
-        setVariants(entry?.[0]?.variants?.items)
-    } else if(!entry){
+      if (query && query.length > 0){
+        console.log(query)
+        setEntry(query?.[0]);
+        setVariants(query?.[0]?.variants?.items)
+    } else {
+      console.log("can't find contentstack entry, fetching product by url")
       getProductsbyURL(params.id)
     }
 
