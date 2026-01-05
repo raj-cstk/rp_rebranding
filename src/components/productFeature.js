@@ -17,7 +17,7 @@ export default function ProductFeature({ content }){
                         <Link href={'/pdp/' + (item?.url ? item?.url : "#")} key={index} >
                             <img className={(content?.large_cards ? "h-[600px] " : "h-[300px] ") + " object-cover object-center w-full"} src={item?.image} />
                             <p className="mt-5">{item?.name}</p>
-                            <span>{item?.currency_symbol}</span><span className="ml-2">{item?.price}</span>
+                            <span>{item.price && <div className="mb-2"> {item.currency_symbol} {parseFloat(item.price).toFixed(2)}</div>}</span>
                         </Link>
                     ))}
                 </div>
