@@ -75,6 +75,7 @@ export default function Page({  }) {
 
   const getContent = async () => {
     if (params.id === "untitled" || !params.id) return;
+    setIsLoading(true);
       const query = await ContentstackClient.getElementByUrlWithRefs(
         "pdp",
         "/pdp/" + params.id,
@@ -85,23 +86,21 @@ export default function Page({  }) {
       if (query && query.length > 0){
         console.log(query)
         setEntry(query?.[0]);
-        setVariants(query?.[0]?.variants?.items)
+        setVariants(query?.[0]?.variants?.items);
+        setIsLoading(false);
     } else {
       console.log("can't find contentstack entry, fetching product by url")
-      getProductsbyURL(params.id)
+      await getProductsbyURL(params.id);
     }
-
-    if (entry || product) setIsLoading(false);
   };
 
   const getProductsbyURL = async (id) => {
       const products = await RPCommerce.getProductByUrl(id, params.locale);
       if(products && products.length > 0) {
           setVariants(products?.[0]?.variants);
-        }
-       //console.log(products)
-        if(products && products.length > 0) {
           setProduct(products?.[0]);
+          setIsLoading(false);
+        } else {
           setIsLoading(false);
         }
     }
@@ -142,6 +141,21 @@ export default function Page({  }) {
 
   //console.log(entry);
   //console.log("product", product);
+  
+  if (isLoading || (!entry && !product)) {
+    return (
+      <div className="relative">
+        <Header locale={params.locale} />
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-cyan-600"></div>
+            <p className="mt-4 text-gray-600">Loading product...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
       <Header locale={params.locale} />
@@ -492,82 +506,83 @@ export default function Page({  }) {
           </div>
           <div className="flex-1 overflow-y-auto p-4">
             <div className="grid grid-cols-1 gap-4">
-              {variants.map((variant, index) => {
-                const variantImages = variant.media || [];
-                const currentImageIndex = variantImageIndices[index] || 0;
-                const hasMultipleImages = variantImages.length > 1;
+              {variants && variants?.length > 0 && (
+                variants.map((variant, index) => {
+                  const variantImages = variant.media || [];
+                  const currentImageIndex = variantImageIndices[index] || 0;
+                  const hasMultipleImages = variantImages.length > 1;
 
-                const handlePreviousImage = (e) => {
-                  e.stopPropagation();
-                  setVariantImageIndices(prev => ({
-                    ...prev,
-                    [index]: currentImageIndex > 0 ? currentImageIndex - 1 : variantImages.length - 1
-                  }));
-                };
-                const handleNextImage = (e) => {
-                  e.stopPropagation();
-                  setVariantImageIndices(prev => ({
-                    ...prev,
-                    [index]: currentImageIndex < variantImages.length - 1 ? currentImageIndex + 1 : 0
-                  }));
-                };
+                  const handlePreviousImage = (e) => {
+                    e.stopPropagation();
+                    setVariantImageIndices(prev => ({
+                      ...prev,
+                      [index]: currentImageIndex > 0 ? currentImageIndex - 1 : variantImages.length - 1
+                    }));
+                  };
+                  const handleNextImage = (e) => {
+                    e.stopPropagation();
+                    setVariantImageIndices(prev => ({
+                      ...prev,
+                      [index]: currentImageIndex < variantImages.length - 1 ? currentImageIndex + 1 : 0
+                    }));
+                  };
 
-                return (
-                  <div key={index}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
-                    {variantImages.length > 0 && (
-                      <div className="relative mb-3">
-                        <img
-                          className="w-full h-48 object-cover rounded-md"
-                          src={variantImages[currentImageIndex]?.path}
-                          alt={variant?.name || "Variant"}
-                        />
-                        {hasMultipleImages && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={handlePreviousImage}
-                              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-colors"
-                              aria-label="Previous image"
-                            >
-                              <ArrowLeftIcon className="h-5 w-5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={handleNextImage}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-colors"
-                              aria-label="Next image"
-                            >
-                              <ArrowRightIcon className="h-5 w-5" />
-                            </button>
-                          </>
-                        )}
+                  return (
+                    <div key={index}
+                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+                      {variantImages.length > 0 && (
+                        <div className="relative mb-3">
+                          <img
+                            className="w-full h-48 object-cover rounded-md"
+                            src={variantImages[currentImageIndex]?.path}
+                            alt={variant?.name || "Variant"}
+                          />
+                          {hasMultipleImages && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={handlePreviousImage}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-colors"
+                                aria-label="Previous image"
+                              >
+                                <ArrowLeftIcon className="h-5 w-5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleNextImage}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-colors"
+                                aria-label="Next image"
+                              >
+                                <ArrowRightIcon className="h-5 w-5" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      )}
+                      <Link href={variant?.url ? variant?.url : "#"}>
+                      <div className="text-lg font-semibold mb-2">
+                        {variant.name}
                       </div>
-                    )}
-                    <Link href={variant?.url ? variant?.url : "#"}>
-                    <div className="text-lg font-semibold mb-2">
-                      {variant.name}
+                      {variant?.price && (
+                        <p className="text-xl font-bold text-cyan-600">
+                          {variant.price}
+                        </p>
+                      )}
+                      {product?.price && (
+                        <p className="text-xl font-bold text-cyan-600">
+                          {product?.currency_symbol}{product?.price}
+                        </p>
+                      )}
+                      {variant?.description && (
+                        <p className="text-sm text-gray-600 mt-2 line-clamp-2" dangerouslySetInnerHTML={{
+                          __html: variant?.description,
+                        }}>
+                        </p>
+                      )}
+                      </Link>
                     </div>
-                    {variant?.price && (
-                      <p className="text-xl font-bold text-cyan-600">
-                        {variant.price}
-                      </p>
-                    )}
-                    {product?.price && (
-                      <p className="text-xl font-bold text-cyan-600">
-                        {product?.currency_symbol}{product?.price}
-                      </p>
-                    )}
-                    {variant?.description && (
-                      <p className="text-sm text-gray-600 mt-2 line-clamp-2" dangerouslySetInnerHTML={{
-                        __html: variant?.description,
-                      }}>
-                      </p>
-                    )}
-                    </Link>
-                  </div>
-                );
-              })}
+                  );
+              }))}
             </div>
           </div>
         </div>
