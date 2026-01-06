@@ -45,17 +45,18 @@ export default function PLP() {
   const [filter, setFilter] = useState([]);        // Active filters: ['attr_123', 'tag_456', 'brand_Nike']
   const [sortBy, setSortBy] = useState("top_sellers");  // Sort criteria
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);  // Filter panel visibility
+  const [isLoading, setIsLoading] = useState(true);    // Loading state for products and filters
   
   const jstag = useJstag();
   const params = useParams();
   const initialData = useDataContext();
 
 
-  const getContent = async () => {
-    const entry = await ContentstackClient.getElementByUrlWithRefs(
-      "plp",
+    const getContent = async () => {
+            const entry = await ContentstackClient.getElementByUrlWithRefs(
+                "plp",
       "/plp/" + params.url,
-      params.locale,
+                params.locale,
       plpReferences,
       initialData
     );
@@ -71,20 +72,23 @@ export default function PLP() {
 
   useEffect(() => {
     const getProducts = async (id) => {
-      const products = await RPCommerce.getProductsByCategory(id, params.locale);
-      setProducts(products);
+        const products = await RPCommerce.getProductsByCategory(id, params.locale);
+        setProducts(products);
     }
-  
+
     const getFilters = async (id) => {
       const filters = await RPCommerce.getCategoryFilters(id, params.locale);
       setCategoryFilters(filters);
     }
   
     if(category?.id) {
+      setIsLoading(true);
       Promise.all([
         getProducts(category.id),
         getFilters(category.id)
-      ])
+      ]).finally(() => {
+        setIsLoading(false);
+      })
     }
   }, [category, params.locale]);
 
@@ -101,12 +105,12 @@ export default function PLP() {
     setCategory(categoryData);
   }
 
-  useEffect(() => {
-    ContentstackClient.onEntryChange(getContent);
+    useEffect(() => {
+        ContentstackClient.onEntryChange(getContent);
     jstag.send({ lead_score: 25 });
-    jstag.call('resetPolling');
-    //fetchTaxonomyContent("6_day");
-  }, [])
+        jstag.call('resetPolling');
+        //fetchTaxonomyContent("6_day");
+    }, [])
 
   /**
    * FILTER MANAGEMENT
@@ -295,7 +299,7 @@ export default function PLP() {
               {entry?.[0]?.modular_blocks_top?.map((block, index) => {
                 const metadata = entry?.[0]?.$?.[`modular_blocks_top__${index}`];
                 const uniqueKey = `${Object.keys(block)[0]}_${index}_${block.wasReplaced ? "replaced" : "original"
-                  }`;
+                }`;
 
                 const blockContent = (
                   <>
@@ -396,8 +400,18 @@ export default function PLP() {
             onResetAll={handleResetAll}
             categoryFilters={categoryFilters}
           />
+          {/* LOADING SPINNER */}
+          {isLoading && (
+            <div className="flex items-center justify-center py-32">
+              <div className="flex flex-col items-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-cyan-600"></div>
+                <p className="mt-4 text-gray-600">Loading products...</p>
+              </div>
+                </div>
+          )}
+
           {/* PRODUCT COUNTER: Shows filtered product count */}
-          {products?.length > 0 && <div className="w-full mx-auto px-12 mt-12 mb-8">
+          {!isLoading && products?.length > 0 && <div className="w-full mx-auto px-12 mt-12 mb-8">
             <div className="text-[0.7rem] font-normal text-black">
               {products.filter((item) => isInFilter(item)).length} RESULTS
             </div>
@@ -418,24 +432,26 @@ export default function PLP() {
             - Dynamic filtering without API calls
             - Any new attributes automatically supported
           */}
-          <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-16 pb-16">
-            {Array.isArray(products) && sortProducts(products.filter((item) => isInFilter(item)))
-              .map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false, amount: 0.1 }}
-                  transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <ProductCard item={item} />
-                </motion.div>
-              ))}
-          </div>
+          {!isLoading && (
+            <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-16 pb-16">
+              {Array.isArray(products) && sortProducts(products.filter((item) => isInFilter(item)))
+                .map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.1 }}
+                    transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <ProductCard item={item} />
+                  </motion.div>
+                ))}
+                          </div>
+          )}
         </div>
       </div>
 
-      {!filterPanelOpen && (
+      {!filterPanelOpen && !isLoading && (
         <button
           onClick={() => setFilterPanelOpen(true)}
           className={`fixed ${(process.env.LIVE_PREVIEW_ENABLED) ? "bottom-16" : "bottom-8"} right-8 z-50 bg-white hover:bg-gray-50 text-gray-800 font-medium px-6 py-4 rounded-full shadow-lg border border-gray-400 flex items-center gap-2 transition-all duration-200 hover:shadow-xl ${filterPanelOpen ? "hidden" : ""}`}
@@ -507,7 +523,7 @@ export default function PLP() {
                 )}
                 {block.hasOwnProperty("image_grid") && (
                   <ImageGrid
-                    key={index}
+                key={index}
                     content={block.image_grid}
                     isKiosk={
                       entry?.[0]?._applied_variants?.title ===
