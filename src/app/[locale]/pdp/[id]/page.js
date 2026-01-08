@@ -85,6 +85,7 @@ export default function Page({  }) {
       );
       if (query && query.length > 0){
         console.log(query)
+        setProduct(query?.[0]?.product?.items?.[0])
         setEntry(query?.[0]);
         setVariants(query?.[0]?.variants?.items);
         setIsLoading(false);
