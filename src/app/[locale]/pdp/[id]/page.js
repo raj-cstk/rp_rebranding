@@ -150,7 +150,7 @@ export default function Page({  }) {
               
               {/* Thumbnails column */}
               <div className="flex flex-col gap-3">
-                {((entry?.images?.length === 0 || !entry?.images) ||
+                {((entry?.images?.length === 0 || !entry?.images) &&
                   (product?.media && product?.media?.length > 0)) && (
                   <div className="flex flex-col gap-3">
                     {product.media?.map((image, index) => (
@@ -198,7 +198,7 @@ export default function Page({  }) {
 
               {/* Main image */}
               <div className="flex-1">
-                {(product?.media && product?.media?.length > 0) && (
+                {(product?.media && product?.media?.length > 0) && (entry?.images?.length === 0 || !entry?.images) && (
                   <img
                     className="object-cover mx-auto h-[500px] w-full"
                     src={product?.media[imageIndex].path}
