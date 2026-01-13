@@ -86,12 +86,14 @@ export default function Page({  }) {
     try {
       // Clear translations when locale changes
       setTranslations({});
-      // Pass null for initialData to always fetch fresh translations for the current locale
-      const translationsEntry = await ContentstackClient.getElement(
-        "bltd9ee50006d3067ad",
+      // Fetch all translations entries and find the one with title "PDP Translations"
+      const translationsEntries = await ContentstackClient.getElementByType(
         "translations",
         params.locale,
         null
+      );
+      const translationsEntry = translationsEntries?.find(
+        (entry) => entry.title === "PDP Translations"
       );
       if (translationsEntry && translationsEntry.key_values) {
         const translationsMap = {};
@@ -100,7 +102,7 @@ export default function Page({  }) {
         });
         setTranslations(translationsMap);
       } else {
-        console.warn(`No translations found for locale: ${params.locale}`);
+        console.warn(`No translations found for locale: ${params.locale} with title "PDP Translations"`);
       }
     } catch (error) {
       console.error("Error fetching translations:", error);
