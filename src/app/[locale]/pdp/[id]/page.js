@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ContentstackClient } from "@/lib/contentstack-client"
 import Footer from "@/components/footer";
 import Header from "@/components/header";
@@ -36,16 +36,12 @@ export default function Page({  }) {
   const [product, setProduct] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [imageIndex, setImageIndex] = useState(0);
-  const [purchaseOpen, setPurchaseOpen] = useState(0);
-  const [inputValue, setInputValue] = useState("");
-  const lyticsProfileData = useEntity();
-  const [isOpen, setIsOpen] = useState(false);
-  const jstag = useJstag();
   const params = useParams();
   const router = useRouter();
   const [variants, setVariants] = useState([]);
   const [variantsOpen, setVariantsOpen] = useState(false);
   const [variantImageIndices, setVariantImageIndices] = useState({});
+  const [translations, setTranslations] = useState({});
 
   const initialData = useDataContext();
 
@@ -53,27 +49,18 @@ export default function Page({  }) {
     router.back();
   };
 
-  // const handleChange = (event) => {
-  //   event.preventDefault();
-  //   setInputValue(event.target.value);
-  // };
+  const getProductsbyURL = useCallback(async (id) => {
+      const products = await RPCommerce.getProductByUrl(id, params.locale);
+      if(products && products.length > 0) {
+          setVariants(products?.[0]?.variants);
+          setProduct(products?.[0]);
+          setIsLoading(false);
+        } else {
+          setIsLoading(false);
+        }
+    }, [params.locale]);
 
-  // function buyClick(price) {
-  //   jstag.send({
-  //     shopify_total_spend: price, //pulls price of product entry and increments field
-  //     _e: "purchase", //sends event named purchase to Data Cloud
-  //     email: inputValue, // pulls input value from form and sends to Data Cloud
-  //   });
-  //   jstag.call("resetPolling"); // resets polling to fetch profile quicker
-  //   setInputValue("");
-  // }
-
-  // function getRandomNumberBetween15And20() {
-  // return Math.floor(Math.random() * (20 - 15 + 1)) + 15;
-  // }
-
-
-  const getContent = async () => {
+  const getContent = useCallback(async () => {
     if (params.id === "untitled" || !params.id) return;
     setIsLoading(true);
       const query = await ContentstackClient.getElementByUrlWithRefs(
@@ -93,55 +80,42 @@ export default function Page({  }) {
       console.log("can't find contentstack entry, fetching product by url")
       await getProductsbyURL(params.id);
     }
+  }, [params.id, params.locale, initialData, getProductsbyURL]);
+
+  const getTranslations = useCallback(async () => {
+    try {
+      // Clear translations when locale changes
+      setTranslations({});
+      // Pass null for initialData to always fetch fresh translations for the current locale
+      const translationsEntry = await ContentstackClient.getElement(
+        "bltd9ee50006d3067ad",
+        "translations",
+        params.locale,
+        null
+      );
+      if (translationsEntry && translationsEntry.key_values) {
+        const translationsMap = {};
+        translationsEntry.key_values.forEach((item) => {
+          translationsMap[item.key] = item.value;
+        });
+        setTranslations(translationsMap);
+      } else {
+        console.warn(`No translations found for locale: ${params.locale}`);
+      }
+    } catch (error) {
+      console.error("Error fetching translations:", error);
+    }
+  }, [params.locale]);
+
+  const getTranslation = (key, fallback) => {
+    return translations[key] || fallback;
   };
 
-  const getProductsbyURL = async (id) => {
-      const products = await RPCommerce.getProductByUrl(id, params.locale);
-      if(products && products.length > 0) {
-          setVariants(products?.[0]?.variants);
-          setProduct(products?.[0]);
-          setIsLoading(false);
-        } else {
-          setIsLoading(false);
-        }
-    }
-
   useEffect(() => {
+    getTranslations();
     ContentstackClient.onEntryChange(getContent);
-  }, []);
+  }, [getTranslations, getContent]);
 
-  // useEffect(() => {
-  //   const tags = entry?.tags
-  //   if(tags){
-  //    Object.keys(tags).forEach(key => {
-  //     if(tags[key] === 'adventure'){
-  //       const number = getRandomNumberBetween15And20();
-  //       if ((!lyticsProfileData?.data?.user?.likely_premier_score) || (lyticsProfileData?.data?.user?.likely_premier_score <= 80)){
-  //         jstag.send({likely_premier_score: number});
-  //         jstag.call('resetPolling');
-  //       }
-  //     }
-  //   });
-  // }
-  // }, [entry]);
-
-  // useEffect(() => {
-  //   //console.log("lytics use effect", lyticsProfileData);
-  //   if (lyticsProfileData?.data?.user?.segments?.length > 0) {
-  //     if (
-  //       lyticsProfileData.data.user.segments.includes("likely_premier_customer")
-  //     ) {
-  //       //console.log("found premier");
-  //       if (!isOpen && localStorage.getItem("offerShown") !== "true") {
-  //         setIsOpen(true);
-  //         localStorage.setItem("offerShown", "true");
-  //       }
-  //     }
-  //   }
-  // }, [lyticsProfileData]);
-
-  //console.log(entry);
-  //console.log("product", product);
   
   if (isLoading || (!entry && !product)) {
     return (
@@ -160,8 +134,6 @@ export default function Page({  }) {
   return (
     <div className="relative">
       <Header locale={params.locale} />
-      {/* {console.log(entry)}
-      <LyticsTracking></LyticsTracking> */}
       <div className="max-w-8xl mx-auto px-8 pt-10 flex flex-col font-paragraph mb-12">
         <div className="w-full md:flex gap-16">
           <div className="md:w-1/2">
@@ -170,7 +142,7 @@ export default function Page({  }) {
               className="flex mb-4 items-center text-cyan-600 hover:text-[#D1A261]"
             >
               <ArrowLeftIcon className="h-5 w-5 mr-2" />
-              <p className="inline-block">Back to previous products</p>
+              <p className="inline-block">{getTranslation("back_button", "Back to previous products")}</p>
             </button>
             <div className="mt-4 flex gap-4">
               
@@ -261,19 +233,18 @@ export default function Page({  }) {
             <div id="wrapper" className="relative w-3/4 mt-4">
               {variants && variants.length > 0 && (
                 <button
-                  className="flex h-[75px] mt-4 md:w-full lg:w-3/4 xl:w-4/6 text-nowrap relative rounded-[60px] button tracking-widest uppercase bg-white font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:bg-cyan-600 hover:text-white"
+                  className="flex items-center gap-3 min-h-[75px] px-4 mt-4 md:w-full lg:w-3/4 xl:w-4/6 relative rounded-[60px] button tracking-widest uppercase bg-white font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:bg-cyan-600 hover:text-white"
                   onClick={() => setVariantsOpen(true)}
                 >
-                  <img className="w-[70px] h-[70px] rounded-[50%] ml-[3px] self-center mr-4" src={variants?.[0]?.media?.[0]?.path}></img>
-                  {variants?.length > 1 && ( <div className="self-center">See All {variants?.length} Variations</div> )}
-                  {variants?.length === 1 && ( <div className="self-center">See 1 Variation</div> )}
+                  <img className="w-[70px] h-[70px] rounded-[50%] flex-shrink-0" src={variants?.[0]?.media?.[0]?.path} alt={variants?.[0]?.name || "Product variant"}></img>
+                  <div className="flex-1 text-center whitespace-normal break-words">{getTranslation("variations_button", "SEE ALL VARIATIONS")}</div>
                 </button>
               )}
               <button
                 className="mt-4 rounded-[60px] md:w-full lg:w-3/4 xl:w-4/6 text-nowrap relative button px-8 py-4 text-md tracking-widest uppercase bg-white font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:bg-cyan-600 hover:text-white"
                 onClick={() => setPurchaseOpen(true)}
               >
-               Add to Cart
+               {getTranslation("cart_button", "Add to Cart")}
               </button>
             </div>
 
@@ -281,7 +252,7 @@ export default function Page({  }) {
           </div>
         </div>
         <div className="text-[32px] leading-none normal-case mt-8">
-          Description
+          {getTranslation("description_label", "Description")}
         </div>
         <div
           className="mt-4 font-extralight whitespace-pre-line [&_p]:mt-3 [&_ul]:list-disc  [&_ul]:pl-10 text-sm tracking-wide"
@@ -293,113 +264,6 @@ export default function Page({  }) {
           {...entry?.$?.description}
         ></div>
       </div>
-
-      {/* <div
-        className={`fixed top-0 h-full bg-black opacity-50 w-full z-40 hidden ${purchaseOpen ? "sm:block" : ""
-          }`}
-      ></div>
-      <div
-        className={`fixed w-full sm:w-[350px] z-50 h-full top-0 border-r bg-white shadow-lg p-4  transition-all duration-500 ${purchaseOpen ? "left-0" : "-left-full sm:-left-[350px] "
-          }`}
-      >
-        <XMarkIcon
-          className="size-5 ml-auto cursor-pointer"
-          onClick={() => setPurchaseOpen(false)}
-        />
-
-        <p className="">Your purchase:</p>
-
-        <p className="mt font-medium ">
-          {entry?.product_name ? entry?.product_name : product?.name}
-        </p>
-
-        <div className="flex mt-10">
-          <div className="w-5/12">
-            <p>Price:</p>
-            <p className="mt-3">Total:</p>
-          </div>
-          {product?.price && (
-            <div className="w-7/12">
-              <p>{entry?.price ? entry?.price : product?.price}</p>
-              <p className="mt-3">
-                {entry?.price ? entry?.price : product?.price}
-              </p>
-            </div>
-          )}
-        </div>
-
-        <form className="mt-6 flex w-full">
-          <input
-            className="rounded-lg w-full py-2 px-4 max-md:p-1 border mr-0 text-gray-800 border-gray-200 bg-white"
-            placeholder="Email"
-            value={inputValue}
-            onChange={handleChange}
-          />
-        </form>
-
-        <div className="flex mt-3">
-          {/* <input type="checkbox" checked /> */}
-          {/* <label className="ml-2">Use card on file</label>
-        </div>
-
-        <div className="mt-2 bg-[#efefef] py-2 px-4 flex items-center gap-4">
-          <img
-            className="h-8"
-            src="https://images.contentstack.io/v3/assets/blt678db9efc83edd2d/blt237b95a3377390c0/681bec8e9b0925fa46df2048/amex-svgrepo-com.svg"
-          />
-          <p>...5309</p>
-        </div>
-
-        <button
-          onClick={() => buyClick(entry?.price ? entry?.price : product?.price)}
-          className="bg-black text-white rounded-lg py-4 w-full mt-10 font-semibold  tracking-wide border-black border-2 hover:bg-white hover:text-black"
-        >
-          Complete Purchase
-        </button>
-
-        <button className="rounded-lg border-2 border-[#5a30f4] w-full mt-4 flex justify-center p-2">
-          <img
-            className="h-10"
-            src="https://images.contentstack.io/v3/assets/blt678db9efc83edd2d/bltbc9d297783dbfffc/681e1c146b233bd9775c08c4/spay.png"
-          />
-        </button>
-      </div> */}
-
-      {/* <Dialog
-        open={isOpen}
-        onClose={() => setIsOpen(false)}
-        className="relative z-50"
-      >
-        <DialogBackdrop className="fixed inset-0 bg-black/70" />
-
-        <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-          <DialogPanel className="max-w-[1000px] space-y-4 bg-white ">
-            <div className="flex gap-8">
-              <div className="w-3/5">
-                <img
-                  className="h-full object-cover"
-                  src="https://images.contentstack.io/v3/assets/blt441ffce57ce4e444/blt4b377ead86261bae/689f816a65a024bd4c550ae8/snorkeling_couple.avif"
-                />
-              </div>
-
-              <div className="w-2/5 p-4 flex flex-col content-center flex-wrap justify-center">
-                <p className="text-center font-medium text-[28px] font-cinzel">
-                  Exclusive Package Access
-                </p>
-                <p className="mt-5 ">
-                  Red Panda Resort is your gateway to adventure. Explore luxury
-                  packages for every level of adventurer
-                </p>
-                <Link href="/plp/package-offers-exclusive" className="mx-auto mt-5">
-                  <button className="rounded-md button mt-6 px-8 py-4 text-md tracking-widest uppercase font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:text-white hover:bg-cyan-600">
-                    Show me
-                  </button>
-                </Link>
-              </div>
-            </div>
-          </DialogPanel>
-        </div>
-      </Dialog> */}
 
       <div
         className={
