@@ -3,13 +3,13 @@ import Header from "@/components/header";
 import { useParams } from "next/navigation";
 import Footer from "@/components/footer";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { ContentstackClient } from "@/lib/contentstack-client";
 
 export default function CloudinaryPage(){
     const params = useParams();
     const [entry, setEntry] = useState({});
     const [selectedDemo, setSelectedDemo] = useState('responsive');
+    const [selectedImage, setSelectedImage] = useState(null);
 
     const getContent = async () => {
         const entries = await ContentstackClient.getElementByType(
@@ -268,25 +268,51 @@ export default function CloudinaryPage(){
                             {demos[selectedDemo].description}
                         </p>
                         
-                        <div className="grid md:grid-cols-3 gap-6">
-                            {demos[selectedDemo].images.map((img, index) => (
-                                <div key={index} className="border rounded-lg overflow-hidden">
-                                    <div className="aspect-square bg-gray-200 relative">
-                                        <Image
-                                            src={img.url}
-                                            alt={img.label}
-                                            fill
-                                            className="object-cover"
-                                            unoptimized
-                                        />
+                        <div className="space-y-6">
+                            {demos[selectedDemo].images.map((img, index) => {
+                                const isOriginal = index === 0;
+                                // Extract width from Cloudinary URL
+                                const widthMatch = img.url.match(/w_(\d+)/);
+                                const width = widthMatch ? widthMatch[1] : null;
+                                
+                                return (
+                                    <div key={index} className="border rounded-lg overflow-hidden">
+                                        <div className="bg-gray-50 px-4 py-2 border-b">
+                                            <p className="text-sm font-raleway font-medium text-neutral-700">
+                                                {img.label}
+                                                {isOriginal && <span className="ml-2 text-xs text-neutral-500 font-normal">(Original)</span>}
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => setSelectedImage(img)}
+                                            className="w-full hover:bg-gray-50 transition-colors group"
+                                        >
+                                            <div 
+                                                className="relative w-full bg-gray-200 flex items-center justify-center mx-auto"
+                                                style={{ 
+                                                    height: width ? `${Math.min(parseInt(width) * 0.75, 400)}px` : '300px',
+                                                    maxWidth: width ? `${Math.min(parseInt(width), 800)}px` : '100%'
+                                                }}
+                                            >
+                                                <img
+                                                    src={img.url}
+                                                    alt={img.label}
+                                                    className="max-w-full max-h-full object-contain group-hover:opacity-90 transition-opacity"
+                                                    style={{
+                                                        width: width ? `${parseInt(width)}px` : 'auto',
+                                                        height: 'auto'
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="p-3 bg-white">
+                                                <p className="text-xs text-neutral-500 text-center font-raleway font-light">
+                                                    Click to view full size
+                                                </p>
+                                            </div>
+                                        </button>
                                     </div>
-                                    <div className="p-4 bg-white">
-                                        <p className="text-sm font-raleway font-medium text-neutral-700 text-center">
-                                            {img.label}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -386,6 +412,77 @@ export default function CloudinaryPage(){
                     </div>
                 </div>
             </div>
+
+            {/* Image Modal */}
+            {selectedImage && (
+                <div 
+                    className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <div 
+                        className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+                            <h3 className="text-xl font-raleway font-medium text-neutral-700">
+                                {selectedImage.label}
+                            </h3>
+                            <button
+                                onClick={() => setSelectedImage(null)}
+                                className="text-neutral-500 hover:text-neutral-700 text-2xl font-bold"
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            {/* Extract width from Cloudinary URL */}
+                            {(() => {
+                                const widthMatch = selectedImage.url.match(/w_(\d+)/);
+                                const heightMatch = selectedImage.url.match(/h_(\d+)/);
+                                const width = widthMatch ? widthMatch[1] : null;
+                                const height = heightMatch ? heightMatch[1] : null;
+                                
+                                return (
+                                    <div className="mb-4">
+                                        <div className="bg-cyan-50 border border-cyan-200 rounded-lg p-3 mb-4">
+                                            <p className="text-sm font-raleway font-medium text-cyan-800">
+                                                Image Dimensions: {width ? `${width}px` : 'Original'} {height ? `× ${height}px` : ''}
+                                            </p>
+                                        </div>
+                                        <div 
+                                            className="relative bg-gray-100 rounded-lg overflow-hidden mx-auto border-2 border-gray-300"
+                                            style={{
+                                                width: width ? `${Math.min(parseInt(width), 1200)}px` : '100%',
+                                                maxWidth: '100%',
+                                                aspectRatio: height && width ? `${width}/${height}` : 'auto'
+                                            }}
+                                        >
+                                            <img
+                                                src={selectedImage.url}
+                                                alt={selectedImage.label}
+                                                className="w-full h-auto"
+                                                style={{ 
+                                                    maxWidth: width ? `${parseInt(width)}px` : '100%',
+                                                    height: 'auto',
+                                                    display: 'block'
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="text-sm font-raleway font-medium text-neutral-700 mb-2">
+                                    Image URL:
+                                </p>
+                                <code className="text-xs text-neutral-600 break-all font-mono block">
+                                    {selectedImage.url}
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <Footer locale={params.locale} />
             </div>
