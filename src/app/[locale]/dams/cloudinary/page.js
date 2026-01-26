@@ -29,47 +29,70 @@ export default function CloudinaryPage(){
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Sample Cloudinary image URLs demonstrating different transformations
-    // Using a demo cloud name - replace with your actual Cloudinary cloud name
-    const cloudName = 'demo'; // Replace with your Cloudinary cloud name
-    const baseImage = 'sample'; // Sample image from Cloudinary demo
+    // Extract cloud name from secure_url if available
+    const getCloudName = (url) => {
+        if (!url) return 'demo';
+        const match = url.match(/res\.cloudinary\.com\/([^\/]+)\//);
+        return match ? match[1] : 'demo';
+    };
+    
+    const cloudName = entry?.banner_image?.[0]?.secure_url 
+        ? getCloudName(entry.banner_image[0].secure_url) 
+        : 'demo';
     
     const demos = {
         responsive: {
             title: 'Responsive Images',
             description: 'Automatically serve the perfect image size for every device, reducing bandwidth and improving load times.',
-            images: [
-                { label: 'Mobile (400px)', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,c_fill,g_auto/${baseImage}.jpg` },
-                { label: 'Tablet (800px)', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_800,c_fill,g_auto/${baseImage}.jpg` },
-                { label: 'Desktop (1200px)', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_1200,c_fill,g_auto/${baseImage}.jpg` },
+            images: entry?.responsive_image?.[0]?.secure_url ? [
+                { label: 'Mobile (400px)', url: entry.responsive_image[0].secure_url.replace(/\/upload\//, '/upload/w_400,c_fill,g_auto/') },
+                { label: 'Tablet (800px)', url: entry.responsive_image[0].secure_url.replace(/\/upload\//, '/upload/w_800,c_fill,g_auto/') },
+                { label: 'Desktop (1200px)', url: entry.responsive_image[0].secure_url.replace(/\/upload\//, '/upload/w_1200,c_fill,g_auto/') },
+            ] : [
+                { label: 'Mobile (400px)', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,c_fill,g_auto/sample.jpg` },
+                { label: 'Tablet (800px)', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_800,c_fill,g_auto/sample.jpg` },
+                { label: 'Desktop (1200px)', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_1200,c_fill,g_auto/sample.jpg` },
             ]
         },
         optimization: {
             title: 'Automatic Optimization',
             description: 'Cloudinary automatically optimizes images with format conversion, compression, and quality adjustments.',
-            images: [
-                { label: 'Original', url: `https://res.cloudinary.com/${cloudName}/image/upload/${baseImage}.jpg` },
-                { label: 'Optimized (WebP)', url: `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${baseImage}.jpg` },
-                { label: 'Highly Optimized', url: `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto:best/${baseImage}.jpg` },
+            images: entry?.optimized_image?.[0]?.secure_url ? [
+                { label: 'Original', url: entry.optimized_image[0].secure_url },
+                { label: 'Optimized (WebP)', url: entry.optimized_image[0].secure_url.replace(/\/upload\//, '/upload/f_auto,q_auto/') },
+                { label: 'Highly Optimized', url: entry.optimized_image[0].secure_url.replace(/\/upload\//, '/upload/f_auto,q_auto:best/') },
+            ] : [
+                { label: 'Original', url: `https://res.cloudinary.com/${cloudName}/image/upload/sample.jpg` },
+                { label: 'Optimized (WebP)', url: `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/sample.jpg` },
+                { label: 'Highly Optimized', url: `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto:best/sample.jpg` },
             ]
         },
         transformations: {
             title: 'Dynamic Transformations',
             description: 'Apply real-time transformations like cropping, filters, overlays, and effects without storing multiple versions.',
-            images: [
-                { label: 'Original', url: `https://res.cloudinary.com/${cloudName}/image/upload/${baseImage}.jpg` },
-                { label: 'Grayscale', url: `https://res.cloudinary.com/${cloudName}/image/upload/e_grayscale/${baseImage}.jpg` },
-                { label: 'Sepia', url: `https://res.cloudinary.com/${cloudName}/image/upload/e_sepia/${baseImage}.jpg` },
-                { label: 'Vignette', url: `https://res.cloudinary.com/${cloudName}/image/upload/e_vignette/${baseImage}.jpg` },
+            images: entry?.transformation_image?.[0]?.secure_url ? [
+                { label: 'Original', url: entry.transformation_image[0].secure_url },
+                { label: 'Grayscale', url: entry.transformation_image[0].secure_url.replace(/\/upload\//, '/upload/e_grayscale/') },
+                { label: 'Sepia', url: entry.transformation_image[0].secure_url.replace(/\/upload\//, '/upload/e_sepia/') },
+                { label: 'Vignette', url: entry.transformation_image[0].secure_url.replace(/\/upload\//, '/upload/e_vignette/') },
+            ] : [
+                { label: 'Original', url: `https://res.cloudinary.com/${cloudName}/image/upload/sample.jpg` },
+                { label: 'Grayscale', url: `https://res.cloudinary.com/${cloudName}/image/upload/e_grayscale/sample.jpg` },
+                { label: 'Sepia', url: `https://res.cloudinary.com/${cloudName}/image/upload/e_sepia/sample.jpg` },
+                { label: 'Vignette', url: `https://res.cloudinary.com/${cloudName}/image/upload/e_vignette/sample.jpg` },
             ]
         },
         cropping: {
             title: 'Smart Cropping',
             description: 'Intelligent face detection and automatic cropping ensures perfect framing for every image.',
-            images: [
-                { label: 'Auto Crop', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,h_400,c_fill,g_auto/${baseImage}.jpg` },
-                { label: 'Face Detection', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,h_400,c_fill,g_face/${baseImage}.jpg` },
-                { label: 'Custom Focus', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,h_400,c_fill,g_center/${baseImage}.jpg` },
+            images: entry?.cropping_image?.[0]?.secure_url ? [
+                { label: 'Auto Crop', url: entry.cropping_image[0].secure_url.replace(/\/upload\//, '/upload/w_400,h_400,c_fill,g_auto/') },
+                { label: 'Face Detection', url: entry.cropping_image[0].secure_url.replace(/\/upload\//, '/upload/w_400,h_400,c_fill,g_face/') },
+                { label: 'Custom Focus', url: entry.cropping_image[0].secure_url.replace(/\/upload\//, '/upload/w_400,h_400,c_fill,g_center/') },
+            ] : [
+                { label: 'Auto Crop', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,h_400,c_fill,g_auto/sample.jpg` },
+                { label: 'Face Detection', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,h_400,c_fill,g_face/sample.jpg` },
+                { label: 'Custom Focus', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,h_400,c_fill,g_center/sample.jpg` },
             ]
         }
     };
@@ -313,33 +336,53 @@ export default function CloudinaryPage(){
                 </div>
             </div>
 
-            {/* CTA Section */}
+            {/* Resources Section */}
             <div className="bg-gradient-to-r from-cyan-600 to-blue-700 py-16">
-                <div className="max-w-4xl mx-auto text-center px-8">
-                    <h2 className="text-4xl md:text-5xl text-white mb-6 font-raleway font-light tracking-wide">
-                        Ready to Transform Your Digital Assets?
+                <div className="max-w-4xl mx-auto px-8">
+                    <h2 className="text-4xl md:text-5xl text-white mb-6 font-raleway font-light tracking-wide text-center">
+                        Integration Resources
                     </h2>
-                    <p className="text-xl md:text-2xl text-white mb-8 leading-relaxed font-raleway font-light tracking-wide">
-                        Experience the power of Cloudinary DAM integration. 
-                        Streamline your workflow and deliver stunning imagery to your guests.
+                    <p className="text-xl md:text-2xl text-white mb-8 leading-relaxed font-raleway font-light tracking-wide text-center">
+                        Learn more about the Contentstack and Cloudinary integration, including installation, configuration, and implementation details.
                     </p>
-                    <div className="flex flex-wrap justify-center gap-4">
+                    <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
                         <a
-                            href="https://cloudinary.com/documentation"
+                            href="https://www.contentstack.com/marketplace/cloudinary"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-8 py-4 bg-white text-cyan-600 rounded-md font-raleway font-medium tracking-wide uppercase hover:bg-gray-100 transition-colors"
+                            className="bg-white text-cyan-600 rounded-lg p-6 hover:bg-gray-50 transition-colors group"
                         >
-                            View Documentation
+                            <h3 className="text-xl font-raleway font-medium mb-3 group-hover:text-cyan-700">
+                                Cloudinary Marketplace App
+                            </h3>
+                            <p className="text-neutral-600 font-raleway font-light leading-relaxed">
+                                Explore the Cloudinary app in Contentstack&apos;s Marketplace. Learn about features, use cases, and how to install the integration.
+                            </p>
+                            <div className="mt-4 text-sm font-raleway font-medium text-cyan-600 group-hover:text-cyan-700">
+                                View Marketplace Page →
+                            </div>
                         </a>
                         <a
-                            href="https://cloudinary.com/console"
+                            href="https://www.contentstack.com/docs/developers/marketplace-apps/cloudinary"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-md font-raleway font-medium tracking-wide uppercase hover:bg-white hover:text-cyan-600 transition-colors"
+                            className="bg-white text-cyan-600 rounded-lg p-6 hover:bg-gray-50 transition-colors group"
                         >
-                            Get Started
+                            <h3 className="text-xl font-raleway font-medium mb-3 group-hover:text-cyan-700">
+                                Installation & Configuration Guide
+                            </h3>
+                            <p className="text-neutral-600 font-raleway font-light leading-relaxed">
+                                Step-by-step documentation for installing and configuring the Cloudinary app, including credential setup and field configuration.
+                            </p>
+                            <div className="mt-4 text-sm font-raleway font-medium text-cyan-600 group-hover:text-cyan-700">
+                                View Documentation →
+                            </div>
                         </a>
+                    </div>
+                    <div className="mt-8 text-center">
+                        <p className="text-white/90 font-raleway font-light text-sm">
+                            The Cloudinary app supports Custom Fields and JSON RTE integration, allowing you to manage Cloudinary assets directly within Contentstack entries.
+                        </p>
                     </div>
                 </div>
             </div>
