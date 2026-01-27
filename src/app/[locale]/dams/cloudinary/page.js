@@ -36,8 +36,8 @@ export default function CloudinaryPage(){
         return match ? match[1] : 'demo';
     };
     
-    const cloudName = entry?.banner_image?.[0]?.secure_url 
-        ? getCloudName(entry.banner_image[0].secure_url) 
+    const cloudName = entry?.banner?.banner_image?.[0]?.secure_url 
+        ? getCloudName(entry.banner?.banner_image[0].secure_url) 
         : 'demo';
     
     const demos = {
@@ -45,13 +45,13 @@ export default function CloudinaryPage(){
             title: 'Responsive Images',
             description: 'Automatically serve the perfect image size for every device, reducing bandwidth and improving load times.',
             images: entry?.responsive_image?.[0]?.secure_url ? [
-                { label: 'Mobile (400px)', url: entry.responsive_image[0].secure_url.replace(/\/upload\//, '/upload/w_400,c_fill,g_auto/') },
-                { label: 'Tablet (800px)', url: entry.responsive_image[0].secure_url.replace(/\/upload\//, '/upload/w_800,c_fill,g_auto/') },
-                { label: 'Desktop (1200px)', url: entry.responsive_image[0].secure_url.replace(/\/upload\//, '/upload/w_1200,c_fill,g_auto/') },
+                { label: 'Mobile (400px)', url: entry.responsive_image[0].secure_url.replace(/\/upload\//, '/upload/w_400,c_fill,g_auto/') , $: entry?.$?.responsive_image},
+                { label: 'Tablet (800px)', url: entry.responsive_image[0].secure_url.replace(/\/upload\//, '/upload/w_800,c_fill,g_auto/') , $: entry?.$?.responsive_image},
+                { label: 'Desktop (1200px)', url: entry.responsive_image[0].secure_url.replace(/\/upload\//, '/upload/w_1200,c_fill,g_auto/') , $: entry?.$?.responsive_image},
             ] : [
-                { label: 'Mobile (400px)', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,c_fill,g_auto/sample.jpg` },
-                { label: 'Tablet (800px)', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_800,c_fill,g_auto/sample.jpg` },
-                { label: 'Desktop (1200px)', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_1200,c_fill,g_auto/sample.jpg` },
+                { label: 'Mobile (400px)', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,c_fill,g_auto/sample.jpg`,  $: entry?.$?.responsive_image },
+                { label: 'Tablet (800px)', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_800,c_fill,g_auto/sample.jpg`, $: entry?.$?.responsive_image },
+                { label: 'Desktop (1200px)', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_1200,c_fill,g_auto/sample.jpg`, $: entry?.$?.responsive_image },
             ]
         },
         optimization: {
@@ -59,12 +59,12 @@ export default function CloudinaryPage(){
             description: 'Cloudinary automatically optimizes images with format conversion, compression, and quality adjustments.',
             images: entry?.optimized_image?.[0]?.secure_url ? [
                 { label: 'Original', url: entry.optimized_image[0].secure_url },
-                { label: 'Optimized (WebP)', url: entry.optimized_image[0].secure_url.replace(/\/upload\//, '/upload/f_auto,q_auto/') },
-                { label: 'Highly Optimized', url: entry.optimized_image[0].secure_url.replace(/\/upload\//, '/upload/f_auto,q_auto:best/') },
+                { label: 'Optimized (WebP)', url: entry.optimized_image[0].secure_url.replace(/\/upload\//, '/upload/f_auto,q_auto/') ,  $: entry?.$?.optimized_image},
+                { label: 'Highly Optimized', url: entry.optimized_image[0].secure_url.replace(/\/upload\//, '/upload/f_auto,q_auto:best/'), $: entry?.$?.optimized_image },
             ] : [
-                { label: 'Original', url: `https://res.cloudinary.com/${cloudName}/image/upload/sample.jpg` },
-                { label: 'Optimized (WebP)', url: `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/sample.jpg` },
-                { label: 'Highly Optimized', url: `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto:best/sample.jpg` },
+                { label: 'Original', url: `https://res.cloudinary.com/${cloudName}/image/upload/sample.jpg`,  $: entry?.$?.optimized_image },
+                { label: 'Optimized (WebP)', url: `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/sample.jpg`,  $: entry?.$?.optimized_image },
+                { label: 'Highly Optimized', url: `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto:best/sample.jpg`,  $: entry?.$?.optimized_image },
             ]
         },
         transformations: {
@@ -72,27 +72,27 @@ export default function CloudinaryPage(){
             description: 'Apply real-time transformations like cropping, filters, overlays, and effects without storing multiple versions.',
             images: entry?.transformation_image?.[0]?.secure_url ? [
                 { label: 'Original', url: entry.transformation_image[0].secure_url },
-                { label: 'Grayscale', url: entry.transformation_image[0].secure_url.replace(/\/upload\//, '/upload/e_grayscale/') },
-                { label: 'Sepia', url: entry.transformation_image[0].secure_url.replace(/\/upload\//, '/upload/e_sepia/') },
-                { label: 'Vignette', url: entry.transformation_image[0].secure_url.replace(/\/upload\//, '/upload/e_vignette/') },
+                { label: 'Grayscale', url: entry.transformation_image[0].secure_url.replace(/\/upload\//, '/upload/e_grayscale/'), $: entry?.$?.transformation_image },
+                { label: 'Sepia', url: entry.transformation_image[0].secure_url.replace(/\/upload\//, '/upload/e_sepia/'), $: entry?.$?.transformation_image },
+                { label: 'Vignette', url: entry.transformation_image[0].secure_url.replace(/\/upload\//, '/upload/e_vignette/'), $: entry?.$?.transformation_image },
             ] : [
-                { label: 'Original', url: `https://res.cloudinary.com/${cloudName}/image/upload/sample.jpg` },
-                { label: 'Grayscale', url: `https://res.cloudinary.com/${cloudName}/image/upload/e_grayscale/sample.jpg` },
-                { label: 'Sepia', url: `https://res.cloudinary.com/${cloudName}/image/upload/e_sepia/sample.jpg` },
-                { label: 'Vignette', url: `https://res.cloudinary.com/${cloudName}/image/upload/e_vignette/sample.jpg` },
+                { label: 'Original', url: `https://res.cloudinary.com/${cloudName}/image/upload/sample.jpg`,  $: entry?.$?.transformation_image },
+                { label: 'Grayscale', url: `https://res.cloudinary.com/${cloudName}/image/upload/e_grayscale/sample.jpg`,  $: entry?.$?.transformation_image },
+                { label: 'Sepia', url: `https://res.cloudinary.com/${cloudName}/image/upload/e_sepia/sample.jpg`,  $: entry?.$?.transformation_image },
+                { label: 'Vignette', url: `https://res.cloudinary.com/${cloudName}/image/upload/e_vignette/sample.jpg`,  $: entry?.$?.transformation_image },
             ]
         },
         cropping: {
             title: 'Smart Cropping',
             description: 'Intelligent face detection and automatic cropping ensures perfect framing for every image.',
             images: entry?.cropping_image?.[0]?.secure_url ? [
-                { label: 'Auto Crop', url: entry.cropping_image[0].secure_url.replace(/\/upload\//, '/upload/w_400,h_400,c_fill,g_auto/') },
-                { label: 'Face Detection', url: entry.cropping_image[0].secure_url.replace(/\/upload\//, '/upload/w_400,h_400,c_fill,g_face/') },
-                { label: 'Custom Focus', url: entry.cropping_image[0].secure_url.replace(/\/upload\//, '/upload/w_400,h_400,c_fill,g_center/') },
+                { label: 'Auto Crop', url: entry.cropping_image[0].secure_url.replace(/\/upload\//, '/upload/w_400,h_400,c_fill,g_auto/') , $: entry?.$?.cropping_image},
+                { label: 'Face Detection', url: entry.cropping_image[0].secure_url.replace(/\/upload\//, '/upload/w_400,h_400,c_fill,g_face/') , $: entry?.$?.cropping_image},
+                { label: 'Custom Focus', url: entry.cropping_image[0].secure_url.replace(/\/upload\//, '/upload/w_400,h_400,c_fill,g_center/') , $: entry?.$?.cropping_image},
             ] : [
-                { label: 'Auto Crop', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,h_400,c_fill,g_auto/sample.jpg` },
-                { label: 'Face Detection', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,h_400,c_fill,g_face/sample.jpg` },
-                { label: 'Custom Focus', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,h_400,c_fill,g_center/sample.jpg` },
+                { label: 'Auto Crop', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,h_400,c_fill,g_auto/sample.jpg`,  $: entry?.$?.cropping_image },
+                { label: 'Face Detection', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,h_400,c_fill,g_face/sample.jpg`,  $: entry?.$?.cropping_image },
+                { label: 'Custom Focus', url: `https://res.cloudinary.com/${cloudName}/image/upload/w_400,h_400,c_fill,g_center/sample.jpg`,  $: entry?.$?.cropping_image },
             ]
         }
     };
@@ -135,29 +135,31 @@ export default function CloudinaryPage(){
             {/* Hero Section */}
             <div 
                 className="relative h-[600px] flex items-center justify-center"
-                style={entry?.banner_image?.[0]?.secure_url ? {
-                    backgroundImage: `url(${entry.banner_image[0].secure_url})`,
+                style={entry?.banner?.banner_image?.[0]?.secure_url ? {
+                    backgroundImage: `url(${entry.banner?.banner_image[0].secure_url})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                 } : {
                     background: 'linear-gradient(to right, rgb(8 145 178), rgb(29 78 216))'
                 }}
+                {...entry?.banner?.$?.banner_image}
             >
                 <div className="absolute inset-0 bg-black opacity-40"></div>
                 <div className="relative z-10 text-center px-8">
-                    <h1 
+                    {entry?.banner?.title && <h1 
                         className="text-5xl md:text-7xl text-white mb-6 font-playfair font-normal tracking-wide leading-tight"
                         style={{ fontFamily: 'var(--font-playfair)', fontWeight: 400, letterSpacing: '0.05em', lineHeight: '1.2' }}
+                        {...entry?.banner?.$?.title}
                     >
-                        Cloudinary DAM Integration
-                    </h1>
-                    <p 
+                        {entry.banner.title}
+                    </h1>}
+                    {entry?.banner?.description && <p 
                         className="text-xl md:text-2xl text-white max-w-3xl mx-auto leading-relaxed font-raleway font-light tracking-wide"
                         style={{ fontFamily: 'var(--font-raleway)', fontWeight: 300, letterSpacing: '0.02em' }}
+                        {...entry?.banner?.$?.description}
                     >
-                        Experience seamless digital asset management with Cloudinary. 
-                        Transform, optimize, and deliver stunning resort imagery across all platforms.
-                    </p>
+                        {entry.banner.description}
+                    </p>}
                 </div>
             </div>
 
@@ -302,6 +304,7 @@ export default function CloudinaryPage(){
                                                         width: width ? `${parseInt(width)}px` : 'auto',
                                                         height: 'auto'
                                                     }}
+                                                    {...img?.$}
                                                 />
                                             </div>
                                             <div className="p-3 bg-white">

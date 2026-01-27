@@ -47,3 +47,6 @@ logs/
 
 # backups
 _backup_*/
+
+.vscode/
+*.zip

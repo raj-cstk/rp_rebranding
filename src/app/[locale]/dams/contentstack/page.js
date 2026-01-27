@@ -54,7 +54,7 @@ export default function ContentstackPage(){
     };
 
     // Get base image URLs from Contentstack entry
-    const bannerUrl = entry?.banner?.url || 'https://images.contentstack.io/v3/assets/bltc991c0dda4197336/blt5d9c10062e0a93f7/67411c8348603bf3bb498fd9/chairs_on_beach.jpeg';
+    const bannerUrl = entry?.banner?.banner_image?.url || 'https://images.contentstack.io/v3/assets/bltc991c0dda4197336/blt5d9c10062e0a93f7/67411c8348603bf3bb498fd9/chairs_on_beach.jpeg';
     const responsiveImageUrl = entry?.responsive_image?.url || bannerUrl;
     const optimizationImageUrl = entry?.optimization_image?.url || bannerUrl;
     const effectsImageUrl = entry?.image_effects?.url || bannerUrl;
@@ -65,38 +65,38 @@ export default function ContentstackPage(){
             title: 'Responsive Images',
             description: 'Serve optimized image sizes for different devices using width and height parameters. Reduce bandwidth and improve load times across mobile, tablet, and desktop.',
             images: [
-                { label: 'Mobile (400px)', url: buildImageUrl(responsiveImageUrl, { width: 400 }) },
-                { label: 'Tablet (800px)', url: buildImageUrl(responsiveImageUrl, { width: 800 }) },
-                { label: 'Desktop (1200px)', url: buildImageUrl(responsiveImageUrl, { width: 1200 }) },
+                { label: 'Mobile (400px)', url: buildImageUrl(responsiveImageUrl, { width: 400 }) , $: entry?.responsive_image?.$},
+                { label: 'Tablet (800px)', url: buildImageUrl(responsiveImageUrl, { width: 800 }) , $: entry?.responsive_image?.$},
+                { label: 'Desktop (1200px)', url: buildImageUrl(responsiveImageUrl, { width: 1200 }) , $: entry?.responsive_image?.$},
             ]
         },
         optimization: {
             title: 'Format & Quality Optimization',
             description: 'Convert images to modern formats like WebP and adjust quality settings to optimize file size while maintaining visual quality.',
             images: [
-                { label: 'Original (JPG)', url: optimizationImageUrl },
-                { label: 'WebP Format', url: buildImageUrl(optimizationImageUrl, { format: 'webp' }) },
-                { label: 'Optimized Quality', url: buildImageUrl(optimizationImageUrl, { format: 'webp', quality: 80 }) },
+                { label: 'Original (JPG)', url: optimizationImageUrl , $: entry?.optimization_image?.$},
+                { label: 'WebP Format', url: buildImageUrl(optimizationImageUrl, { format: 'webp' }), $: entry?.optimization_image?.$ },
+                { label: 'Optimized Quality', url: buildImageUrl(optimizationImageUrl, { format: 'webp', quality: 80 }) , $: entry?.optimization_image?.$ },
             ]
         },
         effects: {
             title: 'Image Effects',
             description: 'Apply real-time image effects including saturation, contrast, and brightness adjustments without storing multiple versions.',
             images: [
-                { label: 'Original', url: effectsImageUrl },
-                { label: 'Grayscale (Saturation -100)', url: buildImageUrl(effectsImageUrl, { saturation: -100 }) },
-                { label: 'High Contrast', url: buildImageUrl(effectsImageUrl, { contrast: 50 }) },
-                { label: 'Brightened', url: buildImageUrl(effectsImageUrl, { brightness: 30 }) },
+                { label: 'Original', url: effectsImageUrl , $: entry?.image_effects?.$},
+                { label: 'Grayscale (Saturation -100)', url: buildImageUrl(effectsImageUrl, { saturation: -100 }) , $: entry?.image_effects?.$},
+                { label: 'High Contrast', url: buildImageUrl(effectsImageUrl, { contrast: 50 }) , $: entry?.image_effects?.$},
+                { label: 'Brightened', url: buildImageUrl(effectsImageUrl, { brightness: 30 }) , $: entry?.image_effects?.$},
             ]
         },
         resizeFilters: {
             title: 'Resize Filters',
             description: 'Choose from different resize filters (nearest, bilinear, bicubic, lanczos) to control how images are scaled, affecting sharpness and quality.',
             images: [
-                { label: 'Original', url: resizeImageUrl },
-                { label: 'Bilinear Filter', url: buildImageUrl(resizeImageUrl, { width: 800, resizeFilter: 'bilinear' }) },
-                { label: 'Bicubic Filter', url: buildImageUrl(resizeImageUrl, { width: 800, resizeFilter: 'bicubic' }) },
-                { label: 'Lanczos Filter', url: buildImageUrl(resizeImageUrl, { width: 800, resizeFilter: 'lanczos3' }) },
+                { label: 'Original', url: resizeImageUrl , $: entry?.resize_image?.$},
+                { label: 'Bilinear Filter', url: buildImageUrl(resizeImageUrl, { width: 800, resizeFilter: 'bilinear' }) , $: entry?.resize_image?.$},
+                { label: 'Bicubic Filter', url: buildImageUrl(resizeImageUrl, { width: 800, resizeFilter: 'bicubic' }) , $: entry?.resize_image?.$},
+                { label: 'Lanczos Filter', url: buildImageUrl(resizeImageUrl, { width: 800, resizeFilter: 'lanczos3' }) , $: entry?.resize_image?.$},
             ]
         }
     };
@@ -144,22 +144,23 @@ export default function ContentstackPage(){
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                 }}
+                {...entry?.banner?.$?.banner_image}
             >
                 <div className="absolute inset-0 bg-black opacity-40"></div>
-                <div className="relative z-10 text-center px-8">
-                    <h1 
+                <div className="relative z-10 text-center px-8" {...entry?.banner?.$?.title}>
+                    {entry?.banner?.title && <h1 
                         className="text-5xl md:text-7xl text-white mb-6 font-playfair font-normal tracking-wide leading-tight"
                         style={{ fontFamily: 'var(--font-playfair)', fontWeight: 400, letterSpacing: '0.05em', lineHeight: '1.2' }}
                     >
-                        Contentstack Image Delivery API
-                    </h1>
-                    <p 
+                        {entry.banner.title}
+                    </h1>}
+                    {entry?.banner?.description && <p 
                         className="text-xl md:text-2xl text-white max-w-3xl mx-auto leading-relaxed font-raleway font-light tracking-wide"
                         style={{ fontFamily: 'var(--font-raleway)', fontWeight: 300, letterSpacing: '0.02em' }}
+                        {...entry?.banner?.$?.description}
                     >
-                        Transform and optimize images on-the-fly using Contentstack&apos;s powerful Image Delivery API. 
-                        Deliver perfectly sized, optimized images across all your digital channels.
-                    </p>
+                        {entry.banner.description}
+                    </p>}
                 </div>
             </div>
 
@@ -318,6 +319,7 @@ export default function ContentstackPage(){
                                                                 width: width ? `${parseInt(width)}px` : 'auto',
                                                                 height: 'auto'
                                                             }}
+                                                            {...img?.$?.url}
                                                         />
                                                     </div>
                                                 );
