@@ -177,7 +177,6 @@ export const ContentstackClient = {
     },
 
     getElementByType: async function (type, locale, initialData) {
-        console.log("getElementByType", type, locale, initialData);
         const searchQueryParams = getSearchQueryParams();
         if (inLivePreview() && !(searchQueryParams.live_preview || searchQueryParams.hash)) {
             while (!ContentstackLivePreview?.hash) {

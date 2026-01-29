@@ -7,7 +7,7 @@ export async function DELETE(req, { params }) {
     const { profile_id } = await params;
 
     const { data: profiles, error, status } = await supabase
-        .from('profiles')
+        .from('user_profiles')
         .delete()
         .eq('id', profile_id);
         

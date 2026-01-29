@@ -8,7 +8,6 @@ import ButtonCTA from '@/components/mobile/buttonCTA';
 import IconGrid from '@/components/mobile/iconGrid';
 import { ContentstackClient } from "@/lib/contentstack-client"
 import { usePersonalize } from '@/context/personalize.context';
-import { createClient } from '@/utils/supabase/client';
 import { faUser } from '@awesome.me/kit-610837e1f9/icons/classic/light';
 import {
   faBars,
@@ -24,34 +23,75 @@ import {
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
+// Helper function to get cookie value
+function getCookie(name) {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        const cookieValue = parts.pop().split(';').shift();
+        try {
+            return JSON.parse(decodeURIComponent(cookieValue));
+        } catch {
+            return decodeURIComponent(cookieValue);
+        }
+    }
+    return null;
+}
+
+// Helper function to delete cookie
+function deleteCookie(name) {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+}
+
 export default function Mobile({ }) {
     const [entry, setEntry] = useState({});
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState(null);
     const [profiles, setProfiles] = useState([]);
     const [selectedProfile, setSelectedProfile] = useState("");
     const params = useParams();
 
     const personalizeSDK = usePersonalize();
 
-    const supabase = createClient();
-
-    const getUser = async () => {
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
-
-        setUser(user);
-        return (user);
+    const getUser = () => {
+        const oauthUser = getCookie('oauth_user');
+        setUser(oauthUser);
+        return oauthUser;
     }
 
     async function logout() {
-        if (user) {
-            await supabase.auth.signOut();
-        }
+        deleteCookie('oauth_user');
+        deleteCookie('oauth_token');
+        deleteCookie('oauth_session');
+        
         localStorage.setItem('profile', "");
         await personalizeSDK.set({ "client_type": "" });
 
-        router.push("/account/login");
+        window.location.reload();
+    }
+
+    // Generate random state for CSRF protection
+    function generateState() {
+        const array = new Uint8Array(32);
+        crypto.getRandomValues(array);
+        return Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Handle OAuth login
+    function handleOAuthLogin() {
+        // Generate and store state
+        const state = generateState();
+        sessionStorage.setItem('oauth_state', state);
+
+        // Build OAuth URL
+        const authUrl = new URL(process.env.NEXT_PUBLIC_OAUTH_URL);
+        authUrl.searchParams.set('client_id', process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID);
+        authUrl.searchParams.set('redirect_uri', `${window.location.origin}/oauth/callback`);
+        authUrl.searchParams.set('state', state);
+        authUrl.searchParams.set('response_type', 'code');
+
+        // Redirect to OAuth server
+        window.location.href = authUrl.toString();
     }
 
     const getContent = async () => {
@@ -64,13 +104,10 @@ export default function Mobile({ }) {
     };
 
     useEffect(() => {
-        async function getUserId(){
-            let currentUser = await getUser();
-            if(currentUser){
-              getProfiles(currentUser.id);
-            }
+        const currentUser = getUser();
+        if(currentUser){
+          getProfiles(currentUser.id);
         }
-        getUserId()
         ContentstackClient.onEntryChange(getContent);
       }, []);
 
@@ -98,7 +135,10 @@ export default function Mobile({ }) {
                 setProfiles(tempProfiles);
                 let saved = localStorage.getItem('profile');
                 if (saved) {
-                    setSelectedProfile(tempProfiles.find(p => p.audience === saved).fname);
+                    const foundProfile = tempProfiles.find(p => p.audience === saved);
+                    if (foundProfile) {
+                        setSelectedProfile(foundProfile.fname);
+                    }
                 }
 
             })
@@ -134,12 +174,12 @@ export default function Mobile({ }) {
                         </PopoverButton>
 
                         <PopoverPanel anchor="bottom end" className="flex flex-col py-2 px-4 rounded text-neutral-700 bg-[#f3f3f9] shadow-lg">
-                            <Link
-                                href="/account/login"
-                                className="text-nowrap font-light"
+                            <button
+                                onClick={handleOAuthLogin}
+                                className="text-nowrap font-light cursor-pointer text-left"
                             >
                                 Log In
-                            </Link>
+                            </button>
                         </PopoverPanel>
                     </Popover>
                 }
@@ -169,6 +209,12 @@ export default function Mobile({ }) {
                             <div className="my-1 h-px bg-black/25" />
                             <Link href="/profiles" className="font-light">MANAGE PROFILES</Link>
                             <div className="my-1 h-px bg-black/25" />
+                            <button
+                                className="text-nowrap font-light cursor-pointer text-left"
+                                onClick={handleOAuthLogin}
+                            >
+                                SWITCH ACCOUNT
+                            </button>
                             <a
                                 className="text-nowrap font-light cursor-pointer"
                                 onClick={logout}

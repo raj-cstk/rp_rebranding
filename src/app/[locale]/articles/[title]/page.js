@@ -43,7 +43,6 @@ export default function ArticlesList({ }) {
   return (
     <>
       <Header locale={params.locale} />
-      {console.log("articles in component",articles)}
       <div className="bg-white py-16 sm:py-24">
         <div className="mx-auto max-w-8xl px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">

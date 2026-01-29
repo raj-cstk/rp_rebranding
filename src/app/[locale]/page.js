@@ -12,7 +12,6 @@ import ProductFeature from "@/components/productFeature";
 import Tabs from "@/components/tabs";
 import Marquee from "@/components/marquee";
 import LeadCapture from "@/components/leadCapture";
-import { createClient } from '@/utils/supabase/client'
 import CategoryBanner from "@/components/categoryBanner";
 import Agent from "@/components/agent";
 import RecommendationsBanner from "@/components/recommendationsBanner";
@@ -23,18 +22,9 @@ import { homepageReferences } from "@/helpers/referencePaths";
 export default function Home({ }) {
   const [entry, setEntry] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState({});
-  const supabase = createClient();
   const params = useParams();
 
   const initialData = useDataContext();
-
-  const getUser = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    setUser(user);
-  }
 
   const getContent = async () => {
     const entry = await ContentstackClient.getElementByTypeWithRefs(
@@ -43,13 +33,11 @@ export default function Home({ }) {
       homepageReferences,
       initialData
     );
-    console.log("homepage", entry[0]);
     setEntry(entry[0]);
     setIsLoading(false);
   };
 
   useEffect(() => {
-    getUser();
     getContent();
     ContentstackClient.onEntryChange(() => {
       getContent();

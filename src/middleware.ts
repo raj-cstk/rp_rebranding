@@ -18,7 +18,7 @@ export default async function middleware(req: NextRequest) {
     const { variantParam, personalize } = await initializePersonalize(req, process.env.CONTENTSTACK_PERSONALIZE_EDGE_API_URL, projectUid);
 
     // For non-API routes, we must rewrite the URL to support next-intl
-    if (!req.nextUrl.pathname.startsWith('/api')) {
+    if (!req.nextUrl.pathname.startsWith('/api') && !req.nextUrl.pathname.startsWith('/oauth')) {
       const parsedUrl = new URL(req.url);
       // parsedUrl.searchParams.set(personalize.VARIANT_QUERY_PARAM, variantParam);
       const newReq = new NextRequest(parsedUrl.toString(), req);
@@ -49,7 +49,7 @@ export default async function middleware(req: NextRequest) {
     
   }
 
-  if (req.nextUrl.pathname.startsWith('/api')) {
+  if (req.nextUrl.pathname.startsWith('/api') || req.nextUrl.pathname.startsWith('/oauth')) {
     return NextResponse.next();
   }
 

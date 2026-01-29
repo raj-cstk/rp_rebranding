@@ -24,6 +24,7 @@ export async function POST(req, { params }) {
     const supabase = await createClient()
 
     const { user_id } = await params;
+
     const form = await req.formData();
     const profile = JSON.parse(form.get('profile'));
     const file = form.get('file');

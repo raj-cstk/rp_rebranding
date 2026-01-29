@@ -1,5 +1,4 @@
 "use client"
-import { createClient } from '@/utils/supabase/client'
 import Header from "@/components/header";
 import { useState, useEffect } from 'react';
 import { ContentstackClient } from '@/lib/contentstack-client'
@@ -7,27 +6,39 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleUser, faTrash, faPlus, faCheck } from "@awesome.me/kit-610837e1f9/icons/classic/solid";
 import { useParams } from 'next/navigation';
 
+// Helper function to get cookie value
+function getCookie(name) {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        const cookieValue = parts.pop().split(';').shift();
+        try {
+            return JSON.parse(decodeURIComponent(cookieValue));
+        } catch {
+            return decodeURIComponent(cookieValue);
+        }
+    }
+    return null;
+}
+
 export default function Profiles({ }) {
     const [profiles, setProfiles] = useState([]);
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState(null);
     const [audiences, setAudiences] = useState([]);
     const [saving, setSaving] = useState(-1);
     const [deleting, setDeleting] = useState(-1);
-    const supabase = createClient();
     const params = useParams();
 
-    const getUser = async () => {
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
-
-        setUser(user);
-        return user.id;
+    const getUser = () => {
+        const oauthUser = getCookie('oauth_user');
+        setUser(oauthUser);
+        return oauthUser;
     }
 
     const getAudiences = async () => {
         const entry = await ContentstackClient.getElementByType("config", "en");
-        setAudiences(entry[0][0].audience);
+        setAudiences(entry[0].audience);
     }
 
     const getProfiles = async (user_id) => {
@@ -41,14 +52,15 @@ export default function Profiles({ }) {
                     return Promise.reject(response);
             })
             .then((result) => {
+                console.log('result', result);
                 let tempProfiles = [];
                 for(const profile of result.profiles){
                     tempProfiles.push({
-                        fname: profile.first_name,
-                        lname: profile.last_name,
-                        audience: profile.audience,
-                        id: profile.id,
-                        image: profile.avatar_url ? profile.avatar_url : '',
+                        fname: profile?.first_name,
+                        lname: profile?.last_name,
+                        audience: profile?.audience,
+                        id: profile?.id,
+                        image: profile?.avatar_url ? profile?.avatar_url : '',
                         file: ''
                     })
                 }
@@ -61,11 +73,10 @@ export default function Profiles({ }) {
 
     useEffect(() => {
         getAudiences();
-        async function getUserId(){
-            let currentUser = await getUser();
-            getProfiles(currentUser);
+        const currentUser = getUser();
+        if (currentUser) {
+            getProfiles(currentUser.id);
         }
-        getUserId()
     }, []);
 
     const handleFieldChange = (id, key, value, checked) => {
@@ -77,14 +88,14 @@ export default function Profiles({ }) {
                 auds = auds.replace('|' + value, '');
             setProfiles(profiles =>
                 profiles.map(profile =>
-                    profile.id === id ? { ...profile, ['audience']: auds } : profile
+                    profile?.id === id ? { ...profile, ['audience']: auds } : profile
                 )
             )
         }
         else{
             setProfiles(profiles =>
                 profiles.map(profile =>
-                    profile.id === id ? { ...profile, [key]: value } : profile
+                    profile?.id === id ? { ...profile, [key]: value } : profile
                 )
             )
         }
@@ -144,15 +155,15 @@ export default function Profiles({ }) {
 
         const formData = new FormData();
         formData.append('profile', JSON.stringify({
-            fname: profile.fname,
-            lname: profile.lname,
-            id: profile.id,
-            audience: profile.audience,
-            isNew: profile.isNew
+            fname: profile?.fname,
+            lname: profile?.lname,
+            id: profile?.id,
+            audience: profile?.audience,
+            isNew: profile?.isNew
         }))
 
-        if(profile.file)
-            formData.append('file', profile.file, profile.file.name);
+        if(profile?.file)
+            formData.append('file', profile?.file, profile?.file.name);
 
         let result = await fetch(`/api/profiles/${user.id}`, {
             method: "POST",
@@ -168,7 +179,7 @@ export default function Profiles({ }) {
                 if (result.result === 'error')
                     console.log('error', result);
                 else {
-                    if(profile.isNew){
+                    if(profile?.isNew){
                         handleFieldChange(id, 'id', result.profiles[0].id);
                     }
                 }
@@ -201,22 +212,22 @@ export default function Profiles({ }) {
                 <div className={`mb-16 ${user ? "" : "hidden"}`}>
                     <div className="flex flex-col gap-y-8">
                         {profiles.map((profile, index) => (
-                            <div key={profile.id}>
+                            <div key={profile?.id}>
                                 <div className="w-full bg-blue-500 text-white py-4 px-5 rounded-t-lg items-center flex justify-between">
-                                    <p className="font-medium">{profile.fname === "" ? (profile.isNew ? "New Profile": "Enter Name") : profile.fname}</p>
+                                    <p className="font-medium">{profile?.fname === "" ? (profile?.isNew ? "New Profile": "Enter Name") : profile?.fname}</p>
                                     <div className="flex">
-                                        <p className={`mr-4 font-medium ${deleting === profile.id ? 'block' : 'hidden'}`}>Are you sure?</p>
-                                        {deleting === profile.id &&
+                                        <p className={`mr-4 font-medium ${deleting === profile?.id ? 'block' : 'hidden'}`}>Are you sure?</p>
+                                        {deleting === profile?.id &&
                                             <button
-                                                onClick={() => deleteProfile(profile.id)}
+                                                onClick={() => deleteProfile(profile?.id)}
                                                 className="text-white hover:text-red-400"
                                             >
                                                 <FontAwesomeIcon icon={faCheck} className="text-2xl" />
                                             </button>
                                         }
-                                        {deleting !== profile.id &&
+                                        {deleting !== profile?.id &&
                                             <button
-                                                onClick={() => setDeleting(profile.id)}
+                                                onClick={() => setDeleting(profile?.id)}
                                                 className="text-white hover:text-red-400"
                                             >
                                                 <FontAwesomeIcon icon={faTrash} className="text-2xl" />
@@ -224,15 +235,15 @@ export default function Profiles({ }) {
                                         }
                                     </div>
                                 </div>
-                                <div className={`border border-blue-500 p-4 grid grid-cols-6 w-full ${saving === profile.id ? 'opacity-25 pointer-events-none' : ''}`}>
+                                <div className={`border border-blue-500 p-4 grid grid-cols-6 w-full ${saving === profile?.id ? 'opacity-25 pointer-events-none' : ''}`}>
                                     <div className="col-span-8 md:col-span-4 ">
                                         <label htmlFor="fname">First Name*</label>
                                         <div className="mt-2">
                                             <input
                                                 name="fname"
                                                 id="fname"
-                                                value={profile.fname}
-                                                onChange={(e) => handleFieldChange(profile.id, 'fname', e.target.value)}
+                                                value={profile?.fname || ''}
+                                                onChange={(e) => handleFieldChange(profile?.id, 'fname', e.target.value)}
                                                 className="border p-2 w-full"
                                             />
                                         </div>
@@ -244,8 +255,8 @@ export default function Profiles({ }) {
                                             <input
                                                 name="lname"
                                                 id="lname"
-                                                value={profile.lname}
-                                                onChange={(e) => handleFieldChange(profile.id, 'lname', e.target.value)}
+                                                value={profile?.lname || ''}
+                                                onChange={(e) => handleFieldChange(profile?.id, 'lname', e.target.value)}
                                                 className="border p-2 w-full"
                                             />
                                         </div>
@@ -253,16 +264,16 @@ export default function Profiles({ }) {
 
                                     <div className="my-10 col-span-full">
                                         <div className="max-w-[96px]">
-                                            <label htmlFor={"upload-image" + profile.id} className="max-w-[96px]">
-                                                {profile.image !== '' &&
-                                                    <img className="size-[96px] rounded-full ml-5" src={profile.image} />
+                                            <label htmlFor={"upload-image" + profile?.id} className="max-w-[96px]">
+                                                {profile?.image !== '' &&
+                                                    <img className="size-[96px] rounded-full ml-5" src={profile?.image} />
                                                 }
-                                                {profile.image === '' &&
+                                                {profile?.image === '' &&
                                                     <FontAwesomeIcon icon={faCircleUser} className="text-8xl ml-5 text-neutral-700 cursor-pointer" />
                                                 }
                                             </label>
                                             <input
-                                                id={"upload-image" + profile.id}
+                                                id={"upload-image" + profile?.id}
                                                 type="file"
                                                 hidden
                                                 accept="image/*"
@@ -272,8 +283,8 @@ export default function Profiles({ }) {
                                                     let selectedFiles = e.target.files;
                                                     if (selectedFiles && selectedFiles[0]) {
                                                         let blobUrl = URL.createObjectURL(selectedFiles[0]);
-                                                        handleFieldChange(profile.id, 'image', blobUrl);
-                                                        handleFieldChange(profile.id, 'file', e.target.files[0]);
+                                                        handleFieldChange(profile?.id, 'image', blobUrl);
+                                                        handleFieldChange(profile?.id, 'file', e.target.files[0]);
                                                     }
                                                 }}
                                             />
@@ -286,19 +297,19 @@ export default function Profiles({ }) {
                                             <div className="mt-2" key={audienceIdx}>
                                                 <input 
                                                     type="checkbox" 
-                                                    id={profile.id + audience} 
+                                                    id={profile?.id + audience} 
                                                     name={"audience" + index}
                                                     value={audience}
-                                                    checked={profile.audience?.includes(audience)}
-                                                    onChange={(e) => handleFieldChange(profile.id, 'audience', e.target.value, e.target.checked)}
+                                                    checked={profile?.audience?.includes(audience)}
+                                                    onChange={(e) => handleFieldChange(profile?.id, 'audience', e.target.value, e.target.checked)}
                                                 />
-                                                <label htmlFor={profile.id + audience} className="ml-2">{audience}</label>
+                                                <label htmlFor={profile?.id + audience} className="ml-2">{audience}</label>
                                             </div>
                                         ))}
                                     </div>
                                     <div className="flex justify-end col-span-full">
                                         <button
-                                            onClick={() => saveProfile(profile.id)}
+                                            onClick={() => saveProfile(profile?.id)}
                                             className="border border-blue-500 rounded py-2 px-5 hover:bg-blue-500 hover:text-white"
                                         >
                                             Save
@@ -321,4 +332,3 @@ export default function Profiles({ }) {
         </div>
     )
 }
-

@@ -4,7 +4,6 @@ import { cslp } from '@/lib/cstack';
 import { useRouter } from 'next/navigation';
 import { ContentstackClient } from "@/lib/contentstack-client";
 import { usePersonalize } from '@/context/personalize.context';
-import { createClient } from '@/utils/supabase/client';
 import { faCheck, faCircleUser as loggedIn, faCircleQuestion } from '@awesome.me/kit-610837e1f9/icons/classic/solid';
 import { faCircleUser as loggedOut } from '@awesome.me/kit-610837e1f9/icons/classic/thin';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -17,6 +16,27 @@ import { useJstag } from '../context/lyticsTracking';
 import { useParams } from 'next/navigation';
 import { useSlidePanel } from '@/context/slidePanel.context';
 
+// Helper function to get cookie value
+function getCookie(name) {
+  if (typeof document === 'undefined') return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    const cookieValue = parts.pop().split(';').shift();
+    try {
+      return JSON.parse(decodeURIComponent(cookieValue));
+    } catch {
+      return decodeURIComponent(cookieValue);
+    }
+  }
+  return null;
+}
+
+// Helper function to delete cookie
+function deleteCookie(name) {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+}
+
 export default function Header({ color, locale }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [entry, setEntry] = useState({});
@@ -25,7 +45,7 @@ export default function Header({ color, locale }) {
   const [selectedProfile, setSelectedProfile] = useState('');
   const [avatar, setAvatar] = useState('');
   const router = useRouter();
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
   const pathname = usePathname();
   const slug = pathname.slice(3);
   const jstag = useJstag();
@@ -33,25 +53,45 @@ export default function Header({ color, locale }) {
   const params = useParams();
   const { togglePanel } = useSlidePanel();
 
-  const supabase = createClient();
-
-  const getUser = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    setUser(user);
-    return (user);
+  const getUser = () => {
+    const oauthUser = getCookie('oauth_user');
+    setUser(oauthUser);
+    return oauthUser;
   }
 
   async function logout() {
-    if (user) {
-      await supabase.auth.signOut();
-    }
+    deleteCookie('oauth_user');
+    deleteCookie('oauth_token');
+    deleteCookie('oauth_session');
+    
     localStorage.setItem('profile', "");
     await personalizeSDK.set({ "client_type": "" });
 
-    router.push("/account/login");
+    window.location.reload();
+  }
+
+  // Generate random state for CSRF protection
+  function generateState() {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // Handle OAuth login
+  function handleOAuthLogin() {
+    // Generate and store state
+    const state = generateState();
+    sessionStorage.setItem('oauth_state', state);
+
+    // Build OAuth URL
+    const authUrl = new URL(process.env.NEXT_PUBLIC_OAUTH_URL);
+    authUrl.searchParams.set('client_id', process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID);
+    authUrl.searchParams.set('redirect_uri', `${window.location.origin}/oauth/callback`);
+    authUrl.searchParams.set('state', state);
+    authUrl.searchParams.set('response_type', 'code');
+
+    // Redirect to OAuth server
+    window.location.href = authUrl.toString();
   }
 
   const getContent = async () => {
@@ -88,7 +128,10 @@ export default function Header({ color, locale }) {
         let saved = localStorage.getItem('profile');
         if (saved) {
           setSelectedProfile(saved);
-          setAvatar(tempProfiles.find(p => p.fname === saved).avatar);
+          const foundProfile = tempProfiles.find(p => p.fname === saved);
+          if (foundProfile) {
+            setAvatar(foundProfile.avatar);
+          }
         }
 
       })
@@ -98,13 +141,10 @@ export default function Header({ color, locale }) {
   }
 
   useEffect(() => {
-    async function getUserId() {
-      let currentUser = await getUser();
-      if (currentUser) {
-        getProfiles(currentUser.id);
-      }
+    const currentUser = getUser();
+    if (currentUser) {
+      getProfiles(currentUser.id);
     }
-    getUserId()
     ContentstackClient.onEntryChange(getContent);
     jstag.call("resetPolling");
   }, []);
@@ -126,7 +166,6 @@ export default function Header({ color, locale }) {
     else {
       const profile = profiles.find(p => p.fname === name);
       localStorage.setItem('profile', profile.fname);
-      console.log('audience', profile.audience);
       await personalizeSDK.set({ "client_type": profile.audience });
     }
     window.location.reload();
@@ -261,12 +300,12 @@ export default function Header({ color, locale }) {
             </PopoverButton>
 
             <PopoverPanel anchor="bottom end" className="flex flex-col py-2 px-4 rounded text-neutral-700 bg-[#f3f3f9] shadow-lg">
-              <Link
-                href="/account/login"
-                className="text-nowrap font-light"
+              <button
+                onClick={handleOAuthLogin}
+                className="text-nowrap font-light cursor-pointer text-left"
               >
                 Log In
-              </Link>
+              </button>
             </PopoverPanel>
           </Popover>
         }
@@ -274,7 +313,7 @@ export default function Header({ color, locale }) {
           <Popover className="relative">
             <PopoverButton className="outline-none">
               {avatar && 
-                <img className="size-8 rounded-full -mt-1.5" src={avatar} />
+                <img className="w-8 h-8 min-w-8 min-h-8 flex-shrink-0 rounded-full object-cover -mt-1.5" src={avatar} />
               }
               {!avatar &&
                 <FontAwesomeIcon icon={loggedIn} className="text-4xl -mt-1.5 " />
@@ -301,6 +340,12 @@ export default function Header({ color, locale }) {
               <div className="my-1 h-px bg-black/25" />
               <Link href="/profiles" className="font-light">MANAGE PROFILES</Link>
               <div className="my-1 h-px bg-black/25" />
+              <button
+                className="text-nowrap font-light cursor-pointer text-left"
+                onClick={handleOAuthLogin}
+              >
+                SWITCH ACCOUNT
+              </button>
               <a
                 className="text-nowrap font-light cursor-pointer"
                 onClick={logout}

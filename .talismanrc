@@ -1,4 +1,4 @@
 fileignoreconfig:
-- filename: package-lock.json
-  checksum: e4a3a61574d08c16860bfd62f9435abc340aa017c09f37be4ef670512172a7ad
+- filename: src/app/[locale]/profiles/page.js
+  checksum: ca9af22e155d35ed951a5b7ade75e20c0d1516a11083a0cccd6239e11188c357
 version: "1.0"
