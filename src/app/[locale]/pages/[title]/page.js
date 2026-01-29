@@ -45,6 +45,16 @@ export default function Page({ }) {
         ContentstackClient.onEntryChange(getContent);
     }, []);
 
+    useEffect(() => {
+        if(entry?.taxonomies && entry?.taxonomies?.length > 0){
+            entry?.taxonomies.map((tax) => {
+                console.log(`sending ${tax?.term_uid} to data and insights`);
+                jstag.send({taxonomy: tax.term_uid})
+            })
+        }
+    }, [entry])
+
+    console.log(entry)
     return (
         <div >
             {entry?._applied_variants?.title !== "cs76fdee0e83c5c333" &&
