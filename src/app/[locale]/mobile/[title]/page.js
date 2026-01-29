@@ -65,7 +65,7 @@ export default function Mobile({ }) {
         deleteCookie('oauth_session');
         
         localStorage.setItem('profile', "");
-        await personalizeSDK.set({ "client_type": "" });
+        await personalizeSDK?.set({ "client_type": "" });
 
         window.location.reload();
     }
@@ -152,12 +152,12 @@ export default function Mobile({ }) {
 
         if (name === ""){
             localStorage.setItem('profile', "");
-            await personalizeSDK.set({ "client_type": "" });
+            await personalizeSDK?.set({ "client_type": "" });
         }
         else {
             const profile = profiles.find(p => p.fname === name);
             localStorage.setItem('profile', profile.audience);
-            await personalizeSDK.set({ "client_type": profile.audience });
+            await personalizeSDK?.set({ "client_type": profile.audience });
         }
         window.location.reload();
     }

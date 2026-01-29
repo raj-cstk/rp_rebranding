@@ -37,7 +37,7 @@ export default function Page({ }) {
     async function submit (e) {
         e.preventDefault();
 
-        await personalizeSDK.set({"client_type": category})
+        await personalizeSDK?.set({"client_type": category})
         setDialogOpen(true);
     }
 
