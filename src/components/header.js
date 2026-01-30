@@ -182,7 +182,11 @@ export default function Header({ color, locale }) {
         (color === "white" ? "text-white absolute" : "text-neutral-700")
       }
     >
-      <a href="/" className={"my-auto" +
+      <Link href="/" prefetch={false}
+        onClick={(e) => {
+          // Optional: if you want to ensure the browser does a hard fetch
+          window.location.href = "/";
+        }} className={"my-auto" +
         (entry?.image_width === "Auto" ? " w-auto" : " w-40")}>
         {color === "white" && (
           <img className="" src={entry?.light_logo?.url} {...entry?.$?.light_logo} />
@@ -190,7 +194,7 @@ export default function Header({ color, locale }) {
         {color !== "white" && (
           <img className="" src={entry?.dark_logo?.url} {...entry?.$?.dark_logo} />
         )}
-      </a>
+      </Link>
 
       <div className="flex lg:hidden">
         <button className="" onClick={() => setMenuOpen(true)}>
