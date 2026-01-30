@@ -182,7 +182,7 @@ export default function Header({ color, locale }) {
         (color === "white" ? "text-white absolute" : "text-neutral-700")
       }
     >
-      <Link href="/" className={"my-auto" +
+      <a href="/" className={"my-auto" +
         (entry?.image_width === "Auto" ? " w-auto" : " w-40")}>
         {color === "white" && (
           <img className="" src={entry?.light_logo?.url} {...entry?.$?.light_logo} />
@@ -190,7 +190,7 @@ export default function Header({ color, locale }) {
         {color !== "white" && (
           <img className="" src={entry?.dark_logo?.url} {...entry?.$?.dark_logo} />
         )}
-      </Link>
+      </a>
 
       <div className="flex lg:hidden">
         <button className="" onClick={() => setMenuOpen(true)}>
@@ -263,7 +263,7 @@ export default function Header({ color, locale }) {
       </div>
 
 
-      <div className="hidden lg:flex justify-center align-top" style={{ width: '150px', justifyContent: 'end' }}>
+      <div className="hidden lg:flex justify-center align-top items-center" style={{ width: '150px', justifyContent: 'end' }}>
 
         <button
           onClick={togglePanel}
