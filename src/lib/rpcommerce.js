@@ -1,6 +1,6 @@
 const baseURL =  `${process.env.RED_PANDA_COMMERCE_API_URL}/api/public/store/${process.env.RED_PANDA_COMMERCE_STORE_ID}`;
 const headers = {
-    'authorization': process.env.RED_PANDA_COMMERCE_STORE_TOKEN
+    'Authorization': process.env.RED_PANDA_COMMERCE_STORE_TOKEN
 }
 
 const RPCommerce = {
