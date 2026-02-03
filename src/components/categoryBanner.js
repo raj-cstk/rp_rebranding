@@ -76,7 +76,7 @@ export default function CategoryBanner({ content, locale }) {
         </h1>
 
         <div className="text-md plp-description leading-relaxed line-clamp-5 h-[150px] overflow-hidden" {...content?.$?.description}>
-          {category.description ? parse(category.description) : ''}
+          {category.description && typeof category.description === 'string' ? parse(category.description) : ''}
         </div>
 
         {category.plp && category.plp.length > 0 && category.plp[0].url && (

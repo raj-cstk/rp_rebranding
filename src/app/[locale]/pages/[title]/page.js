@@ -22,6 +22,7 @@ import RecommendationsBanner from "@/components/recommendationsBanner";
 import { useParams } from "next/navigation";
 import { useDataContext } from "@/context/data.context";
 import { pagesReferences } from "@/helpers/referencePaths";
+import { jsonToHTML } from '@contentstack/utils';
 
 export default function Page({ }) {
     const [entry, setEntry] = useState({});
@@ -38,6 +39,12 @@ export default function Page({ }) {
             pagesReferences,
             initialData
         );
+
+        jsonToHTML({
+            entry: entry[0],
+            paths: ['modular_blocks.category_banner.description']
+        });
+
         setEntry(entry[0]);
     };
 

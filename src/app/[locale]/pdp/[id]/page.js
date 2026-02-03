@@ -29,6 +29,7 @@ import Link from "next/link";
 import RPCommerce from "@/lib/rpcommerce";
 import { pdpReferences } from "@/helpers/referencePaths";
 import { useDataContext } from "@/context/data.context";
+import { jsonToHTML } from '@contentstack/utils';
 
 
 export default function Page({  }) {
@@ -72,6 +73,12 @@ export default function Page({  }) {
       );
       if (query && query.length > 0){
         console.log(query)
+
+        jsonToHTML({
+          entry: query[0],
+          paths: ['modular_blocks_top.category_banner.description', 'modular_blocks_bottom.category_banner.description']
+        });
+
         setProduct(query?.[0]?.product?.items?.[0])
         setEntry(query?.[0]);
         setVariants(query?.[0]?.variants?.items);

@@ -30,40 +30,32 @@ import { useDataContext } from "@/context/data.context";
 import { plpReferences } from "@/helpers/referencePaths";
 
 export default function PLP() {
-  // CONTENTSTACK CMS DATA
-  const [entry, setEntry] = useState({});          // PLP page content from Contentstack
-  const [category, setCategory] = useState({});    // Product category details
-  
-  // RED PANDA COMMERCE DATA
-  const [products, setProducts] = useState([]);    // All products in category (fetched once)
-  const [categoryFilters, setCategoryFilters] = useState(null);  // Available filters (attributes, tags, brands)
-  
-  // CLIENT-SIDE FILTERING STATE
-  // ===========================
-  // We fetch ALL products once, then filter/sort on the client side.
-  // This enables instant filtering without API calls for each filter change.
-  const [filter, setFilter] = useState([]);        // Active filters: ['attr_123', 'tag_456', 'brand_Nike']
-  const [sortBy, setSortBy] = useState("top_sellers");  // Sort criteria
-  const [filterPanelOpen, setFilterPanelOpen] = useState(false);  // Filter panel visibility
-  const [isLoading, setIsLoading] = useState(true);    // Loading state for products and filters
-  
+  const [entry, setEntry] = useState({});
+  const [category, setCategory] = useState({});
+  const [products, setProducts] = useState([]);
+  const [categoryFilters, setCategoryFilters] = useState(null);
+  const [filter, setFilter] = useState([]);
+  const [sortBy, setSortBy] = useState("top_sellers");
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   const jstag = useJstag();
   const params = useParams();
   const initialData = useDataContext();
 
 
-    const getContent = async () => {
-            const entry = await ContentstackClient.getElementByUrlWithRefs(
-                "plp",
+  const getContent = async () => {
+    const entry = await ContentstackClient.getElementByUrlWithRefs(
+      "plp",
       "/plp/" + params.url,
-                params.locale,
+      params.locale,
       plpReferences,
       initialData
     );
 
     jsonToHTML({
-        entry: entry,
-        paths: ['modular_blocks_top.category_banner.description', 'modular_blocks_bottom.category_banner.description', 'description']
+      entry: entry,
+      paths: ['modular_blocks_top.category_banner.description', 'modular_blocks_bottom.category_banner.description', 'description']
     })
 
     setEntry(entry);
@@ -72,16 +64,16 @@ export default function PLP() {
 
   useEffect(() => {
     const getProducts = async (id) => {
-        const products = await RPCommerce.getProductsByCategory(id, params.locale);
-        setProducts(products);
+      const products = await RPCommerce.getProductsByCategory(id, params.locale);
+      setProducts(products);
     }
 
     const getFilters = async (id) => {
       const filters = await RPCommerce.getCategoryFilters(id, params.locale);
       setCategoryFilters(filters);
     }
-  
-    if(category?.id) {
+
+    if (category?.id) {
       setIsLoading(true);
       Promise.all([
         getProducts(category.id),
@@ -105,12 +97,12 @@ export default function PLP() {
     setCategory(categoryData);
   }
 
-    useEffect(() => {
-        ContentstackClient.onEntryChange(getContent);
+  useEffect(() => {
+    ContentstackClient.onEntryChange(getContent);
     jstag.send({ lead_score: 25 });
-        jstag.call('resetPolling');
-        //fetchTaxonomyContent("6_day");
-    }, [])
+    jstag.call('resetPolling');
+    //fetchTaxonomyContent("6_day");
+  }, [])
 
   /**
    * FILTER MANAGEMENT
@@ -299,7 +291,7 @@ export default function PLP() {
               {entry?.[0]?.modular_blocks_top?.map((block, index) => {
                 const metadata = entry?.[0]?.$?.[`modular_blocks_top__${index}`];
                 const uniqueKey = `${Object.keys(block)[0]}_${index}_${block.wasReplaced ? "replaced" : "original"
-                }`;
+                  }`;
 
                 const blockContent = (
                   <>
@@ -407,7 +399,7 @@ export default function PLP() {
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-cyan-600"></div>
                 <p className="mt-4 text-gray-600">Loading products...</p>
               </div>
-                </div>
+            </div>
           )}
 
           {/* PRODUCT COUNTER: Shows filtered product count */}
@@ -446,7 +438,7 @@ export default function PLP() {
                     <ProductCard item={item} />
                   </motion.div>
                 ))}
-                          </div>
+            </div>
           )}
         </div>
       </div>
@@ -523,7 +515,7 @@ export default function PLP() {
                 )}
                 {block.hasOwnProperty("image_grid") && (
                   <ImageGrid
-                key={index}
+                    key={index}
                     content={block.image_grid}
                     isKiosk={
                       entry?.[0]?._applied_variants?.title ===
