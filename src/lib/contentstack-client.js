@@ -254,6 +254,7 @@ export const ContentstackClient = {
             });
             if(res.ok) {
                 data = await res.json();
+                console.log("data from getElementByTypeByTaxonomy", data);
             } else {
                 data = null;
             }

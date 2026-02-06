@@ -17,7 +17,7 @@ export default function ArticleCategory({ }) {
       params.locale,
       [params.title]
     );
-    setEntries(entries[0]);
+    setEntries(entries);
     setIsLoading(false);
   };
 
@@ -42,7 +42,7 @@ export default function ArticleCategory({ }) {
           </div>
 
           <div className="mx-auto mt-16 grid max-w-3xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-            {entries.map((article) => (
+            {entries?.length > 0 && entries.map((article) => (
               <article
                 key={article.uid}
                 className="flex flex-col items-start"
