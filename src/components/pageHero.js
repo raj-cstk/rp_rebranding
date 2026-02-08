@@ -1,6 +1,15 @@
 "use client";
 
 export default function PageHero({ content }) {
+  // Get image URL and check if it's valid
+  const imageUrl = content?.image?.url?.trim();
+  const hasValidImageUrl = imageUrl && imageUrl.length > 0;
+  
+  // Debug: log image URL when Full Image style is selected
+  if (content?.style === "Full Image") {
+    console.log('PageHero Full Image - URL:', imageUrl, 'Valid:', hasValidImageUrl);
+  }
+  
   return (
     <div>
         <div>
@@ -10,10 +19,15 @@ export default function PageHero({ content }) {
                 content?.text_color === "Light"
                   ? "text-white"
                   : "text-neutral-700"
-              } relative flex h-[800px] bg-neutral-600 bg-cover bg-top`}
-              style={{ backgroundImage: `url(${content?.image?.url})` }}
+              } relative flex h-[800px] bg-neutral-600 bg-cover bg-center`}
+              style={hasValidImageUrl ? { 
+                backgroundImage: `url("${imageUrl}")`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              } : {}}
             >
-              {!content?.image?.url && (
+              {!hasValidImageUrl && (
                 <div className="absolute top-0 left-0  w-full h-[800px]">
                   <div
                     className="bg-gray-500 -z-20 flex items-center justify-center h-full"
