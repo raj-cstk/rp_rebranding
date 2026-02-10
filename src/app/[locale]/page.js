@@ -15,6 +15,8 @@ import LeadCapture from "@/components/leadCapture";
 import CategoryBanner from "@/components/categoryBanner";
 import Agent from "@/components/agent";
 import RecommendationsBanner from "@/components/recommendationsBanner";
+import UserProfileForm from "@/components/userProfileForm";
+import ArticleBanner from "@/components/articleBanner";
 import { useParams } from "next/navigation";
 import { useDataContext } from "@/context/data.context";
 import { homepageReferences } from "@/helpers/referencePaths";
@@ -111,6 +113,12 @@ export default function Home({ }) {
               )}
               {block.hasOwnProperty("recommendations_banner") && (
                   <RecommendationsBanner key={index} content={block.recommendations_banner} />
+              )}
+              {block.hasOwnProperty("data_and_insights_form_builder") && (
+                  <UserProfileForm key={index} content={block.data_and_insights_form_builder} />
+              )}
+              {block.hasOwnProperty("article_banner") && (
+                  <ArticleBanner key={index} content={block.article_banner} />
               )}
             </div>
           ))}

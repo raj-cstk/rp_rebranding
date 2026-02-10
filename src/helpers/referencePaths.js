@@ -7,7 +7,8 @@ export const homepageReferences = [
     'modular_blocks.review.testimonials.reviews.review',
     'modular_blocks.product_banner.plp',
     'modular_blocks.cards.card.page',
-    'modular_blocks.text_and_image.page'
+    'modular_blocks.text_and_image.page',
+    'modular_blocks.article_banner.articles',
 ]
 
 export const pagesReferences = [
@@ -20,7 +21,8 @@ export const pagesReferences = [
     'modular_blocks.review.testimonials.reviews.review',
     'modular_blocks.product_banner.plp',
     'modular_blocks.cards.card.page',
-    'modular_blocks.text_and_image.page'
+    'modular_blocks.text_and_image.page',
+    'modular_blocks.article_banner.articles',
 ]
 
 export const plpReferences = [
@@ -37,6 +39,7 @@ export const plpReferences = [
     'modular_blocks_top.resort_package.resort_package',
     'modular_blocks_top.resort_package.resort_package.products',
     'modular_blocks_top.category_banner.plp',
+    'entry_products',
 
     'modular_blocks_bottom.hero.hero',
     'modular_blocks_bottom.hero_banner.hero',

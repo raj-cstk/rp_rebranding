@@ -3,8 +3,8 @@ import Link from "next/link";
 
 export default function ArticleBanner({ content }) {
     return (
-        <div className="max-w-8xl mx-auto px-8 my-24">
-            <p className="text-center text-3xl" {...content?.$?.heading}>{content?.heading}</p>
+        <div className="max-w-8xl mx-auto px-8 my-32">
+            <h3 className="text-center text-3xl" {...content?.$?.heading}>{content?.heading}</h3>
             {content?.articles?.length === 0 &&
                 <div className="grid grid-cols-3 w-full gap-8 mt-16" {...content?.$?.articles}>
                     <div className="h-[292px]">
@@ -34,7 +34,7 @@ export default function ArticleBanner({ content }) {
                 {content?.articles?.map((article, index) => (
                     <article
                         key={article?.uid}
-                        className="flex flex-col items-start justify-between"
+                        className="flex flex-col items-start "
                         {...cslp(content, 'articles__', index)}
                     >
                         <Link href={(article?.url ? article?.url : "#")}>
@@ -50,7 +50,7 @@ export default function ArticleBanner({ content }) {
                             </div>
                         </Link>
                         <div className="max-w-xl">
-                            <div className="mt-8 flex items-center gap-x-4 text-xs">
+                            <div className="mt-4 flex items-center gap-x-4 text-xs">
                                 <time className="text-gray-500">Editorial Staff</time>
 
                                 {article?.taxonomies?.map((tax, tdx) => {
@@ -66,13 +66,13 @@ export default function ArticleBanner({ content }) {
                                 })}
                             </div>
                             <div className="group relative">
-                                <h3 className="mt-3 text-lg font-paragraph font-medium leading-6 text-gray-900 group-hover:text-gray-600" {...article.$?.title}>
+                                <div className="mt-3 text-lg font-paragraph font-medium leading-6 text-gray-900 group-hover:text-gray-600 h-[50px]" {...article.$?.title}>
                                     <Link href={(article?.url ? article.url : "#")}>
                                        
                                         {article?.title}
                                     </Link>
-                                </h3>
-                                <p className="mt-5 line-clamp-3 text-sm font-light font-paragraph tracking-wide leading-6 text-neutral-700 whitespace-break-spaces" {...article.$?.teaser}>
+                                </div>
+                                <p className="mt-auto line-clamp-3 text-sm font-light font-paragraph tracking-wide leading-6 text-neutral-700 whitespace-break-spaces" {...article.$?.teaser}>
                                     {article?.teaser}
                                 </p>
                             </div>

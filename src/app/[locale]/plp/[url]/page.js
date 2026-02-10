@@ -272,6 +272,63 @@ export default function PLP() {
     return true;
   };
 
+  const transformEntryProducts = () => {
+    if (!entry?.[0]?.entry_products || !Array.isArray(entry[0].entry_products) || entry[0].entry_products.length === 0) {
+      return [];
+    }
+
+    return entry[0].entry_products.map((product) => {
+      const productImages = [];
+      if (product?.images && Array.isArray(product.images) && product.images.length > 0) {
+        product.images.forEach(img => {
+          const imageUrl = img?.image?.url || img?.url || img;
+          if (imageUrl) {
+            productImages.push({ path: imageUrl });
+          }
+        });
+      }
+      // If no images array, use single image
+      if (productImages.length === 0 && product?.image) {
+        const imageUrl = product.image?.url || product.image;
+        if (imageUrl) {
+          productImages.push({ path: imageUrl });
+        }
+      }
+
+      // Extract URL - remove /pdp/ prefix if present since ProductCard adds it
+      let productUrl = product?.url || "";
+      if (productUrl.startsWith("/pdp/")) {
+        productUrl = productUrl.replace("/pdp/", "");
+      }
+
+      // Transform Contentstack product reference to match ProductCard structure
+      return {
+        url: productUrl || product?.uid || "",
+        name: product?.product_name || product?.name || product?.title || "",
+        price: product?.price || "",
+        currency_symbol: product?.currency_symbol || "$",
+        image: productImages.length > 0 ? productImages[0].path : "",
+        image_path: productImages.length > 0 ? productImages[0].path : "",
+        media: productImages,
+        tags: product?.tags || [],
+        attributes: product?.attributes || [],
+        variants: product?.variants?.items || product?.variants || [],
+        // Add any other fields that might be needed
+        created_at: product?.created_at || new Date().toISOString(),
+        brand: product?.brand || null,
+        brand_name: product?.brand_name || product?.brand?.name || null,
+      };
+    });
+  };
+
+  // Combine Red Panda Commerce products with Contentstack entry_products
+  const allProducts = [
+    ...(Array.isArray(products) ? products : []),
+    ...transformEntryProducts()
+  ];
+
+  console.log(entry)
+
   return (
     <div className="relative overflow-hidden">
       <Header locale={params.locale} />
@@ -403,9 +460,9 @@ export default function PLP() {
           )}
 
           {/* PRODUCT COUNTER: Shows filtered product count */}
-          {!isLoading && products?.length > 0 && <div className="w-full mx-auto px-12 mt-12 mb-8">
+          {!isLoading && allProducts?.length > 0 && <div className="w-full mx-auto px-12 mt-12 mb-8">
             <div className="text-[0.7rem] font-normal text-black">
-              {products.filter((item) => isInFilter(item)).length} RESULTS
+              {allProducts.filter((item) => isInFilter(item)).length} RESULTS
             </div>
           </div>}
 
@@ -426,10 +483,10 @@ export default function PLP() {
           */}
           {!isLoading && (
             <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-16 pb-16">
-              {Array.isArray(products) && sortProducts(products.filter((item) => isInFilter(item)))
+              {Array.isArray(allProducts) && sortProducts(allProducts.filter((item) => isInFilter(item)))
                 .map((item, index) => (
                   <motion.div
-                    key={index}
+                    key={item?.url || item?.uid || index}
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: false, amount: 0.1 }}

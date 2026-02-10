@@ -72,21 +72,26 @@ export default function Hero({ content, locale, withHeader, cslp }) {
         <div className=" ">
           
           {content?.map((hero, index) => {
+            // Get aspect ratio class based on contentstack field
+            let aspectRatioClass = "aspect-video"; // Default to 16:9
+            if (hero?.aspect_ratio === "16:9") {
+              aspectRatioClass = "aspect-video"; // 16:9
+            } else if (hero?.aspect_ratio === "3:2") {
+              aspectRatioClass = "aspect-[3/2]";
+            } else if (hero?.aspect_ratio === "2:1") {
+              aspectRatioClass = "aspect-[2/1]";
+            } else if (hero?.aspect_ratio === "21:9") {
+              aspectRatioClass = "aspect-[21/9]";
+            }
+
             return (
               <div
                 key={index}
-                className={
-                  withHeader
-                    ? `bg-black relative isolate overflow-hidden ${
-                      hero?.image_height == "h-screen" ? "h-screen" : hero?.image_height
-                      } flex`
-                    : `bg-black relative isolate overflow-hidden ${
-                        hero?.image_height == "h-screen" ? "h-[calc(100vh-80px)]" : hero?.image_height
-                      } flex`
-                }
+                className={`bg-black relative isolate overflow-hidden ${aspectRatioClass} flex`}
               >
                 <img
-                  className=" inset-0 -z-10 h-full w-full object-cover opacity-75"
+                  className="absolute inset-0 -z-10 h-full w-full object-cover"
+                  style={{opacity : (hero?.image_opacity ? `${hero?.image_opacity}%` : "75%")}}
                   src={hero?.image?.url}
                   {...hero.$?.image}
                 />
@@ -121,6 +126,7 @@ export default function Hero({ content, locale, withHeader, cslp }) {
 
                       <p
                         className={"mt-8 text-left text-white " + bodyClass}
+                        style={{fontSize: hero?.body_text_size ? hero?.body_text_size : "16px"}}
                         {...hero?.$?.body}
                       >
                         {hero?.body}

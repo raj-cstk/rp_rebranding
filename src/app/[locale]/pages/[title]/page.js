@@ -19,6 +19,7 @@ import Agent from "@/components/agent";
 import LeadCapture from "@/components/leadCapture";
 import ProductFeature from "@/components/productFeature";
 import RecommendationsBanner from "@/components/recommendationsBanner";
+import ArticleBanner from "@/components/articleBanner";
 import { useParams } from "next/navigation";
 import { useDataContext } from "@/context/data.context";
 import { pagesReferences } from "@/helpers/referencePaths";
@@ -118,6 +119,9 @@ export default function Page({ }) {
                         {block.hasOwnProperty("recommendations_banner") && (
                             <RecommendationsBanner key={index} content={block.recommendations_banner} />
                         )}
+                        {block.hasOwnProperty("article_banner") && (
+                            <ArticleBanner key={index} content={block.article_banner} />
+                         )}
                     </div>
                 ))}
 
