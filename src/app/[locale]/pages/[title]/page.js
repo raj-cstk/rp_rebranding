@@ -7,7 +7,6 @@ import PageHero from "@/components/pageHero";
 import TextSection from "@/components/textSection";
 import People from "@/components/people";
 import Hero from "@/components/hero";
-import ArticleBanner from "@/components/articleBanner";
 import ImageGrid from "@/components/imageGrid";
 import Tabs from "@/components/tabs";
 import Marquee from "@/components/marquee";
