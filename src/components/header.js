@@ -17,22 +17,6 @@ import { useJstag } from '../context/lyticsTracking';
 import { useParams } from 'next/navigation';
 import { useSlidePanel } from '@/context/slidePanel.context';
 
-// Helper function to get cookie value
-function getCookie(name) {
-  if (typeof document === 'undefined') return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) {
-    const cookieValue = parts.pop().split(';').shift();
-    try {
-      return JSON.parse(decodeURIComponent(cookieValue));
-    } catch {
-      return decodeURIComponent(cookieValue);
-    }
-  }
-  return null;
-}
-
 // Helper function to delete cookie
 function deleteCookie(name) {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
@@ -54,11 +38,30 @@ export default function Header({ color, locale }) {
   const params = useParams();
   const { togglePanel } = useSlidePanel();
 
-  const getUser = () => {
-    const oauthUser = getCookie('oauth_user');
-    setUser(oauthUser);
-    return oauthUser;
+  const getUser = async () => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+    return user;
   }
+
+  useEffect(() => {
+    const init = async () => {
+      const user = await getUser();
+      if (user) {
+        const saved = localStorage.getItem('profile');
+        if (saved) {
+          setSelectedProfile(saved);
+          const foundProfile = profiles?.find(p => p.fname === saved);
+          if (foundProfile) {
+            setAvatar(foundProfile.avatar);
+            await personalizeSDK?.set({ "client_type": foundProfile.audience });
+          }
+        }
+      }
+    };
+    init();
+  }, [profiles]);
 
   async function logout() {
     const supabase = createClient();
@@ -105,49 +108,44 @@ export default function Header({ color, locale }) {
   };
 
   const getProfiles = async (user_id) => {
-    let result = await fetch(`/api/profiles/${user_id}`, {
-      method: 'GET',
-    })
-      .then((response) => {
-        if (response.ok)
-          return response.json();
-        else
-          return Promise.reject(response);
-      })
-      .then((result) => {
-        let tempProfiles = [];
-        for (const profile of result.profiles) {
-          tempProfiles.push({
-            fname: profile.first_name,
-            lname: profile.last_name,
-            audience: profile.audience,
-            id: profile.id,
-            avatar: profile.avatar_url
-          })
-        }
-        setProfiles(tempProfiles);
-        let saved = localStorage.getItem('profile');
-        if (saved) {
-          setSelectedProfile(saved);
-          const foundProfile = tempProfiles.find(p => p.fname === saved);
-          if (foundProfile) {
-            setAvatar(foundProfile.avatar);
-          }
-        }
+    try {
+      const response = await fetch(`/api/profiles/${user_id}`, { method: 'GET' });
+      if (!response.ok) throw response;
+      const result = await response.json();
 
-      })
-      .catch((error) => {
-        console.log(error);
-      })
+      const tempProfiles = result.profiles.map(profile => ({
+        fname: profile.first_name,
+        lname: profile.last_name,
+        audience: profile.audience,
+        id: profile.id,
+        avatar: profile.avatar_url,
+      }));
+      setProfiles(tempProfiles);
+
+      const saved = localStorage.getItem('profile');
+      if (saved) {
+        setSelectedProfile(saved);
+        const foundProfile = tempProfiles.find(p => p.fname === saved);
+        if (foundProfile) {
+          setAvatar(foundProfile.avatar);
+          await personalizeSDK?.set({ "client_type": foundProfile.audience });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   useEffect(() => {
-    const currentUser = getUser();
-    if (currentUser) {
-      getProfiles(currentUser.id);
-    }
-    ContentstackClient.onEntryChange(getContent);
-    jstag.call("resetPolling");
+    const init = async () => {
+      const currentUser = await getUser();
+      if (currentUser) {
+        getProfiles(currentUser.id);
+      }
+      ContentstackClient.onEntryChange(getContent);
+      jstag.call("resetPolling");
+    };
+    init();
   }, []);
 
   if (isLoading) return;

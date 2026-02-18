@@ -32,8 +32,6 @@ export async function POST(req, { params }) {
     const profile = JSON.parse(form.get('profile'));
     const file = form.get('file');
 
-    console.log('profile', profile);
-
     let path = '';
     if(file){
         const ext = file.name.split('.').pop();

@@ -5,35 +5,26 @@ import { ContentstackClient } from '@/lib/contentstack-client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleUser, faTrash, faPlus, faCheck } from "@awesome.me/kit-610837e1f9/icons/classic/solid";
 import { useParams } from 'next/navigation';
-
-// Helper function to get cookie value
-function getCookie(name) {
-    if (typeof document === 'undefined') return null;
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-        const cookieValue = parts.pop().split(';').shift();
-        try {
-            return JSON.parse(decodeURIComponent(cookieValue));
-        } catch {
-            return decodeURIComponent(cookieValue);
-        }
-    }
-    return null;
-}
+import { createClient } from '@/utils/supabase/client';
+import { usePersonalize } from '@/context/personalize.context';
 
 export default function Profiles({ }) {
     const [profiles, setProfiles] = useState([]);
     const [user, setUser] = useState(null);
+    const [authLoading, setAuthLoading] = useState(true);
     const [audiences, setAudiences] = useState([]);
     const [saving, setSaving] = useState(-1);
     const [deleting, setDeleting] = useState(-1);
     const params = useParams();
 
-    const getUser = () => {
-        const oauthUser = getCookie('oauth_user');
-        setUser(oauthUser);
-        return oauthUser;
+    const personalizeSDK = usePersonalize();
+
+    const getUser = async () => {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+        setAuthLoading(false);
+        return user;
     }
 
     const getAudiences = async () => {
@@ -52,7 +43,6 @@ export default function Profiles({ }) {
                     return Promise.reject(response);
             })
             .then((result) => {
-                console.log('result', result);
                 let tempProfiles = [];
                 for(const profile of result.profiles){
                     tempProfiles.push({
@@ -72,11 +62,14 @@ export default function Profiles({ }) {
     }
 
     useEffect(() => {
-        getAudiences();
-        const currentUser = getUser();
-        if (currentUser) {
-            getProfiles(currentUser.id);
-        }
+        const init = async () => {
+            getAudiences();
+            const currentUser = await getUser();
+            if (currentUser) {
+                getProfiles(currentUser.id);
+            }
+        };
+        init();
     }, []);
 
     const handleFieldChange = (id, key, value, checked) => {
@@ -182,6 +175,7 @@ export default function Profiles({ }) {
                     if(profile?.isNew){
                         handleFieldChange(id, 'id', result.profiles[0].id);
                     }
+                    personalizeSDK?.set({ "client_type": profile?.audience });
                 }
                 setTimeout(() => {
                     setSaving(-1);
@@ -195,16 +189,12 @@ export default function Profiles({ }) {
             })
     }
 
-    const testFunc = (id) => {
-        console.log('this is the id', id);
-    }
-
     return (
         <div>
             <Header locale={params.locale} />
 
             <div className="max-w-8xl mx-auto px-8 pt-16">
-                <div className={`${!user ? "flex" : "hidden"}`}>
+                <div className={`${!authLoading && !user ? "flex" : "hidden"}`}>
                     <div className="w-full text-center mt-32">
                         <h3>You must be logged in.</h3>
                     </div>
