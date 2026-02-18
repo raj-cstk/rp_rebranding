@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
 
 function CallbackContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState('processing');
   const [error, setError] = useState(null);
@@ -13,7 +13,6 @@ function CallbackContent() {
     handleCallback();
   }, []);
 
-  // Helper function to set cookies
   function setCookie(name, value, days = 7) {
     const expires = new Date(Date.now() + days * 864e5).toUTCString();
     document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
@@ -36,7 +35,6 @@ function CallbackContent() {
       return;
     }
 
-    // Validate state
     const savedState = sessionStorage.getItem('oauth_state');
     if (state !== savedState) {
       setStatus('error');
@@ -45,31 +43,50 @@ function CallbackContent() {
     }
 
     try {
-      // Decode user from code
-      const [payload] = code.split('.');
-      const userInfo = JSON.parse(atob(payload));
+      // Exchange code → hub verifies it and returns Supabase tokens
+      const res = await fetch('/api/auth/exchange-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ code }),
+      });
 
-      // Store user info in cookies
-      const userObj = {
-        id: userInfo.sub,
-        email: userInfo.email,
-        authenticatedAt: new Date().toISOString(),
-      };
-      
-      setCookie('oauth_user', JSON.stringify(userObj));
-      setCookie('oauth_token', code);
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        const msg = [data.error, data.details].filter(Boolean).join(' — ');
+        setStatus('error');
+        setError(msg || 'Token exchange failed');
+        return;
+      }
+
+      // Initialize browser Supabase client with tokens so client-side RLS works
+      if (data.access_token && data.refresh_token) {
+        const supabase = createClient();
+        await supabase.auth.setSession({
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+        });
+      }
+
+      // Set cookie for header UI state
+      if (data.user) {
+        setCookie('oauth_user', JSON.stringify({
+          id: data.user.id,
+          email: data.user.email,
+          authenticatedAt: new Date().toISOString(),
+        }));
+      }
       setCookie('oauth_session', Date.now().toString());
 
       sessionStorage.removeItem('oauth_state');
       setStatus('success');
 
-      // Check if there's a return URL stored
       const returnUrl = sessionStorage.getItem('oauth_return');
       sessionStorage.removeItem('oauth_return');
 
-      // Redirect
-      setTimeout(() => router.push(returnUrl || '/'), 1500);
-
+      // Full page navigation so server cookies are included in all subsequent requests
+      setTimeout(() => { window.location.href = returnUrl || '/'; }, 1500);
     } catch (e) {
       setStatus('error');
       setError('Failed to process login');

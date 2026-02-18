@@ -8,6 +8,7 @@ import ButtonCTA from '@/components/mobile/buttonCTA';
 import IconGrid from '@/components/mobile/iconGrid';
 import { ContentstackClient } from "@/lib/contentstack-client"
 import { usePersonalize } from '@/context/personalize.context';
+import { createClient } from '@/utils/supabase/client';
 import { faUser } from '@awesome.me/kit-610837e1f9/icons/classic/light';
 import {
   faBars,
@@ -60,13 +61,13 @@ export default function Mobile({ }) {
     }
 
     async function logout() {
+        const supabase = createClient();
+        await supabase.auth.signOut();
         deleteCookie('oauth_user');
         deleteCookie('oauth_token');
         deleteCookie('oauth_session');
-        
         localStorage.setItem('profile', "");
         await personalizeSDK?.set({ "client_type": "" });
-
         window.location.reload();
     }
 

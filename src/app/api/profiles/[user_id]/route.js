@@ -1,16 +1,19 @@
 import { NextResponse } from "next/server";
-import { createClient } from '@/utils/supabase/client'
+import { createClient } from '@/utils/supabase/server'
 
 export async function GET(req, { params }) {
     const supabase = await createClient()
 
     const { user_id } = await params;
+    
 
     const { data: profiles, error, status } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, avatar_url, audience')
         .eq('user_id', user_id)
         .order('updated_at', { ascending: true });
+
+    // console.log('profiles', profiles);
 
     if (error) {
         console.log('Error getting profiles:', error);
@@ -28,6 +31,8 @@ export async function POST(req, { params }) {
     const form = await req.formData();
     const profile = JSON.parse(form.get('profile'));
     const file = form.get('file');
+
+    console.log('profile', profile);
 
     let path = '';
     if(file){
@@ -48,7 +53,7 @@ export async function POST(req, { params }) {
     }
 
     if (profile.isNew) {
-        const { data: profile_id, error, status } = await supabase
+        const { data: profile_id, error } = await supabase
             .from('profiles')
             .insert({
                 first_name: profile.fname,
@@ -86,7 +91,7 @@ export async function POST(req, { params }) {
             }
         }
 
-        const { data: profile_result, error, status } = await supabase
+        const { data: profile_result, error } = await supabase
             .from('profiles')
             .update(upObj)
             .eq('id', profile.id)

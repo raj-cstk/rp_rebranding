@@ -3,6 +3,7 @@ import ContentstackServer from "@/lib/cstack";
 export async function POST(request) {
     try {
         const variantParam = request.headers.get('x-personalize-variants');
+        console.log('variantParam', variantParam);
         const { type, locale, references, live_preview } = await request.json();
         const res = await ContentstackServer.getElementByTypeWithRefs(type, locale, references, live_preview, variantParam);
         return Response.json(res || {});

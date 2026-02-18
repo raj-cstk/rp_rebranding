@@ -4,6 +4,7 @@ import { cslp } from '@/lib/cstack';
 import { useRouter } from 'next/navigation';
 import { ContentstackClient } from "@/lib/contentstack-client";
 import { usePersonalize } from '@/context/personalize.context';
+import { createClient } from '@/utils/supabase/client';
 import { faCheck, faCircleUser as loggedIn, faCircleQuestion } from '@awesome.me/kit-610837e1f9/icons/classic/solid';
 import { faCircleUser as loggedOut } from '@awesome.me/kit-610837e1f9/icons/classic/thin';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -60,13 +61,13 @@ export default function Header({ color, locale }) {
   }
 
   async function logout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
     deleteCookie('oauth_user');
     deleteCookie('oauth_token');
     deleteCookie('oauth_session');
-    
     localStorage.setItem('profile', "");
     await personalizeSDK?.set({ "client_type": "" });
-
     window.location.reload();
   }
 
