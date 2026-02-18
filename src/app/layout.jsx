@@ -152,10 +152,7 @@ export default async function RootLayout({
   const headerFont = fontPicker(config.header_font);
   const buttonFont = fontPicker(config.button_font);
   const paragraphFont = fontPicker(config.paragraph_font);
-  
-  console.log('headerFont', headerFont);
-  console.log('buttonFont', buttonFont);
-  console.log('paragraphFont', paragraphFont);
+
   
   return (
     <html lang={locale}>
