@@ -56,7 +56,10 @@ const nextConfig: NextConfig = {
         RED_PANDA_COMMERCE_STORE_ID: process.env.RED_PANDA_COMMERCE_STORE_ID,
         RED_PANDA_COMMERCE_STORE_TOKEN: process.env.RED_PANDA_COMMERCE_STORE_TOKEN,
         RED_PANDA_COMMERCE_API_URL: typeof process.env.RED_PANDA_COMMERCE_API_URL === 'string' && !process.env.RED_PANDA_COMMERCE_API_URL.includes('https://') ? `https://${process.env.RED_PANDA_COMMERCE_API_URL}` : process.env.RED_PANDA_COMMERCE_API_URL,
-    }
+
+        NEXT_PUBLIC_OAUTH_URL: typeof process.env.NEXT_PUBLIC_OAUTH_URL === 'string' && !process.env.NEXT_PUBLIC_OAUTH_URL.includes('https://') ? `https://${process.env.NEXT_PUBLIC_OAUTH_URL}` : process.env.NEXT_PUBLIC_OAUTH_URL,
+        NEXT_PUBLIC_OAUTH_CLIENT_ID: process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID,
+    }   
 };
 
 export default withNextIntl(nextConfig);

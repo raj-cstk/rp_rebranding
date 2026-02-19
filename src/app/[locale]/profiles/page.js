@@ -176,6 +176,7 @@ export default function Profiles({ }) {
                         handleFieldChange(id, 'id', result.profiles[0].id);
                     }
                     personalizeSDK?.set({ "client_type": profile?.audience });
+                    localStorage.setItem('profile', profile?.fname);
                 }
                 setTimeout(() => {
                     setSaving(-1);
