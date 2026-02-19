@@ -17,6 +17,7 @@ import Agent from "@/components/agent";
 import RecommendationsBanner from "@/components/recommendationsBanner";
 import UserProfileForm from "@/components/userProfileForm";
 import ArticleBanner from "@/components/articleBanner";
+import Modal from "@/components/modal";
 import { useParams } from "next/navigation";
 import { useDataContext } from "@/context/data.context";
 import { homepageReferences } from "@/helpers/referencePaths";
@@ -26,7 +27,7 @@ export default function Home({ }) {
   const [entry, setEntry] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const params = useParams();
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const initialData = useDataContext();
 
   const getContent = async () => {
@@ -53,7 +54,19 @@ export default function Home({ }) {
     });
   }, []);
 
+  useEffect(() => {
+    if (!isLoading && entry?.modal) {
+      const timer = setTimeout(() => {
+        setIsModalOpen(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, entry?.modal]);
+
+
   if (isLoading) return;
+
+  console.log("Entry data:", entry);
 
   return (
     <>
@@ -125,6 +138,7 @@ export default function Home({ }) {
         </div>
 
         <Footer />
+        <Modal content={entry?.modal} open={isModalOpen} onClose={() => setIsModalOpen(false)} />
       </div>
     </>
   );

@@ -2,6 +2,7 @@ export const homepageReferences = [
     'modular_blocks.review.reference',
     'modular_blocks.image_grid.image.page',
     'hero.hero_banner',
+    'modal.modal',
     'hero.page',
     'modular_blocks.review.testimonials',
     'modular_blocks.review.testimonials.reviews.review',
@@ -12,6 +13,7 @@ export const homepageReferences = [
 ]
 
 export const pagesReferences = [
+    'modal.modal',
     'modular_blocks.hero.hero',
     'modular_blocks.hero_banner.hero',
     'modular_blocks.articles.articles',

@@ -19,7 +19,7 @@ import Agent from "@/components/agent";
 import LeadCapture from "@/components/leadCapture";
 import ProductFeature from "@/components/productFeature";
 import RecommendationsBanner from "@/components/recommendationsBanner";
-import ArticleBanner from "@/components/articleBanner";
+import Modal from "@/components/modal";
 import { useParams } from "next/navigation";
 import { useDataContext } from "@/context/data.context";
 import { pagesReferences } from "@/helpers/referencePaths";
@@ -28,6 +28,8 @@ import { jsonToHTML } from '@contentstack/utils';
 export default function Page({ }) {
     const [entry, setEntry] = useState({});
     const [isKiosk, setIsKiosk] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const params = useParams();
 
     const initialData = useDataContext();
@@ -47,11 +49,21 @@ export default function Page({ }) {
         });
 
         setEntry(entry[0]);
+        setIsLoading(false);
     };
 
     useEffect(() => {
         ContentstackClient.onEntryChange(getContent);
     }, []);
+
+    useEffect(() => {
+        if (!isLoading && entry?.modal) {
+            const timer = setTimeout(() => {
+                setIsModalOpen(true);
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [isLoading, entry?.modal]);
 
     useEffect(() => {
         if(entry?.taxonomies && entry?.taxonomies?.length > 0){
@@ -131,6 +143,7 @@ export default function Page({ }) {
                 <Footer />
             }
 
+            <Modal content={entry?.modal} open={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </div>
     );
 }
