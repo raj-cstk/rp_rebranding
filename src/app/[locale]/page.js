@@ -66,8 +66,6 @@ export default function Home({ }) {
 
   if (isLoading) return;
 
-  console.log("Entry data:", entry);
-
   return (
     <>
       <div

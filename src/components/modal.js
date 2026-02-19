@@ -1,11 +1,10 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import { useJstag } from "../context/lyticsTracking";
 import { ContentstackClient } from "@/lib/contentstack-client";
 
-
-export default function Modal({ content , open = false, onClose = () => {} }) {
+export default function Modal({ content, open = false, onClose = () => {} }) {
   const [formState, setFormState] = useState({});
   const jstag = useJstag();
 
@@ -14,17 +13,18 @@ export default function Modal({ content , open = false, onClose = () => {} }) {
   const modal = content?.[0];
   const blocks = modal?.modular_blocks || [];
 
-  console.log("button reference in modal:", modal?.button_reference);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
-
   // Handle form submit (button click)
   const handleSend = () => {
-    if (typeof jstag !== "undefined" && jstag && typeof jstag.send === "function") {
-      console.log("Sending to jstag:", formState);
+    if (
+      typeof jstag !== "undefined" &&
+      jstag &&
+      typeof jstag.send === "function"
+    ) {
       jstag.send(formState);
       console.log("Data sent to jstag successfully");
     } else {
@@ -33,27 +33,43 @@ export default function Modal({ content , open = false, onClose = () => {} }) {
     onClose();
   };
 
-  // Handle button click: fetch referenced entry and redirect if button_reference exists, else call handleSend
+  // Handle button click: fetch referenced entry and redirect if button_reference exists then check if any form fields are present if yes then send form data to jstag and then redirect, if no form fields are present then just redirect, if no button reference then just close the modal on button click
   const handleButtonClick = async () => {
-    if (modal?.button_reference && modal.button_reference[0]?._content_type_uid && modal.button_reference[0]?.uid) {
+    const hasFormBlock =
+      Array.isArray(blocks) &&
+      blocks.some(
+        (block) => block.name_block || block.phone_block || block.email_block,
+      );
+
+    if (
+      modal?.button_reference &&
+      modal.button_reference[0]?._content_type_uid &&
+      modal.button_reference[0]?.uid
+    ) {
       try {
-        const locale = modal.locale || (typeof window !== 'undefined' ? window.location.pathname?.split('/').filter(Boolean)[0] : 'en');
+        const locale =
+          modal.locale ||
+          (typeof window !== "undefined"
+            ? window.location.pathname?.split("/").filter(Boolean)[0]
+            : "en");
         const entry = await ContentstackClient.getElement(
           modal.button_reference[0].uid,
           modal.button_reference[0]._content_type_uid,
-          locale
+          locale,
         );
-        console.log("Fetched referenced entry for button:", entry);
         // Try to get the url from the entry
         const url = entry?.url || entry?.[0]?.url;
         if (url) {
+          if (hasFormBlock) {
+            handleSend();
+          }
           // Prepend domain and locale if not already present
-          let base = '';
-          if (typeof window !== 'undefined') {
+          let base = "";
+          if (typeof window !== "undefined") {
             base = window.location.origin;
           }
           // Ensure url starts with a slash
-          const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
+          const normalizedUrl = url.startsWith("/") ? url : `/${url}`;
           // If locale is not already in the url, add it
           let finalUrl = normalizedUrl;
           if (!normalizedUrl.startsWith(`/${locale}/`)) {
@@ -63,13 +79,9 @@ export default function Modal({ content , open = false, onClose = () => {} }) {
           return;
         }
       } catch (e) {
-        console.warn('Failed to fetch referenced entry or url:', e);
+        console.warn("Failed to fetch referenced entry or url:", e);
       }
     }
-    // Check if any of the blocks have name_block, phone_block, or email_block if yes then call handleSend to send form data to jstag, else just close the modal
-    const hasFormBlock = Array.isArray(blocks) && blocks.some(
-      block => block.name_block || block.phone_block || block.email_block
-    );
     if (hasFormBlock) {
       handleSend();
       console.log("Form submitted with data:", formState);
@@ -77,7 +89,6 @@ export default function Modal({ content , open = false, onClose = () => {} }) {
       onClose();
     }
   };
-  
 
   const getOverlayOpacity = (overlayValue) => {
     const opacityMap = {
@@ -87,7 +98,7 @@ export default function Modal({ content , open = false, onClose = () => {} }) {
       "75%": 0.25,
       "100%": 0,
     };
-    return opacityMap[overlayValue] ?? 1; 
+    return opacityMap[overlayValue] ?? 1;
   };
 
   const overlayOpacity = getOverlayOpacity(modal?.overlay);
@@ -124,7 +135,6 @@ export default function Modal({ content , open = false, onClose = () => {} }) {
 
         {/* Modal Content */}
         <div className="p-8">
-
           {/* Render blocks in sequence */}
           {blocks.map((block, index) => (
             <div key={index}>
@@ -141,7 +151,10 @@ export default function Modal({ content , open = false, onClose = () => {} }) {
               )}
               {/* Teaser Block */}
               {block.teaser_block?.teaser_text && (
-                <p className="text-3xl! text-gray-600 mb-4 leading-relaxed" {...(block.teaser_block?.$?.teaser_text || {})}>
+                <p
+                  className="text-3xl! text-gray-600 mb-4 leading-relaxed"
+                  {...(block.teaser_block?.$?.teaser_text || {})}
+                >
                   {block.teaser_block.teaser_text}
                 </p>
               )}
@@ -158,12 +171,14 @@ export default function Modal({ content , open = false, onClose = () => {} }) {
               {/* Full Name Field */}
               {block.name_block?.name_format === "Full Name" && (
                 <div className="mb-4">
-                  <label className="block text-gray-700 mb-1">{block.name_block?.full_name_label || "Full Name"}</label>
+                  <label className="block text-gray-700 mb-1">
+                    {block.name_block?.full_name_label || "Full Name"}
+                  </label>
                   <input
                     type="text"
                     name="fullname"
                     className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    value={formState.fullname ??  ''}
+                    value={formState.fullname ?? ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -171,41 +186,46 @@ export default function Modal({ content , open = false, onClose = () => {} }) {
 
               {/* First and last Name Field */}
               {block.name_block?.name_format === "First And Last Name" && (
-               <div>
-                 <div className="mb-4">
-                  <label className="block text-gray-700 mb-1">{block.name_block?.first_name_label || "First Name"}</label>
-                  <input
-                    type="text"
-                    name="first_name"
-                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    value={formState.first_name ?? ''}
-                    onChange={handleChange}
-                  />
-                </div>
+                <div>
+                  <div className="mb-4">
+                    <label className="block text-gray-700 mb-1">
+                      {block.name_block?.first_name_label || "First Name"}
+                    </label>
+                    <input
+                      type="text"
+                      name="first_name"
+                      className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      value={formState.first_name ?? ""}
+                      onChange={handleChange}
+                    />
+                  </div>
 
-                <div className="mb-4">
-                  <label className="block text-gray-700 mb-1">{block.name_block?.last_name_label || "Last Name"}</label>
-                  <input
-                    type="text"
-                    name="last_name"
-                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    value={formState.last_name ?? ''}
-                    onChange={handleChange}
-                  />
+                  <div className="mb-4">
+                    <label className="block text-gray-700 mb-1">
+                      {block.name_block?.last_name_label || "Last Name"}
+                    </label>
+                    <input
+                      type="text"
+                      name="last_name"
+                      className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      value={formState.last_name ?? ""}
+                      onChange={handleChange}
+                    />
+                  </div>
                 </div>
-              </div>
               )}
-
 
               {/* Phone Field */}
               {block.phone_block?.phone_number_field === true && (
                 <div className="mb-4">
-                  <label className="block text-gray-700 mb-1">{block.phone_block?.phone_number_label || "Phone Number"}</label>
+                  <label className="block text-gray-700 mb-1">
+                    {block.phone_block?.phone_number_label || "Phone Number"}
+                  </label>
                   <input
                     type="tel"
                     name="phone"
                     className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    value={formState.phone ?? ''}
+                    value={formState.phone ?? ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -214,12 +234,14 @@ export default function Modal({ content , open = false, onClose = () => {} }) {
               {/* Email Field */}
               {block.email_block?.email_field === true && (
                 <div className="mb-4">
-                  <label className="block text-gray-700 mb-1">{block.email_block?.email_label || "Email Address"}</label>
+                  <label className="block text-gray-700 mb-1">
+                    {block.email_block?.email_label || "Email Address"}
+                  </label>
                   <input
                     type="email"
                     name="email"
                     className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    value={formState.email ?? ''}
+                    value={formState.email ?? ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -234,7 +256,7 @@ export default function Modal({ content , open = false, onClose = () => {} }) {
                 onClick={handleButtonClick}
                 className="text-gray-800 font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
                 style={{
-                  backgroundColor: modal?.button_colour?.hex || '#FFFFFF',
+                  backgroundColor: modal?.button_colour?.hex || "#FFFFFF",
                   opacity: 0.8,
                 }}
                 {...(modal?.$?.button_text || {})}
