@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useJstag } from "../context/lyticsTracking";
-import { ContentstackClient } from "@/lib/contentstack-client";
 
 export default function Modal({ content, open = false, onClose = () => {} }) {
   const [formState, setFormState] = useState({});
@@ -41,47 +40,40 @@ export default function Modal({ content, open = false, onClose = () => {} }) {
         (block) => block.name_block || block.phone_block || block.email_block,
       );
 
-    if (
-      modal?.button_reference &&
-      modal.button_reference[0]?._content_type_uid &&
-      modal.button_reference[0]?.uid
-    ) {
+    const redirectUrl = modal?.button_reference?.[0]?.url;
+    if (redirectUrl) {
       try {
         const locale =
           modal.locale ||
           (typeof window !== "undefined"
             ? window.location.pathname?.split("/").filter(Boolean)[0]
             : "en");
-        const entry = await ContentstackClient.getElement(
-          modal.button_reference[0].uid,
-          modal.button_reference[0]._content_type_uid,
-          locale,
-        );
-        // Try to get the url from the entry
-        const url = entry?.url || entry?.[0]?.url;
-        if (url) {
-          if (hasFormBlock) {
-            handleSend();
-          }
-          // Prepend domain and locale if not already present
-          let base = "";
-          if (typeof window !== "undefined") {
-            base = window.location.origin;
-          }
-          // Ensure url starts with a slash
-          const normalizedUrl = url.startsWith("/") ? url : `/${url}`;
-          // If locale is not already in the url, add it
-          let finalUrl = normalizedUrl;
-          if (!normalizedUrl.startsWith(`/${locale}/`)) {
-            finalUrl = `/${locale}${normalizedUrl}`;
-          }
-          window.location.href = `${base}${finalUrl}`;
-          return;
+
+        if (hasFormBlock) {
+          handleSend();
         }
+
+        let base = "";
+        if (typeof window !== "undefined") {
+          base = window.location.origin;
+        }
+
+        const normalizedUrl = redirectUrl.startsWith("/")
+          ? redirectUrl
+          : `/${redirectUrl}`;
+
+        let finalUrl = normalizedUrl;
+        if (!normalizedUrl.startsWith(`/${locale}/`)) {
+          finalUrl = `/${locale}${normalizedUrl}`;
+        }
+
+        window.location.href = `${base}${finalUrl}`;
+        return;
       } catch (e) {
-        console.warn("Failed to fetch referenced entry or url:", e);
+        console.warn("Failed to build redirect url:", e);
       }
     }
+
     if (hasFormBlock) {
       handleSend();
       console.log("Form submitted with data:", formState);

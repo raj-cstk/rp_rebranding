@@ -57,13 +57,20 @@ export default function Page({ }) {
     }, []);
 
     useEffect(() => {
-        if (!isLoading && entry?.modal) {
+    if (!isLoading && entry?.modal) {
+        const key = `page_modal_shown_${params.locale}`; 
+        const hasShownModal = localStorage.getItem(key); 
+
+        if (!hasShownModal) {
             const timer = setTimeout(() => {
                 setIsModalOpen(true);
+                localStorage.setItem(key, "true"); 
             }, 500);
+
             return () => clearTimeout(timer);
         }
-    }, [isLoading, entry?.modal]);
+    }
+    }, [isLoading, entry?.modal, params.locale]); 
 
     useEffect(() => {
         if(entry?.taxonomies && entry?.taxonomies?.length > 0){
