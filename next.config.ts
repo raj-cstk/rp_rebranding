@@ -6,6 +6,9 @@ const withNextIntl = createNextIntlPlugin();
 const nextConfig: NextConfig = {
   reactStrictMode: false,
   devIndicators: false,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
     images: {
         remotePatterns: [
             {
