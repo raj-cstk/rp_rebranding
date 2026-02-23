@@ -74,6 +74,17 @@ const navigation = [
         router.refresh();
     }
 
+    function resetModalFlags(){
+      Object.keys(localStorage).forEach((key) => {
+        if (
+            key.startsWith("homepage_modal_shown_") ||
+            key.startsWith("page_modal_shown_")
+        ) {
+            localStorage.removeItem(key);
+        }
+      });
+    }
+
     return (
       <footer className="bg-white">
         <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
@@ -87,7 +98,11 @@ const navigation = [
             )))}
           </div>
           <div className="mt-8 md:order-1 md:mt-0">
-            <p onClick={resetSegment} className="text-center text-xs leading-5 text-gray-500 cursor-pointer">
+            <p onClick={() => {
+              resetModalFlags(); 
+              resetSegment(); 
+              }} 
+            className="text-center text-xs leading-5 text-gray-500 cursor-pointer">
               &copy; {year} Contentstack Inc. All rights reserved.
             </p>
           </div>
