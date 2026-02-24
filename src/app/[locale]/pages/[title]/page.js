@@ -58,7 +58,7 @@ export default function Page({ }) {
 
     useEffect(() => {
     if (!isLoading && entry?.modal) {
-        const key = `page_modal_shown_${params.locale}`; 
+        const key = `page_modal_shown_${params.locale}_${params.title}`; 
         const hasShownModal = localStorage.getItem(key); 
 
         if (!hasShownModal) {
