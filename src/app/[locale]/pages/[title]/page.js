@@ -18,6 +18,7 @@ import Agent from "@/components/agent";
 import LeadCapture from "@/components/leadCapture";
 import ProductFeature from "@/components/productFeature";
 import RecommendationsBanner from "@/components/recommendationsBanner";
+import ArticleBanner from "@/components/articleBanner";
 import Modal from "@/components/modal";
 import { useParams } from "next/navigation";
 import { useDataContext } from "@/context/data.context";
