@@ -11,6 +11,7 @@ export const homepageReferences = [
     'modular_blocks.cards.card.page',
     'modular_blocks.text_and_image.page',
     'modular_blocks.article_banner.articles',
+    'modular_blocks.category_banner.plp',
 ]
 
 export const pagesReferences = [
@@ -24,6 +25,7 @@ export const pagesReferences = [
     'modular_blocks.review.testimonials',
     'modular_blocks.review.testimonials.reviews.review',
     'modular_blocks.product_banner.plp',
+    'modular_blocks.category_banner.plp',
     'modular_blocks.cards.card.page',
     'modular_blocks.text_and_image.page',
     'modular_blocks.article_banner.articles',
