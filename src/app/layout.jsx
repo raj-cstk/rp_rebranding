@@ -86,7 +86,7 @@ const cormorant = Cormorant({
 // -------------------------------
 const getConfig = cache(async () => {
   const res = await fetch(
-    "https://cdn.contentstack.io/v3/content_types/config/entries",
+    `https://${process.env.CONTENTSTACK_CDN_HOST}/v3/content_types/config/entries`,
     {
       method: "GET",
       headers: {
@@ -94,11 +94,10 @@ const getConfig = cache(async () => {
         api_key: process.env.CONTENTSTACK_API_KEY,
         access_token: process.env.CONTENTSTACK_DELIVERY_TOKEN,
       },
-      next: { revalidate: 60 }, // optional caching
     }
   );
 
-  const json = await res.json();
+  const json = await res?.json();
   return json.entries?.[0] || {};
 });
 

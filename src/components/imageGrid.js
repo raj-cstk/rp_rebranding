@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function ImageGrid({ content }) {
   return (
-    <div className="max-w-8xl mx-auto mt-32 mb-32 px-8 font-cinzel">
+    <div className="max-w-8xl mx-auto mt-32 mb-32 px-8">
       {(content?.image && content?.image?.length === 0) && (
         <div
           className="h-[800px] visual-builder__empty-block-parent"
