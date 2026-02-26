@@ -6,9 +6,6 @@ const withNextIntl = createNextIntlPlugin();
 const nextConfig: NextConfig = {
   reactStrictMode: false,
   devIndicators: false,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
     images: {
         remotePatterns: [
             {
@@ -38,7 +35,7 @@ const nextConfig: NextConfig = {
         CONTENTSTACK_DELIVERY_TOKEN: process.env.CONTENTSTACK_DELIVERY_TOKEN,
         CONTENTSTACK_ENVIRONMENT: process.env.CONTENTSTACK_ENVIRONMENT,
         CONTENTSTACK_BRANCH: process.env.CONTENTSTACK_BRANCH,
-        CONTENTSTACK_CDN_HOST: process.env.CONTENTSTACK_CDN_HOST,
+        CONTENTSTACK_CDN_HOST: process.env.CONTENTSTACK_CDN_HOST || 'cdn.contentstack.io',
         CONTENTSTACK_APP_HOST: process.env.CONTENTSTACK_APP_HOST || 'app.contentstack.com',
 
         CONTENTSTACK_REGION: process.env.CONTENTSTACK_REGION,
