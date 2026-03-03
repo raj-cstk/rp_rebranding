@@ -58,19 +58,19 @@ export default function Page({ }) {
 
     useEffect(() => {
     if (!isLoading && entry?.modal) {
-        const key = `page_modal_shown_${params.locale}_${params.title}`; 
-        const hasShownModal = localStorage.getItem(key); 
+        const key = `page_modal_shown_${params.locale}_${params.title}`;
+        const hasShownModal = localStorage.getItem(key);
 
         if (!hasShownModal) {
-            const timer = setTimeout(() => {
-                setIsModalOpen(true);
-                localStorage.setItem(key, "true"); 
-            }, 500);
+        const timer = setTimeout(() => {
+            setIsModalOpen(true);
+            localStorage.setItem(key, "true");
+        }, 500);
 
-            return () => clearTimeout(timer);
+        return () => clearTimeout(timer);
         }
     }
-    }, [isLoading, entry?.modal, params.locale]); 
+    }, [isLoading, entry?.modal, params.locale, params.title]);
 
     useEffect(() => {
         if(entry?.taxonomies && entry?.taxonomies?.length > 0){

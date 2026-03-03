@@ -84,17 +84,47 @@ export default function Hero({ content, locale, withHeader, cslp }) {
               aspectRatioClass = "aspect-[21/9]";
             }
 
+            const mediaOpacity = hero?.media_overlay || "75%";
+            const imageFile = hero?.image_options?.image?.url || null;
+            const imageHeight = hero?.image_options?.image_height || "h-auto";
+
+            const videoFile = hero?.video_options?.video?.url || null;
+            const videoControls = hero?.video_options?.video_controls;
+            const videoLoop = hero?.video_options?.in_loop;
+
             return (
               <div
                 key={index}
                 className={`bg-black relative isolate overflow-hidden ${aspectRatioClass} flex`}
               >
-                <img
-                  className="absolute inset-0 -z-10 h-full w-full object-cover"
-                  style={{opacity : (hero?.image_opacity ? `${hero?.image_opacity}%` : "75%")}}
-                  src={hero?.image?.url}
-                  {...hero.$?.image}
-                />
+                {/* PRIORITY: Video > Image */}
+
+                {videoFile ? (
+                  <video
+                    className="absolute inset-0 -z-10 h-full w-full object-cover"
+                    style={{ opacity: mediaOpacity }}
+                    autoPlay={videoControls === "Autoplay"}
+                    controls={videoControls === "Show Controls"}
+                    muted={videoControls === "Autoplay"}
+                    loop={videoControls === "Autoplay"
+                            ? true
+                            : videoControls === "Show Controls"
+                            ? videoLoop
+                            : false
+                          }
+                  >
+                    <source src={videoFile} type="video/mp4" />
+                  </video>
+                ) : imageFile ? (
+                  <img
+                    className={`absolute inset-0 -z-10 w-full ${imageHeight} object-cover`}
+                    style={{
+                      opacity: mediaOpacity
+                    }}
+                    src={imageFile}
+                    {...hero?.$?.image_options?.image}
+                  />
+                ) : null}
 
                 {withHeader ? <Header color="white" locale={locale} /> : <></>}
                 <div className={"absolute max-w-2xl " + positionClass}>

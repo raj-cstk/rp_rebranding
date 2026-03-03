@@ -126,10 +126,15 @@ export default function Modal({ content, open = false, onClose = () => {} }) {
         </button>
 
         {/* Modal Content */}
-        <div className="p-8">
+        <div
+          className={`p-8 ${
+            blocks.length === 0 ? "visual-builder__empty-block-parent" : ""
+          }`}
+          {...modal?.$?.modular_blocks}
+        >
           {/* Render blocks in sequence */}
           {blocks.map((block, index) => (
-            <div key={index}>
+            <div key={index} {...modal?.$?.["modular_blocks__" + index]}>
               {/* Image Block */}
               {block.image_block?.image?.url && (
                 <div className="mb-6 h-fit overflow-hidden bg-gray-100 ">
