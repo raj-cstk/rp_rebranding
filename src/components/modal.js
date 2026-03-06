@@ -168,7 +168,7 @@ export default function Modal({ content, open = false, onClose = () => {} }) {
               {/* Full Name Field */}
               {block.name_block?.name_format === "Full Name" && (
                 <div className="mb-4">
-                  <label className="block text-gray-700 mb-1">
+                  <label className="block text-gray-700 mb-1" {...(block.name_block?.$?.full_name_label || {})} >
                     {block.name_block?.full_name_label || "Full Name"}
                   </label>
                   <input
@@ -185,7 +185,7 @@ export default function Modal({ content, open = false, onClose = () => {} }) {
               {block.name_block?.name_format === "First And Last Name" && (
                 <div>
                   <div className="mb-4">
-                    <label className="block text-gray-700 mb-1">
+                    <label className="block text-gray-700 mb-1" {...(block.name_block?.$?.first_name_label || {})} >
                       {block.name_block?.first_name_label || "First Name"}
                     </label>
                     <input
@@ -198,7 +198,7 @@ export default function Modal({ content, open = false, onClose = () => {} }) {
                   </div>
 
                   <div className="mb-4">
-                    <label className="block text-gray-700 mb-1">
+                    <label className="block text-gray-700 mb-1" {...(block.name_block?.$?.last_name_label || {})} >
                       {block.name_block?.last_name_label || "Last Name"}
                     </label>
                     <input
@@ -215,7 +215,7 @@ export default function Modal({ content, open = false, onClose = () => {} }) {
               {/* Phone Field */}
               {block.phone_block?.phone_number_field === true && (
                 <div className="mb-4">
-                  <label className="block text-gray-700 mb-1">
+                  <label className="block text-gray-700 mb-1" {...(block.phone_block?.$?.phone_number_label || {})} >
                     {block.phone_block?.phone_number_label || "Phone Number"}
                   </label>
                   <input
@@ -231,7 +231,7 @@ export default function Modal({ content, open = false, onClose = () => {} }) {
               {/* Email Field */}
               {block.email_block?.email_field === true && (
                 <div className="mb-4">
-                  <label className="block text-gray-700 mb-1">
+                  <label className="block text-gray-700 mb-1" {...(block.email_block?.$?.email_label || {})} >
                     {block.email_block?.email_label || "Email Address"}
                   </label>
                   <input

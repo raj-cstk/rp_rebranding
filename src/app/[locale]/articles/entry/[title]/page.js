@@ -37,6 +37,11 @@ export default function Page({ }) {
     if (isLoading) 
         return;
 
+    // video helpers extracted for clarity (similar to hero.js pattern)
+    const videoFile = entry?.video_options?.video?.url;
+    const videoControls = entry?.video_options?.video_controls;
+    const videoLoop = entry?.video_options?.in_loop;
+
     return (
         <div>
             <Header locale={params.locale} />
@@ -47,15 +52,21 @@ export default function Page({ }) {
                         <Link href="/en/articles">ARTICLES</Link> / {entry?.headline}
                     </p>
                     {/* show video if available, otherwise image */}
-                    {entry?.video_options?.video?.url ? (
+                    {videoFile ? (
                         <video
                             className="mb-10 w-full"
-                            controls={entry?.video_options?.video_controls === "Show Controls"}
-                            autoPlay={entry?.video_options?.video_controls === "Autoplay"}
-                            muted={entry?.video_options?.video_controls === "Autoplay"}
-                            loop={entry?.video_options?.in_loop}
+                            controls={videoControls === "Show Controls"}
+                            autoPlay={videoControls === "Autoplay"}
+                            muted={videoControls === "Autoplay"}
+                            loop={
+                                videoControls === "Autoplay"
+                                    ? true
+                                    : videoControls === "Show Controls"
+                                    ? videoLoop
+                                    : false
+                            }
                         >
-                            <source src={entry.video_options.video.url} />
+                            <source src={videoFile} />
                         </video>
                     ) : entry?.banner_image?.url ? (
                         <img src={entry?.banner_image?.url} className="mb-10" {...entry?.banner_image?.$?.url}></img>
