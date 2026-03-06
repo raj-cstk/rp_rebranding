@@ -37,7 +37,7 @@ export default function Page({ }) {
     if (isLoading) 
         return;
 
-    // video helpers extracted for clarity (similar to hero.js pattern)
+    // video helpers
     const videoFile = entry?.video_options?.video?.url;
     const videoControls = entry?.video_options?.video_controls;
     const videoLoop = entry?.video_options?.in_loop;
