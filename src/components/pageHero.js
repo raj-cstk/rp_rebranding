@@ -11,7 +11,6 @@ export default function PageHero({ content }) {
   const videoControls = content?.video_options?.video_controls;
   const videoLoop = content?.video_options?.in_loop;
   const mediaOverlay = 1 - parseInt(content?.overlay ?? "75%") / 100;
-  console.log("PageHero content:", content); // Debug log to check the structure of the content
 
   return (
     <div>

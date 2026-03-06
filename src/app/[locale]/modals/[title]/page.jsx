@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 import { useParams} from "next/navigation";
 import { ContentstackClient } from "@/lib/contentstack-client";
 import Modal from "@/components/modal";
+import { inLivePreview } from "@/utils/lp";
 
 export default function ModalPreviewPage() {
   const params = useParams();
   const [modalData, setModalData] = useState(null);
 
-  const isActivePreview = true;
+  const isActivePreview = inLivePreview();
 
   useEffect(() => {
     if (!isActivePreview) return;

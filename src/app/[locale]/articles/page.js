@@ -31,7 +31,6 @@ export default function AllArticles({ }) {
 
 
   if (isLoading) return;
-  console.log("Entries: ", entries);
 
   return (
     <>
