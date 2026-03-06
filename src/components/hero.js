@@ -113,7 +113,7 @@ export default function Hero({ content, locale, withHeader, cslp }) {
                             : false
                           }
                   >
-                    <source src={videoFile} type="video/mp4" />
+                    <source src={videoFile} />
                   </video>
                 ) : imageFile ? (
                   <img

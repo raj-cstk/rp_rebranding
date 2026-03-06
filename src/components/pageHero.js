@@ -39,7 +39,7 @@ export default function PageHero({ content }) {
                       : false
                 }
               >
-                <source src={videoUrl} type="video/mp4" />
+                <source src={videoUrl}/>
               </video>
             ) : hasValidImageUrl ? (
               <img
@@ -159,7 +159,7 @@ export default function PageHero({ content }) {
                             : false
                       }
                     >
-                      <source src={videoUrl} type="video/mp4" />
+                      <source src={videoUrl} />
                     </video>
                   ) : hasValidImageUrl ? (
                     <img
@@ -226,7 +226,7 @@ export default function PageHero({ content }) {
                             : false
                       }
                     >
-                      <source src={videoUrl} type="video/mp4" />
+                      <source src={videoUrl} />
                     </video>
                   ) : hasValidImageUrl ? (
                     <img
@@ -267,7 +267,7 @@ export default function PageHero({ content }) {
               }
               {...content?.$?.video}
             >
-              <source src={videoUrl} type="video/mp4" />
+              <source src={videoUrl} />
             </video>
           ) : hasValidImageUrl ? (
             <img
