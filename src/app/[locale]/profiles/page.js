@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleUser, faTrash, faPlus, faCheck } from "@awesome.me/kit-610837e1f9/icons/classic/solid";
 import { useParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import { usePersonalize } from '@/context/personalize.context';
+import { setPersonalizeLiveAttributesCookie } from '@/lib/cspersonalize';
 
 export default function Profiles({ }) {
     const [profiles, setProfiles] = useState([]);
@@ -17,7 +17,6 @@ export default function Profiles({ }) {
     const [deleting, setDeleting] = useState(-1);
     const params = useParams();
 
-    const personalizeSDK = usePersonalize();
 
     const getUser = async () => {
         const supabase = createClient();
@@ -175,7 +174,7 @@ export default function Profiles({ }) {
                     if(profile?.isNew){
                         handleFieldChange(id, 'id', result.profiles[0].id);
                     }
-                    personalizeSDK?.set({ "client_type": profile?.audience });
+                    setPersonalizeLiveAttributesCookie({ client_type: profile?.audience });
                     localStorage.setItem('profile', profile?.fname);
                 }
                 setTimeout(() => {

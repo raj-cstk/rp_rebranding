@@ -3,7 +3,7 @@ import { Fragment, useEffect, useState} from 'react';
 import { cslp } from '@/lib/cstack';
 import { useRouter } from 'next/navigation';
 import { ContentstackClient } from "@/lib/contentstack-client";
-import { usePersonalize } from '@/context/personalize.context';
+import { setPersonalizeLiveAttributesCookie } from '@/lib/cspersonalize';
 import { createClient } from '@/utils/supabase/client';
 import { faCheck, faCircleUser as loggedIn, faCircleQuestion } from '@awesome.me/kit-610837e1f9/icons/classic/solid';
 import { faCircleUser as loggedOut } from '@awesome.me/kit-610837e1f9/icons/classic/thin';
@@ -34,7 +34,6 @@ export default function Header({ color, locale }) {
   const pathname = usePathname();
   const slug = pathname.slice(3);
   const jstag = useJstag();
-  const personalizeSDK = usePersonalize();
   const params = useParams();
   const { togglePanel } = useSlidePanel();
 
@@ -55,7 +54,7 @@ export default function Header({ color, locale }) {
           const foundProfile = profiles?.find(p => p.fname === saved);
           if (foundProfile) {
             setAvatar(foundProfile.avatar);
-            await personalizeSDK?.set({ "client_type": foundProfile.audience });
+            setPersonalizeLiveAttributesCookie({ client_type: foundProfile.audience });
           }
         }
       }
@@ -70,7 +69,7 @@ export default function Header({ color, locale }) {
     deleteCookie('oauth_token');
     deleteCookie('oauth_session');
     localStorage.setItem('profile', "");
-    await personalizeSDK?.set({ "client_type": "" });
+    setPersonalizeLiveAttributesCookie({ client_type: "" });
     window.location.reload();
   }
 
@@ -128,7 +127,7 @@ export default function Header({ color, locale }) {
         const foundProfile = tempProfiles.find(p => p.fname === saved);
         if (foundProfile) {
           setAvatar(foundProfile.avatar);
-          await personalizeSDK?.set({ "client_type": foundProfile.audience });
+          setPersonalizeLiveAttributesCookie({ client_type: foundProfile.audience });
         }
       }
     } catch (error) {
@@ -160,12 +159,12 @@ export default function Header({ color, locale }) {
 
     if (name === ""){
       localStorage.setItem('profile', "");
-      await personalizeSDK?.set({ "client_type": "" });
+      setPersonalizeLiveAttributesCookie({ client_type: "" });
     }
     else {
       const profile = profiles.find(p => p.fname === name);
       localStorage.setItem('profile', profile.fname);
-      await personalizeSDK?.set({ "client_type": profile.audience });
+      setPersonalizeLiveAttributesCookie({ client_type: profile.audience });
     }
     window.location.reload();
   }

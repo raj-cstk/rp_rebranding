@@ -7,7 +7,7 @@ import {
 import Footer from '@/components/footer';
 import Header from '@/components/header';
 import { ContentstackClient } from '../../../lib/contentstack-client';
-import { usePersonalize } from '@/context/personalize.context';
+import { setPersonalizeLiveAttributesCookie } from '@/lib/cspersonalize';
 import {
   Dialog,
   Transition,
@@ -21,7 +21,6 @@ export default function Page({ }) {
     const [category, setCategory] = useState('None');
     const [entry, setEntry] = useState({});
     const params = useParams();
-    const personalizeSDK = usePersonalize()
 
 
     const getContent = async () => {
@@ -37,7 +36,7 @@ export default function Page({ }) {
     async function submit (e) {
         e.preventDefault();
 
-        await personalizeSDK?.set({"client_type": category})
+        setPersonalizeLiveAttributesCookie({ client_type: category })
         setDialogOpen(true);
     }
 

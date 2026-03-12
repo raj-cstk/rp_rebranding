@@ -27,7 +27,6 @@ export async function POST(req) {
     const hubOrigin = new URL(oauthUrl).origin
     const exchangeUrl = `${hubOrigin}/api/oauth/exchange-code`
 
-    console.log('[exchange-code] calling hub:', exchangeUrl)
 
     let hubRes
     try {
@@ -54,7 +53,6 @@ export async function POST(req) {
     }
 
     const tokens = await hubRes.json()
-    console.log('[exchange-code] hub response keys:', Object.keys(tokens))
     const { access_token, refresh_token } = tokens
 
     if (!access_token || !refresh_token) {

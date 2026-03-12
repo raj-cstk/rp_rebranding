@@ -1,4 +1,4 @@
 fileignoreconfig:
-- filename: src/app/[locale]/profiles/page.js
-  checksum: ca9af22e155d35ed951a5b7ade75e20c0d1516a11083a0cccd6239e11188c357
+- filename: src/lib/cspersonalize.js
+  checksum: 71edf1272da422d11655af5db55e791bdbe47bc0b67dc111893ddaf23fb625c7
 version: "1.0"
