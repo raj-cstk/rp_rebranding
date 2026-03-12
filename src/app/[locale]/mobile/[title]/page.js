@@ -7,7 +7,7 @@ import BackgroundAndButtons from '@/components/mobile/backgroundAndButtons';
 import ButtonCTA from '@/components/mobile/buttonCTA';
 import IconGrid from '@/components/mobile/iconGrid';
 import { ContentstackClient } from "@/lib/contentstack-client"
-import { usePersonalize } from '@/context/personalize.context';
+import { setPersonalizeLiveAttributesCookie } from '@/lib/cspersonalize';
 import { createClient } from '@/utils/supabase/client';
 import { faUser } from '@awesome.me/kit-610837e1f9/icons/classic/light';
 import {
@@ -52,7 +52,6 @@ export default function Mobile({ }) {
     const [selectedProfile, setSelectedProfile] = useState("");
     const params = useParams();
 
-    const personalizeSDK = usePersonalize();
 
     const getUser = () => {
         const oauthUser = getCookie('oauth_user');
@@ -67,7 +66,7 @@ export default function Mobile({ }) {
         deleteCookie('oauth_token');
         deleteCookie('oauth_session');
         localStorage.setItem('profile', "");
-        await personalizeSDK?.set({ "client_type": "" });
+        setPersonalizeLiveAttributesCookie({ client_type: "" });
         window.location.reload();
     }
 
@@ -153,12 +152,12 @@ export default function Mobile({ }) {
 
         if (name === ""){
             localStorage.setItem('profile', "");
-            await personalizeSDK?.set({ "client_type": "" });
+            setPersonalizeLiveAttributesCookie({ client_type: "" });
         }
         else {
             const profile = profiles.find(p => p.fname === name);
             localStorage.setItem('profile', profile.audience);
-            await personalizeSDK?.set({ "client_type": profile.audience });
+            setPersonalizeLiveAttributesCookie({ client_type: profile.audience });
         }
         window.location.reload();
     }

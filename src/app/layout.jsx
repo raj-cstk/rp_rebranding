@@ -1,7 +1,6 @@
 import { cache } from "react";
 import "./globals.css";
 import Script from 'next/script';
-import { PersonalizeProvider } from "@/context/personalize.context";
 import { LyticsTracking } from "@/context/lyticsTracking";
 import AppWrapper from "@/components/appWrapper";
 import {
@@ -185,9 +184,7 @@ export default async function RootLayout({
       >
         {process.env.LYTICS_TAG && <LyticsTracking />}
         <AppWrapper>
-          {process.env.CONTENTSTACK_PERSONALIZATION ? <PersonalizeProvider>
-            {children}
-          </PersonalizeProvider> : <>{children}</>}
+          {children}
         </AppWrapper>
       </body>
     </html>
