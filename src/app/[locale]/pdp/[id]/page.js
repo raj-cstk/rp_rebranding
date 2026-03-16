@@ -31,6 +31,25 @@ import { pdpReferences } from "@/helpers/referencePaths";
 import { useDataContext } from "@/context/data.context";
 import { jsonToHTML } from '@contentstack/utils';
 
+// Map product name/description keywords to jstag category
+const PRODUCT_CATEGORY_MAP = [
+  { keywords: ["short-sleeve", "long-sleeve"], category: "party" },
+  { keywords: ["swimsuit", "swim suit"], category: "beach" },
+  { keywords: ["swim"], category: "beach" },
+  { keywords: ["shorts"], category: "shorts" },
+  { keywords: ["polo"], category: "party" },
+];
+
+function getCategoryFromProduct(name, description) {
+  const text = [name, description].filter(Boolean).join(" ").toLowerCase();
+  const categories = [];
+  for (const { keywords, category } of PRODUCT_CATEGORY_MAP) {
+    if (keywords.some((kw) => text.includes(kw)) && !categories.includes(category)) {
+      categories.push(category);
+    }
+  }
+  return categories.join(",");
+}
 
 export default function Page({  }) {
   const [entry, setEntry] = useState({});
@@ -43,12 +62,31 @@ export default function Page({  }) {
   const [variantsOpen, setVariantsOpen] = useState(false);
   const [variantImageIndices, setVariantImageIndices] = useState({});
   const [translations, setTranslations] = useState({});
+  const [purchaseOpen, setPurchaseOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   const initialData = useDataContext();
+  const jstag = useJstag();
 
   const handleGoBack = () => {
     router.back();
   };
+
+  const handleChange = (event) => {
+    event.preventDefault();
+    setInputValue(event.target.value);
+  };
+
+  function buyClick(price) {
+    jstag.send({
+      shopify_total_spend: price,
+      _e: "purchase",
+      email: inputValue,
+    });
+    jstag.call("resetPolling");
+    setInputValue("");
+    setPurchaseOpen(false);
+  }
 
   const getProductsbyURL = useCallback(async (id) => {
       const products = await RPCommerce.getProductByUrl(id, params.locale);
@@ -251,7 +289,15 @@ export default function Page({  }) {
               )}
               <button
                 className="mt-4 rounded-[60px] md:w-full lg:w-3/4 xl:w-4/6 text-nowrap relative button px-8 py-4 text-md tracking-widest uppercase bg-white font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:bg-cyan-600 hover:text-white"
-                onClick={() => setPurchaseOpen(true)}
+                onClick={() => {
+                  const productName = entry?.product_name || product?.name || "";
+                  const description = entry?.description || product?.description || "";
+                  const product_category = getCategoryFromProduct(productName, description);
+                  if (typeof jstag?.send === "function") {
+                    jstag.send({ product_name: productName, product_category });
+                  }
+                  setPurchaseOpen(true);
+                }}
               >
                {getTranslation("cart_button", "Add to Cart")}
               </button>
@@ -460,6 +506,77 @@ export default function Page({  }) {
             </div>
           </div>
         </div>
+      </div>
+
+      <div
+        className={`fixed top-0 h-full bg-black opacity-50 w-full z-40 hidden ${purchaseOpen ? "sm:block" : ""
+          }`}
+      ></div>
+      <div
+        className={`fixed w-full sm:w-[350px] z-50 h-full top-0 right-0 border-l bg-white shadow-lg p-4  transition-all duration-500 ${purchaseOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+      >
+        <XMarkIcon
+          className="size-5 ml-auto cursor-pointer"
+          onClick={() => setPurchaseOpen(false)}
+        />
+
+        <p className="">Your purchase:</p>
+
+        <p className="mt font-medium ">
+          {entry?.product_name ? entry?.product_name : product?.name}
+        </p>
+
+        <div className="flex mt-10">
+          <div className="w-5/12">
+            <p>Price:</p>
+            <p className="mt-3">Total:</p>
+          </div>
+          {product?.price && (
+            <div className="w-7/12">
+              <p>${entry?.price ? entry?.price : product?.price}</p>
+              <p className="mt-3">
+                ${entry?.price ? entry?.price : product?.price}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <form className="mt-6 flex w-full">
+          <input
+            className="rounded-lg w-full py-2 px-4 max-md:p-1 border mr-0 text-gray-800 border-gray-200 bg-white"
+            placeholder="Email"
+            value={inputValue}
+            onChange={handleChange}
+          />
+        </form>
+
+        <div className="flex mt-3">
+          <input type="checkbox" checked />
+          <label className="ml-2">Use card on file</label>
+        </div>
+
+        <div className="mt-2 bg-[#efefef] py-2 px-4 flex items-center gap-4">
+          <img
+            className="h-8"
+            src="https://images.contentstack.io/v3/assets/blt678db9efc83edd2d/blt237b95a3377390c0/681bec8e9b0925fa46df2048/amex-svgrepo-com.svg"
+          />
+          <p>...5309</p>
+        </div>
+
+        <button
+          onClick={() => buyClick(entry?.price ? entry?.price : product?.price)}
+          className="bg-black text-white rounded-lg py-4 w-full mt-10 font-semibold  tracking-wide border-black border-2 hover:bg-white hover:text-black"
+        >
+          Complete Purchase
+        </button>
+
+        <button className="rounded-lg border-2 border-[#5a30f4] w-full mt-4 flex justify-center p-2">
+          <img
+            className="h-10"
+            src="https://images.contentstack.io/v3/assets/blt678db9efc83edd2d/bltbc9d297783dbfffc/681e1c146b233bd9775c08c4/spay.png"
+          />
+        </button>
       </div>
 
       <Footer />
