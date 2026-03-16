@@ -87,21 +87,27 @@ export default function Hero({ content, locale, withHeader, cslp }) {
             const mediaOpacity = hero?.media_overlay || "75%";
             const imageFile = hero?.image_options?.image?.url || null;
             const imageHeight = hero?.image_options?.image_height || "h-auto";
+            const isScreenHeight = imageHeight === "h-screen";
 
             const videoFile = hero?.video_options?.video?.url || null;
             const videoControls = hero?.video_options?.video_controls;
             const videoLoop = hero?.video_options?.in_loop;
 
+            const containerHeightClass = videoFile
+              ? aspectRatioClass
+              : isScreenHeight
+                ? "h-screen w-full"
+                : aspectRatioClass;
+
             return (
               <div
                 key={index}
-                className={`bg-black relative isolate overflow-hidden ${aspectRatioClass} flex`}
+                className={`bg-black relative isolate overflow-hidden flex ${containerHeightClass}`}
               >
-                {/* PRIORITY: Video > Image */}
 
                 {videoFile ? (
                   <video
-                    className="absolute inset-0 -z-10 h-full w-full object-cover"
+                    className="absolute inset-0 -z-10 min-h-full min-w-full h-full w-full object-cover"
                     style={{ opacity: mediaOpacity }}
                     autoPlay={videoControls === "Autoplay"}
                     controls={videoControls === "Show Controls"}
@@ -117,7 +123,7 @@ export default function Hero({ content, locale, withHeader, cslp }) {
                   </video>
                 ) : imageFile ? (
                   <img
-                    className={`absolute inset-0 -z-10 w-full ${imageHeight} object-cover`}
+                    className="absolute inset-0 -z-10 min-h-full min-w-full h-full w-full object-cover"
                     style={{
                       opacity: mediaOpacity
                     }}
