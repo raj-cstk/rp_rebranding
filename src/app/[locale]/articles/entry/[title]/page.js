@@ -37,6 +37,11 @@ export default function Page({ }) {
     if (isLoading) 
         return;
 
+    // video helpers
+    const videoFile = entry?.video_options?.video?.url;
+    const videoControls = entry?.video_options?.video_controls;
+    const videoLoop = entry?.video_options?.in_loop;
+
     return (
         <div>
             <Header locale={params.locale} />
@@ -46,16 +51,32 @@ export default function Page({ }) {
                     <p className="mb-6 text-sm font-semibold leading-7 text-cyan-600 uppercase">
                         <Link href="/en/articles">ARTICLES</Link> / {entry?.headline}
                     </p>
-                    {!entry?.banner_image?.url &&
+                    {/* show video if available, otherwise image */}
+                    {videoFile ? (
+                        <video
+                            className="mb-10 w-full"
+                            controls={videoControls === "Show Controls"}
+                            autoPlay={videoControls === "Autoplay"}
+                            muted={videoControls === "Autoplay"}
+                            loop={
+                                videoControls === "Autoplay"
+                                    ? true
+                                    : videoControls === "Show Controls"
+                                    ? videoLoop
+                                    : false
+                            }
+                        >
+                            <source src={videoFile} />
+                        </video>
+                    ) : entry?.banner_image?.url ? (
+                        <img src={entry?.banner_image?.url} className="mb-10" {...entry?.banner_image?.$?.url}></img>
+                    ) : (
                         <div className="h-[300px] w-full bg-gray-400 flex items-center justify-center" {...entry?.$?.banner_image}>
                             <svg className="w-10 h-10 text-gray-200 dark:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
                                 <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
                             </svg>
                         </div>
-                    }
-                    {entry?.banner_image?.url &&
-                        <img src={entry?.banner_image?.url} className="mb-10" {...entry?.banner_image?.$?.url}></img>
-                    }
+                    )}
 
                     <h1 className="mt-5 text-4xl font-medium uppercase tracking-wider  sm:text-5xl text-neutral-700" {...entry?.$?.headline}>
                         {entry?.headline}
@@ -110,4 +131,5 @@ export default function Page({ }) {
             <Footer />
         </div>
     );
+
 }

@@ -56,19 +56,19 @@ export default function Home({ }) {
 
   useEffect(() => {
     if (!isLoading && entry?.modal) {
-      const key = `homepage_modal_shown_${params.locale}`; 
-      const hasShownModal = localStorage.getItem(key);     
+      const key = `homepage_modal_shown_${params.locale}`;
+      const hasShownModal = localStorage.getItem(key);
 
       if (!hasShownModal) {
         const timer = setTimeout(() => {
           setIsModalOpen(true);
-          localStorage.setItem(key, "true"); 
+          localStorage.setItem(key, "true");
         }, 500);
 
         return () => clearTimeout(timer);
       }
     }
-  }, [isLoading, entry?.modal, params.locale]); 
+  }, [isLoading, entry?.modal, params.locale]);
 
   if (isLoading) return;
 
