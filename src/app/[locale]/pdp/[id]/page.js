@@ -30,25 +30,6 @@ import { pdpReferences } from "@/helpers/referencePaths";
 import { useDataContext } from "@/context/data.context";
 import { jsonToHTML } from '@contentstack/utils';
 
-// Map product name/description keywords to jstag category
-const PRODUCT_CATEGORY_MAP = [
-  { keywords: ["short-sleeve", "long-sleeve"], category: "party" },
-  { keywords: ["swimsuit", "swim suit"], category: "beach" },
-  { keywords: ["swim"], category: "beach" },
-  { keywords: ["shorts"], category: "shorts" },
-  { keywords: ["polo"], category: "party" },
-];
-
-function getCategoryFromProduct(name, description) {
-  const text = [name, description].filter(Boolean).join(" ").toLowerCase();
-  const categories = [];
-  for (const { keywords, category } of PRODUCT_CATEGORY_MAP) {
-    if (keywords.some((kw) => text.includes(kw)) && !categories.includes(category)) {
-      categories.push(category);
-    }
-  }
-  return categories.join(",");
-}
 
 export default function Page({  }) {
   const [entry, setEntry] = useState({});
@@ -291,10 +272,8 @@ export default function Page({  }) {
                 className="mt-4 rounded-[60px] md:w-full lg:w-3/4 xl:w-4/6 text-nowrap relative button px-8 py-4 text-md tracking-widest uppercase bg-white font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:bg-cyan-600 hover:text-white"
                 onClick={() => {
                   const productName = entry?.product_name || product?.name || "";
-                  const description = entry?.description || product?.description || "";
-                  const product_category = getCategoryFromProduct(productName, description);
                   if (typeof jstag?.send === "function") {
-                    jstag.send({ product_name: productName, product_category });
+                    jstag.send({ product_name: productName });
                   }
                   setPurchaseOpen(true);
                 }}
