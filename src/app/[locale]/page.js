@@ -22,6 +22,7 @@ import { useParams } from "next/navigation";
 import { useDataContext } from "@/context/data.context";
 import { homepageReferences } from "@/helpers/referencePaths";
 import { jsonToHTML } from '@contentstack/utils';
+import { inLivePreview } from '@/utils/lp';
 
 export default function Home({ }) {
   const [entry, setEntry] = useState({});
@@ -55,7 +56,7 @@ export default function Home({ }) {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && entry?.modal) {
+    if (!isLoading && entry?.modal && !inLivePreview()) {
       const key = `homepage_modal_shown_${params.locale}`;
       const hasShownModal = localStorage.getItem(key);
 

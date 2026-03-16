@@ -24,6 +24,7 @@ import { useParams } from "next/navigation";
 import { useDataContext } from "@/context/data.context";
 import { pagesReferences } from "@/helpers/referencePaths";
 import { jsonToHTML } from '@contentstack/utils';
+import { inLivePreview } from '@/utils/lp';
 
 export default function Page({ }) {
     const [entry, setEntry] = useState({});
@@ -57,7 +58,7 @@ export default function Page({ }) {
     }, []);
 
     useEffect(() => {
-    if (!isLoading && entry?.modal) {
+    if (!isLoading && entry?.modal && !inLivePreview()) {
         const key = `page_modal_shown_${params.locale}_${params.title}`;
         const hasShownModal = localStorage.getItem(key);
 
