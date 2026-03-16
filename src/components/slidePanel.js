@@ -31,11 +31,44 @@ export default function SlidePanel() {
   if (!lyticsProfileData) {
     return (
       <div
-        className={`shrink-0 w-[450px] bg-white transition-transform duration-300 ease-in-out overflow-y-auto ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+      className={`fixed top-0 right-0 h-screen w-[450px] bg-white transition-transform duration-300 ease-in-out overflow-y-auto z-50 ${
+        isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        {/* Empty white panel when no lytics data */}
+        <div className="flex flex-col shadow-xl bg-white h-full">
+          <div className="flex justify-between items-end bg-[#404040] py-1 px-2 flex-shrink-0">
+            <div className="p-2 mx-1 flex">
+              <img
+                className="h-[20px]"
+                src="https://images.contentstack.io/v3/assets/blt7359e2a55efae483/blt0b9a8281aeac3ec0/664c27d3c9024c35b5ad593a/CS_logo.png"
+              ></img>
+              <div className="font-medium text-[15px] text-neutral-100 normal-case mx-2 self-center h-full">
+                Contentstack Dev Tools
+              </div>
+            </div>
+            <button
+              className="cursor-pointer ms-auto text-white"
+              type="button"
+              onClick={closePanel}
+            >
+              <XMarkIcon className="h-8 m-1 p-1" />
+            </button>
+          </div>
+
+          <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
+            <div className="bg-[#f6f5fc] rounded-lg p-6 w-full">
+              <LockClosedIcon className="h-10 w-10 text-[#6351e3] mx-auto mb-3" />
+              <p className="text-[16px] font-semibold text-gray-800 mb-2">
+                Lytics Tag Not Found
+              </p>
+              <p className="text-[13px] text-gray-500">
+                Add <code className="bg-gray-100 px-1.5 py-0.5 rounded text-[#6351e3] font-mono text-[12px]">LYTICS_TAG</code> to
+                your <code className="bg-gray-100 px-1.5 py-0.5 rounded text-[#6351e3] font-mono text-[12px]">.env</code> file
+                to enable user profiling and behavioral tracking.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

@@ -40,7 +40,7 @@ export default function Page({ }) {
             [
             ]
         );
-        setEntry(entry);
+        setEntry(Array.isArray(entry) ? entry[0] : entry);
     };
 
     useEffect(() => {
