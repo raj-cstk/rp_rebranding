@@ -7,7 +7,6 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
 import { LyticsTracking, useEntity, useJstag } from "@/context/lyticsTracking";
-import { Dialog, DialogPanel, DialogBackdrop } from "@headlessui/react";
 import PageHero from "@/components/pageHero";
 import TextSection from "@/components/textSection";
 import People from "@/components/people";
@@ -43,12 +42,32 @@ export default function Page({  }) {
   const [variantsOpen, setVariantsOpen] = useState(false);
   const [variantImageIndices, setVariantImageIndices] = useState({});
   const [translations, setTranslations] = useState({});
+  const [purchaseOpen, setPurchaseOpen] = useState(false);
+  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   const initialData = useDataContext();
+  const jstag = useJstag();
 
   const handleGoBack = () => {
     router.back();
   };
+
+  const handleChange = (event) => {
+    event.preventDefault();
+    setInputValue(event.target.value);
+  };
+
+  function buyClick(price) {
+    jstag.send({
+      shopify_total_spend: price,
+      _e: "purchase",
+      email: inputValue,
+    });
+    jstag.call("resetPolling");
+    setInputValue("");
+    setPurchaseSuccess(true);
+  }
 
   const getProductsbyURL = useCallback(async (id) => {
       const products = await RPCommerce.getProductByUrl(id, params.locale);
@@ -251,7 +270,13 @@ export default function Page({  }) {
               )}
               <button
                 className="mt-4 rounded-[60px] md:w-full lg:w-3/4 xl:w-4/6 text-nowrap relative button px-8 py-4 text-md tracking-widest uppercase bg-white font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:bg-cyan-600 hover:text-white"
-                onClick={() => setPurchaseOpen(true)}
+                onClick={() => {
+                  const productName = entry?.product_name || product?.name || "";
+                  if (typeof jstag?.send === "function") {
+                    jstag.send({ product_name: productName });
+                  }
+                  setPurchaseOpen(true);
+                }}
               >
                {getTranslation("cart_button", "Add to Cart")}
               </button>
@@ -460,6 +485,112 @@ export default function Page({  }) {
             </div>
           </div>
         </div>
+      </div>
+
+      <div
+        className={`fixed top-0 h-full bg-black opacity-50 w-full z-40 hidden ${purchaseOpen ? "sm:block" : ""
+          }`}
+      ></div>
+      <div
+        className={`fixed w-full sm:w-[350px] z-50 h-full top-0 right-0 border-l bg-white shadow-lg p-4 transition-all duration-500 ${purchaseOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+      >
+        <XMarkIcon
+          className="size-5 ml-auto cursor-pointer"
+          onClick={() => {
+            setPurchaseOpen(false);
+            setPurchaseSuccess(false);
+          }}
+        />
+
+        {purchaseSuccess ? (
+          <div className="flex flex-col items-center justify-center h-[calc(100%-40px)]">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-100 mb-6">
+              <svg className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 text-center">
+              {getTranslation("purchase_success_title", "Purchase Complete!")}
+            </h3>
+            <p className="mt-3 text-sm text-gray-600 text-center px-4">
+              {getTranslation(
+                "purchase_success_message",
+                "Thank you for your order."
+              )}
+            </p>
+            <button
+              onClick={() => {
+                setPurchaseOpen(false);
+                setPurchaseSuccess(false);
+              }}
+              className="mt-8 w-full rounded-lg bg-cyan-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-cyan-700 transition-colors"
+            >
+              {getTranslation("purchase_success_button", "Continue Shopping")}
+            </button>
+          </div>
+        ) : (
+          <>
+            <p className="">Your purchase:</p>
+
+            <p className="mt font-medium ">
+              {entry?.product_name ? entry?.product_name : product?.name}
+            </p>
+
+            <div className="flex mt-10">
+              <div className="w-5/12">
+                <p>Price:</p>
+                <p className="mt-3">Total:</p>
+              </div>
+              {product?.price && (
+                <div className="w-7/12">
+                  <p>${entry?.price ? entry?.price : product?.price}</p>
+                  <p className="mt-3">
+                    ${entry?.price ? entry?.price : product?.price}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <form className="mt-6 flex w-full">
+              <input
+                className="rounded-lg w-full py-2 px-4 max-md:p-1 border mr-0 text-gray-800 border-gray-200 bg-white"
+                placeholder="Email"
+                value={inputValue}
+                onChange={handleChange}
+              />
+            </form>
+
+            <div className="flex mt-3">
+              <input type="checkbox" checked />
+              <label className="ml-2">Use card on file</label>
+            </div>
+
+            <div className="mt-2 bg-[#efefef] py-2 px-4 flex items-center gap-4">
+              <img
+                className="h-8"
+                src="https://images.contentstack.io/v3/assets/blt678db9efc83edd2d/blt237b95a3377390c0/681bec8e9b0925fa46df2048/amex-svgrepo-com.svg"
+                alt="Credit card"
+              />
+              <p>...5309</p>
+            </div>
+
+            <button
+              onClick={() => buyClick(entry?.price ? entry?.price : product?.price)}
+              className="bg-black text-white rounded-lg py-4 w-full mt-10 font-semibold tracking-wide border-black border-2 hover:bg-white hover:text-black"
+            >
+              Complete Purchase
+            </button>
+
+            <button className="rounded-lg border-2 border-[#5a30f4] w-full mt-4 flex justify-center p-2">
+              <img
+                className="h-10"
+                src="https://images.contentstack.io/v3/assets/blt678db9efc83edd2d/bltbc9d297783dbfffc/681e1c146b233bd9775c08c4/spay.png"
+                alt="Shop Pay"
+              />
+            </button>
+          </>
+        )}
       </div>
 
       <Footer />
