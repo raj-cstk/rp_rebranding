@@ -1,8 +1,10 @@
 /**
  * Fetches redirect rules from Contentstack
  * Returns an array of redirect objects with from and to paths
+ * @param {Object} options
+ * @param {boolean} options.edge - When true, omits Next.js fetch options (for Edge runtime/middleware)
  */
-export async function getRedirects() {
+export async function getRedirects(options = {}) {
   const graphqlQuery = `
     query GetRedirects {
       all_redirects {
@@ -32,8 +34,7 @@ export async function getRedirects() {
           variables: null,
           operationName: "GetRedirects",
         }),
-        // Cache for 60 seconds, revalidate in background
-        next: { revalidate: 60 },
+        ...(!options.edge && { next: { revalidate: 60 } }),
       }
     );
 
@@ -47,7 +48,7 @@ export async function getRedirects() {
     }
 
     const graphqlData = await graphqlResponse.json();
-    
+
     if (graphqlData.errors) {
       console.error("GraphQL errors:", graphqlData.errors);
       return [];

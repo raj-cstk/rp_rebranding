@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 import { initializePersonalize } from './lib/cspersonalize';
+import { getRedirects } from './lib/redirects';
 
 const intlMiddleware = createMiddleware({
   // A list of all locales that are supported
@@ -11,7 +12,32 @@ const intlMiddleware = createMiddleware({
   //localeDetection: false
 });
 
+// In-memory cache for redirects (Edge middleware persists across warm requests)
+let redirectCache: { redirects: { from: string; to: string }[]; timestamp: number } | null = null;
+const REDIRECT_CACHE_TTL = 60 * 1000; // 60 seconds
+
 export default async function middleware(req: NextRequest) {
+  // Check CMS redirects first (skip for API/oauth)
+  if (!req.nextUrl.pathname.startsWith('/api') && !req.nextUrl.pathname.startsWith('/oauth')) {
+    try {
+      if (!redirectCache || Date.now() - redirectCache.timestamp > REDIRECT_CACHE_TTL) {
+        redirectCache = {
+          redirects: await getRedirects({ edge: true }),
+          timestamp: Date.now(),
+        };
+      }
+      const match = redirectCache.redirects.find((r) => r.from === req.nextUrl.pathname);
+      if (match) {
+        const dest = new URL(match.to, req.url);
+        dest.search = req.nextUrl.search;
+        console.log(`[redirect] ${req.nextUrl.pathname} -> ${match.to}`);
+        return NextResponse.redirect(dest, 308);
+      }
+    } catch (err) {
+      console.error('[middleware] Redirect check failed:', err);
+    }
+  }
+
   if (!process.env.HOSTING || (process.env.HOSTING && process.env.HOSTING !== 'launch')) {
     const projectUid = process.env.CONTENTSTACK_PERSONALIZATION as string;
 

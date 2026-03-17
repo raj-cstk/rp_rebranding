@@ -79,7 +79,7 @@ export default function Page({ }) {
                             value={search}
                             onChange={(e) => {setSearch(e.target.value); setNotFoundVisible(false)}}
                             placeholder={entry?.placeholder}
-                            className="border py-3 px-4 w-[600px]"
+                            className=" py-3 px-4 w-[600px] bg-white rounded-l"
                             {...entry?.$?.placeholder}
                         />
                         <ExclamationCircleIcon className={"absolute right-32 h-10 w-10 top-1 text-red-600 " + (notFoundVisible ? "" : "hidden")}/>
