@@ -6,6 +6,10 @@ import { useState, useEffect } from 'react';
 import RPCommerce from '@/lib/rpcommerce';
 
 export default function CategoryBanner({ content, locale }) {
+  if(content?.categories && Array.isArray(content?.categories) && content?.categories?.length > 0) {
+    content.categories = content.categories[0];
+  }
+  
   const [category, setCategory] = useState(null);
   
   useEffect(() => {

@@ -2,6 +2,10 @@ import { ArrowRightIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 
 export default function ProductFeature({ content }){
+    if(content?.products && Array.isArray(content?.products) && content?.products?.length > 0) {
+        content.products = content.products[0];
+    }
+    
     return(
         <div className="max-w-8xl mx-auto px-8 py-24">
             <h2 className="normal-case" {...content?.$?.title}>{content?.title}</h2>

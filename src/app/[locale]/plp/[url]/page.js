@@ -58,6 +58,9 @@ export default function PLP() {
       paths: ['modular_blocks_top.category_banner.description', 'modular_blocks_bottom.category_banner.description', 'description']
     })
 
+    if(entry?.[0]?.product_category && Array.isArray(entry?.[0]?.product_category) && entry?.[0]?.product_category?.length > 0) {
+      entry[0].product_category = entry[0].product_category[0];
+    }
     setEntry(entry);
     getCategory(entry);
   };

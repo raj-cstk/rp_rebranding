@@ -97,7 +97,13 @@ export default function Page({  }) {
           entry: query[0],
           paths: ['modular_blocks_top.category_banner.description', 'modular_blocks_bottom.category_banner.description']
         });
-
+        
+        if(query?.[0]?.product && Array.isArray(query?.[0]?.product) && query?.[0]?.product?.length > 0) {
+          query[0].product = query[0].product[0];
+        }
+        if(query?.[0]?.variants && Array.isArray(query?.[0]?.variants) && query?.[0]?.variants?.length > 0) {
+          query[0].variants = query[0].variants[0];
+        }
         setProduct(query?.[0]?.product?.items?.[0])
         setEntry(query?.[0]);
         setVariants(query?.[0]?.variants?.items);
