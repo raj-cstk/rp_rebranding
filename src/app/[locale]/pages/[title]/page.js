@@ -36,7 +36,7 @@ export default function Page({ }) {
     const initialData = useDataContext();
 
     const getContent = async () => {
-        const entry = await ContentstackClient.getElementByUrlWithRefs(
+        const result = await ContentstackClient.getElementByUrlWithRefs(
             "page",
             "/pages/" + params.title,
             params.locale,
@@ -44,12 +44,19 @@ export default function Page({ }) {
             initialData
         );
 
+        const pageEntry = result?.[0];
+        if (!pageEntry) {
+            setEntry({});
+            setIsLoading(false);
+            return;
+        }
+
         jsonToHTML({
-            entry: entry[0],
+            entry: pageEntry,
             paths: ['modular_blocks.category_banner.description']
         });
 
-        setEntry(entry[0]);
+        setEntry(pageEntry);
         setIsLoading(false);
     };
 
