@@ -344,7 +344,7 @@ export const ContentstackClient = {
         }
         if (data && inLivePreview()) {
             for (let i = 0; i < data[0].length; i++) {
-                addEditableTags(data[0][i], type, true, locale);
+                addEditableTags(data[i], type, true, locale);
             }
         }
         return data;

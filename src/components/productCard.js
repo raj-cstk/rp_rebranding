@@ -8,9 +8,9 @@ export default function ProductCard({ item }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Get all images from media array, fallback to single image
-  const allImages = item.media && item.media.length > 0
-    ? item.media.map(m => m.path)
-    : [item.image || item.image_path];
+  const allImages = item?.media && item.media.length > 0
+    ? item.media.map(m => m?.path).filter(Boolean)
+    : [item?.image || item?.image_path];
 
   const handlePrevImage = (e) => {
     e.preventDefault();
@@ -26,7 +26,7 @@ export default function ProductCard({ item }) {
 
   return (
     <Link
-      href={item.url ? "/pdp/" + item.url : "#"}
+      href={item?.url ? "/pdp/" + item.url : "#"}
       className="block group cursor-pointer"
     >
       <div className="relative bg-[#e8e8e8] aspect-square mb-4 overflow-hidden rounded-[1px] shadow-sm">
@@ -37,7 +37,7 @@ export default function ProductCard({ item }) {
               index === currentImageIndex ? "opacity-100" : "opacity-0 absolute inset-0"
             }`}
             src={imagePath}
-            alt={`${item.name} - Image ${index + 1}`}
+            alt={`${item?.name ?? "Product"} - Image ${index + 1}`}
           />
         ))}
 
@@ -62,14 +62,14 @@ export default function ProductCard({ item }) {
       </div>
 
       <div className="space-y-1 px-4">
-        {item.tags?.length > 0 && (
+          {item?.tags?.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-2">
             {item.tags.map((tag, index) => (
               <span
                 key={index}
                 className="px-2 py-0.5 bg-gray-100 text-xs font-medium text-gray-700 rounded-sm"
               >
-                {tag.name}
+                {tag?.name}
               </span>
             ))}
           </div>
@@ -78,12 +78,12 @@ export default function ProductCard({ item }) {
         <h3 className="text-black !font-semibold !text-sm uppercase leading-tight line-clamp-1 mb-2 !font-sans !tracking-[0.05em]">
           {item?.name}
         </h3>
-        {item.price && <div className="text-black font-bold text-sm mb-2"> {item.currency_symbol} {parseFloat(item.price).toFixed(2)}</div>}
+        {item?.price != null && item?.price !== "" && <div className="text-black font-bold text-sm mb-2"> {item?.currency_symbol} {parseFloat(item.price).toFixed(2)}</div>}
 
         <div className="flex justify-start items-center text-[0.7rem] text-black font-normal pt-1">
-          {item.attributes?.find(attribute => attribute.attribute_name.toLowerCase() === "color")?.value && (
+          {item?.attributes?.find(attribute => attribute?.attribute_name?.toLowerCase() === "color")?.value && (
             <div className="text-black mr-4">
-              {item.attributes.find(attribute => attribute.attribute_name.toLowerCase() === "color")?.value}
+              {item.attributes.find(attribute => attribute?.attribute_name?.toLowerCase() === "color")?.value}
             </div>
           )}
           {item.variants?.length > 0 && <div className="text-black">+ {item.variants?.length} models</div>}

@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function ProductFeature({ content }){
     if(content?.products && Array.isArray(content?.products) && content?.products?.length > 0) {
-        content.products = content.products[0];
+        content.products = content?.products?.[0];
     }
     
     return(
@@ -28,8 +28,8 @@ export default function ProductFeature({ content }){
             }
 
             {content?.plp && (
-                <Link href={(content?.plp?.length > 0 && content.plp[0].url) ? content.plp[0].url : "#"} className="flex mt-5 items-center text-cyan-600 hover:text-[#D1A261]" {...content?.$?.plp}>
-                    <p href={(content?.plp?.length > 0 && content.plp[0].url) ? content.plp[0].url : "#"} className="inline-block" {...content?.$?.plp_link_text}>{content?.plp_link_text}</p>
+                <Link href={(content?.plp?.length > 0 && content?.plp?.[0]?.url) ? content?.plp?.[0]?.url : "#"} className="flex mt-5 items-center text-cyan-600 hover:text-[#D1A261]" {...content?.$?.plp}>
+                    <p href={(content?.plp?.length > 0 && content?.plp?.[0]?.url) ? content?.plp?.[0]?.url : "#"} className="inline-block" {...content?.$?.plp_link_text}>{content?.plp_link_text}</p>
                     <ArrowRightIcon className="h-5 w-5 ml-2" />
                 </Link>
             )}

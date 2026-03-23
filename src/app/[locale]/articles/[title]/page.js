@@ -21,13 +21,14 @@ export default function ArticlesList({ }) {
       params.locale,
       initialData
     );
-    setEntry(entry[0]);
+    const first = entry?.[0];
+    setEntry(first ?? {});
 
-    if (entry[0]?.taxonomy_category?.length > 0) {
+    if (first?.taxonomy_category?.length > 0) {
       const articles = await ContentstackClient.getElementByTypeByTaxonomy(
         "article",
         params.locale,
-        entry[0].taxonomy_category
+        first.taxonomy_category
       );
       setArticles(articles);
     }
@@ -75,7 +76,7 @@ export default function ArticlesList({ }) {
                             preload="metadata"
                             style={{ pointerEvents: 'none' }}
                           >
-                            <source src={article.video_options.video.url}/>
+                            <source src={article?.video_options?.video?.url}/>
                           </video>
                           <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
                             <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg"><circle cx="42" cy="42" r="42" opacity="0.5"/><path d="M33 28L56 42L33 56V28Z"/></svg>

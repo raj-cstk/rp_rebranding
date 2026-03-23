@@ -37,7 +37,7 @@ export default function ResortPackage({ content }) {
                                 content?.products?.map((item, index) => (
                                     <div key={index} className="cursor-pointer max-xl:w-[150px] w-[160px]" onClick={() => clickHandle(index)}>
                                         {(item?.images && item?.images.length > 0) &&
-                                            <img className="h-[115px] object-cover " src={(item?.images[0]?.url ? item?.images[0]?.image?.url : "#")} />
+                                            <img className="h-[115px] object-cover " src={(item?.images?.[0]?.url ? item?.images?.[0]?.image?.url : "#")} />
                                         }
                                         <p className="mt-3 text-sm ">{item?.title}</p>
                                     </div>
@@ -56,8 +56,8 @@ export default function ResortPackage({ content }) {
                     <div className="flex flex-wrap overflow-y-auto w-[100%] items-center justify-center h-full max-lg:flex-row-reverse max-xl:items-start">
                         <div className="bg-white max-lg:px-14 lg:px-6">
                             <div className="flex justify-between items-center pb-6">
-                                {content?.proudcts && content?.products?.length > 0 && (
-                                <div className="font-bold text-black text-4xl">{content?.products[modalContent]?.title}</div>
+                                {content?.products && content?.products?.length > 0 && (
+                                <div className="font-bold text-black text-4xl">{content?.products?.[modalContent]?.title}</div>
                                 )}
                                 <XMarkIcon className="size-8 cursor-pointer text-black" onClick={() => closeHandle()} />
                             </div>
@@ -65,17 +65,17 @@ export default function ResortPackage({ content }) {
 
                             <div className="flex gap-5 max-lg:flex-col-reverse">
                                 <div className="flex flex-col gap-y-5 max-lg:flex-row">
-                                    {((content?.products && content?.products?.length > 0)  && (content?.products[modalContent]?.images && content?.products[modalContent]?.images?.length > 0)) &&
-                                        content?.products[modalContent].images.map((item, index) => (
+                                    {((content?.products && content?.products?.length > 0)  && (content?.products?.[modalContent]?.images && content?.products?.[modalContent]?.images?.length > 0)) &&
+                                        content?.products?.[modalContent]?.images?.map((item, index) => (
                                             <div key={index} onClick={() => setImageIndex(index)} className="size-[80px] border flex items-center-justify-center p-1">
                                                 <img className="object-cover" src={item?.image?.url} />
                                             </div>
                                         ))}
                                 </div>
-                                {((content?.products && content?.products?.length > 0) && (content?.products[modalContent]?.images && content?.products[modalContent]?.images?.length > 0)) && (
-                                <img className="h-[500px] w-[60%] max-lg:w-[95%] lg:h-[600px] xl:h-[500px] object-cover" src={content?.products[modalContent]?.images[imageIndex].image?.url} />
+                                {((content?.products && content?.products?.length > 0) && (content?.products?.[modalContent]?.images && content?.products?.[modalContent]?.images?.length > 0)) && (
+                                <img className="h-[500px] w-[60%] max-lg:w-[95%] lg:h-[600px] xl:h-[500px] object-cover" src={content?.products?.[modalContent]?.images?.[imageIndex]?.image?.url} />
                                 )}
-                                <p className="font-extralight whitespace-pre-line [&_p]:mt-3 [&_ul]:list-disc  [&_ul]:pl-10 text-sm tracking-wide xl:h-[500px] lg:h-[600px] max-lg:my-auto lg:overflow-y-auto text-black" dangerouslySetInnerHTML={{ __html: content?.products[modalContent]?.description }}></p>
+                                <p className="font-extralight whitespace-pre-line [&_p]:mt-3 [&_ul]:list-disc  [&_ul]:pl-10 text-sm tracking-wide xl:h-[500px] lg:h-[600px] max-lg:my-auto lg:overflow-y-auto text-black" dangerouslySetInnerHTML={{ __html: content?.products?.[modalContent]?.description }}></p>
                             </div>
                         </div>
                     </div>
@@ -117,7 +117,7 @@ export default function ResortPackage({ content }) {
 
                                 {(content?.products && content?.products.length > 0) && (
                                     <ul className="divide-y divide-neutral-200 border border-neutral-200">
-                                        {content.products.map((item, index) => (
+                                        {content?.products?.map((item, index) => (
                                             <li
                                                 key={item.id ?? index}
                                                 className="px-3 py-2 text-sm text-neutral-800 truncate"

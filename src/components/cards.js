@@ -7,7 +7,7 @@ export default function Cards({ content }) {
     return (
             <div className="py-24  justify-center " style={{ backgroundColor: content?.background_color?.hex }} {...content?.$?.background_color}>
                 {(content?.card && content?.card?.length === 0) &&
-                    <div className="h-[800px] visual-builder__empty-block-parent" {...content.$.card} >
+                    <div className="h-[800px] visual-builder__empty-block-parent" {...content?.$?.card} >
                     </div>
                 }
                 {(content?.card && content?.card?.length > 0) &&
@@ -39,7 +39,7 @@ export default function Cards({ content }) {
                                 </div>
                                 <div className="flex flex-col items-center mt-auto mb-12">
                                 {data?.page && (
-                                    <Link href={(data?.page?.length > 0 && data?.page[0]?.url) ? data?.page[0]?.url : '/'}>
+                                    <Link href={(data?.page?.length > 0 && data?.page?.[0]?.url) ? data?.page?.[0]?.url : '/'}>
                                     <button className="rounded-md button px-8 py-4 text-md tracking-widest uppercase font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:text-white hover:bg-cyan-600" {...data?.$?.button_text}>
                                         {data?.button_text}
                                     </button>

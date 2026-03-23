@@ -9,13 +9,14 @@ export default function FaqSection({ params }){
     const [entry, setEntry] = useState({});
 
     const getContent = async () => {
-        const entry = await ContentstackClient.getElementByUrlWithRefs(
+        const raw = await ContentstackClient.getElementByUrlWithRefs(
             "faq",
             "/faq/" + params.title,
             params.locale,
             [
             ]
         );
+        const entry = Array.isArray(raw) ? raw[0] : raw;
         const cat = entry?.categories?.find(c => c._metadata.uid === params.id)
         setEntry(cat);
     };

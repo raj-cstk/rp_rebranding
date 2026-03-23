@@ -17,7 +17,7 @@ export default function ContentstackPage(){
             params.locale
         );
         if (entries && entries.length > 0) {
-            setEntry(entries[0]);
+            setEntry(entries?.[0] ?? {});
             console.log('Contentstack DAM content fetched:', entries[0]);
         }
     };
@@ -152,14 +152,14 @@ export default function ContentstackPage(){
                         className="text-5xl md:text-7xl text-white mb-6 font-playfair font-normal tracking-wide leading-tight"
                         style={{ fontFamily: 'var(--font-playfair)', fontWeight: 400, letterSpacing: '0.05em', lineHeight: '1.2' }}
                     >
-                        {entry.banner.title}
+                        {entry?.banner?.title}
                     </h1>}
                     {entry?.banner?.description && <p 
                         className="text-xl md:text-2xl text-white max-w-3xl mx-auto leading-relaxed font-raleway font-light tracking-wide"
                         style={{ fontFamily: 'var(--font-raleway)', fontWeight: 300, letterSpacing: '0.02em' }}
                         {...entry?.banner?.$?.description}
                     >
-                        {entry.banner.description}
+                        {entry?.banner?.description}
                     </p>}
                 </div>
             </div>

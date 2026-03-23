@@ -25,6 +25,7 @@ import { useDataContext } from "@/context/data.context";
 import { pagesReferences } from "@/helpers/referencePaths";
 import { jsonToHTML } from '@contentstack/utils';
 import { inLivePreview } from '@/utils/lp';
+import { useJstag } from "@/context/lyticsTracking";
 
 export default function Page({ }) {
     const [entry, setEntry] = useState({});
@@ -32,6 +33,7 @@ export default function Page({ }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const params = useParams();
+    const jstag = useJstag();
 
     const initialData = useDataContext();
 
@@ -84,7 +86,7 @@ export default function Page({ }) {
         if(entry?.taxonomies && entry?.taxonomies?.length > 0){
             entry?.taxonomies.map((tax) => {
                 console.log(`sending ${tax?.term_uid} to data and insights`);
-                jstag.send({taxonomy: tax.term_uid})
+                jstag?.send({taxonomy: tax.term_uid})
             })
         }
     }, [entry])
@@ -126,7 +128,7 @@ export default function Page({ }) {
                             <Agent key={index} agentData={block.agent} />
                         }
                         {block.hasOwnProperty("hero_banner") &&
-                            <Hero key={index} content={block.hero_banner.hero} locale={params.locale} withHeader={false} />
+                            <Hero key={index} content={block?.hero_banner?.hero} locale={params.locale} withHeader={false} />
                         }
                         {block.hasOwnProperty("image_grid") &&
                             <ImageGrid key={index} content={block.image_grid} isKiosk={entry?._applied_variants?.title === "cs76fdee0e83c5c333"} {...block.$?.image_grid}/>

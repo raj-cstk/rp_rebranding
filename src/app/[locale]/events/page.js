@@ -213,8 +213,8 @@ export default function Page(){
           // Fetch events page content
           const data = await ContentstackClient.getElementByType("events_page", params.locale, null);
           if(data) {
-            setEntry(data[0]);
-            console.log("Events Page Entry:", data[0]);
+            setEntry(data?.[0] ?? null);
+            console.log("Events Page Entry:", data?.[0]);
           } else {
             setEntry(null);
           }

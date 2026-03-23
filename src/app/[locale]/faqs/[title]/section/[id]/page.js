@@ -19,7 +19,7 @@ export default function FaqSection({ }){
             ]
         );
         const data = Array.isArray(entry) ? entry[0] : entry;
-        const cat = data?.categories?.find(c => c._metadata.uid === params.id);
+        const cat = data?.categories?.find((c) => c._metadata.uid === params.id);
         setEntry(cat);
     };
 

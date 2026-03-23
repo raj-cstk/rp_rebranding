@@ -136,31 +136,31 @@ export default function Modal({ content, open = false, onClose = () => {} }) {
           {blocks.map((block, index) => (
             <div key={index} {...modal?.$?.["modular_blocks__" + index]}>
               {/* Image Block */}
-              {block.image_block?.image?.url && (
+              {block?.image_block?.image?.url && (
                 <div className="mb-6 h-fit overflow-hidden bg-gray-100 ">
                   <img
-                    src={block.image_block.image.url}
-                    alt={block.image_block.image?.title || "modal image"}
+                    src={block?.image_block?.image?.url}
+                    alt={block?.image_block?.image?.title || "modal image"}
                     className="w-full h-full object-cover"
-                    {...(block.image_block.$?.image || {})}
+                    {...(block?.image_block?.$?.image || {})}
                   />
                 </div>
               )}
               {/* Teaser Block */}
-              {block.teaser_block?.teaser_text && (
+              {block?.teaser_block?.teaser_text && (
                 <p
                   className="text-3xl! text-gray-600 mb-4 leading-relaxed"
                   {...(block.teaser_block?.$?.teaser_text || {})}
                 >
-                  {block.teaser_block.teaser_text}
+                  {block?.teaser_block?.teaser_text}
                 </p>
               )}
 
               {/* Body Block */}
-              {block.body_block?.body && (
+              {block?.body_block?.body && (
                 <div
                   className="text-base text-gray-700 mb-6 leading-relaxed prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: block.body_block.body }}
+                  dangerouslySetInnerHTML={{ __html: block?.body_block?.body }}
                   {...(block.body_block?.$?.body || {})}
                 />
               )}
