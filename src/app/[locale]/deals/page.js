@@ -209,7 +209,7 @@ export default function Page({ }) {
                 
             ]
         );
-        setEntry(entry[0][0]);
+        setEntry(entry?.[0]?.[0] ?? {});
         setIsLoading(false);
     };
 

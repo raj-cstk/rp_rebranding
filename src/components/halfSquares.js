@@ -79,8 +79,8 @@ export default function HalfSquares({ content }) {
           {content?.page && (
             <Link
               href={
-                content?.page?.length > 0 && content?.page[0]?.url
-                  ? content?.page[0]?.url
+                content?.page?.length > 0 && content?.page?.[0]?.url
+                  ? content?.page?.[0]?.url
                   : "#"
               }
             >

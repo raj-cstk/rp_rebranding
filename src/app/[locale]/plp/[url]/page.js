@@ -53,13 +53,17 @@ export default function PLP() {
       initialData
     );
 
-    jsonToHTML({
-      entry: entry,
-      paths: ['modular_blocks_top.category_banner.description', 'modular_blocks_bottom.category_banner.description', 'description']
-    })
+    const firstEntry = entry?.[0];
+    if (firstEntry) {
+      jsonToHTML({
+        entry: firstEntry,
+        paths: ['modular_blocks_top.category_banner.description', 'modular_blocks_bottom.category_banner.description', 'description']
+      })
+    }
 
-    if(entry?.[0]?.product_category && Array.isArray(entry?.[0]?.product_category) && entry?.[0]?.product_category?.length > 0) {
-      entry[0].product_category = entry[0].product_category[0];
+    const plpFirst = entry?.[0];
+    if(plpFirst?.product_category && Array.isArray(plpFirst.product_category) && plpFirst.product_category.length > 0) {
+      plpFirst.product_category = plpFirst.product_category[0];
     }
     setEntry(entry);
     getCategory(entry);
@@ -91,9 +95,9 @@ export default function PLP() {
     const category = await RPCommerce.getCategoryByURL('/' + params.url, params.locale, true, 2) || entry?.[0]?.product_category?.items?.[0];
     const categoryData = {
       ...(category || {}),
-      name: entry?.[0]?.headline || category.name,
-      description: (entry?.[0]?.description && entry?.[0]?.description != "<p></p>" && entry?.[0]?.description != "") ? entry?.[0]?.description : category.description,
-      image: entry?.[0]?.image?.url || category.image,
+      name: entry?.[0]?.headline || category?.name,
+      description: (entry?.[0]?.description && entry?.[0]?.description != "<p></p>" && entry?.[0]?.description != "") ? entry?.[0]?.description : category?.description,
+      image: entry?.[0]?.image?.url || category?.image,
       video: entry?.[0]?.video?.url || null,
       $: entry?.[0]?.$
     };
@@ -276,11 +280,12 @@ export default function PLP() {
   };
 
   const transformEntryProducts = () => {
-    if (!entry?.[0]?.entry_products || !Array.isArray(entry[0].entry_products) || entry[0].entry_products.length === 0) {
+    const first = entry?.[0];
+    if (!first?.entry_products || !Array.isArray(first.entry_products) || first.entry_products.length === 0) {
       return [];
     }
 
-    return entry[0].entry_products.map((product) => {
+    return first.entry_products.map((product) => {
       const productImages = [];
       if (product?.images && Array.isArray(product.images) && product.images.length > 0) {
         product.images.forEach(img => {

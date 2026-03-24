@@ -39,12 +39,15 @@ export default function Home({ }) {
       initialData
     );
 
-    jsonToHTML({
-      entry: entry[0],
-      paths: ['modular_blocks.category_banner.description']
-    });
+    const first = entry?.[0];
+    if (first) {
+      jsonToHTML({
+        entry: first,
+        paths: ['modular_blocks.category_banner.description']
+      });
+    }
 
-    setEntry(entry[0]);
+    setEntry(first ?? {});
     setIsLoading(false);
   };
 
@@ -94,7 +97,7 @@ export default function Home({ }) {
           }
           {...entry?.$?.modular_blocks}
         >
-          {entry?.modular_blocks.map((block, index) => (
+          {entry?.modular_blocks?.map((block, index) => (
             <div key={index} {...entry?.$?.["modular_blocks__" + index]}>
               {block.hasOwnProperty("text_block") && (
                 <TextBlock key={index} content={block.text_block} />

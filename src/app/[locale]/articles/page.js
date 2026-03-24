@@ -46,7 +46,7 @@ export default function AllArticles({ }) {
           </div>
 
           <div className="mx-auto mt-16 grid max-w-3xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-            {entries?.map((article) => (
+            {Array.isArray(entries) && entries?.map((article) => (
               <article
                 key={article.uid}
                 className="flex flex-col items-start justify-between"
@@ -60,7 +60,7 @@ export default function AllArticles({ }) {
                         preload="metadata"
                         style={{ pointerEvents: 'none' }}
                       >
-                        <source src={article.video_options.video.url}/>
+                        <source src={article?.video_options?.video?.url}/>
                       </video>
                       <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
                         <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg"><circle cx="42" cy="42" r="42" opacity="0.5"/><path d="M33 28L56 42L33 56V28Z"/></svg>

@@ -25,7 +25,7 @@ export default function Page({ }) {
             params.locale,
             initialData
         );
-        setEntry(entry[0]);
+        setEntry(entry?.[0] ?? {});
         setIsLoading(false);
         //jstag.send({"taxonomy" : entry?.taxonomies[0]?.term_uid});
     };
@@ -110,17 +110,17 @@ export default function Page({ }) {
                         {entry?.event_details?.venue && <div className="flex items-center gap-x-2 mt-2" {...entry?.event_details?.$?.venue}>
                             <FontAwesomeIcon icon={faLocationDot} className="text-md text-neutral-700" />
                             <span className="font-paragraph font-light text-md text-left whitespace-pre-wrap tracking-wide leading-8 text-neutral-700 capitalize" >
-                                {entry.event_details.venue}
+                                {entry?.event_details?.venue}
                             </span>
                         </div>}
                     </>}
                     
                     {entry?.article_body &&
                         <div>
-                            {entry.article_body.children.length === 1 && entry.article_body.children[0].children[0].text === "" &&
+                            {entry?.article_body?.children?.length === 1 && entry?.article_body?.children?.[0]?.children?.[0]?.text === "" &&
                                 <div className="mt-10 max-w-3xl article" {...entry?.$?.article_body}>Article body</div>
                             }
-                            {entry.article_body &&
+                            {entry?.article_body &&
                                 <div className="mt-10 max-w-3xl whitespace-break-spaces article [&_a]:text-blue-500" dangerouslySetInnerHTML={{ __html: jsonToHtml(entry?.article_body) }} {...entry?.$?.article_body}></div>
                             }
                         </div>

@@ -95,12 +95,13 @@ export default function Mobile({ }) {
     }
 
     const getContent = async () => {
-        const entry = await ContentstackClient.getElementByUrl(
+        const data = await ContentstackClient.getElementByUrl(
             "mobile",
             "/mobile/" + params.title,
             params.locale
         );
-        setEntry(entry);
+        const normalized = Array.isArray(data) ? data[0] : data;
+        setEntry(normalized ?? {});
     };
 
     useEffect(() => {

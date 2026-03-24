@@ -50,8 +50,8 @@ export default function Page({ }) {
     async function searchForAnswer() {
         const regex = new RegExp(search, 'i');
         let found = false;
-        entry.categories.forEach((category) => {
-            category.faqs.forEach((faq) => {
+        entry?.categories?.forEach((category) => {
+            category?.faqs?.forEach((faq) => {
                 if(regex.test(faq.question) || regex.test(faq.answer)){
                     if(!found)
                         router.push(params.title + "/section/" + category._metadata.uid + "/" + faq._metadata.uid);

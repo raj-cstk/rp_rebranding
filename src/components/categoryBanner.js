@@ -7,14 +7,14 @@ import RPCommerce from '@/lib/rpcommerce';
 
 export default function CategoryBanner({ content, locale }) {
   if(content?.categories && Array.isArray(content?.categories) && content?.categories?.length > 0) {
-    content.categories = content.categories[0];
+    content.categories = content?.categories?.[0];
   }
   
   const [category, setCategory] = useState(null);
   
   useEffect(() => {
     const getCategory = async () => {
-      const category = await RPCommerce.getCategoryByURL((content?.categories?.items?.[0]?.url) ? (content.categories.items?.[0]?.url) : ('/' + content.title.toLowerCase()), locale, true, 2) || content.categories?.items?.[0];
+      const category = await RPCommerce.getCategoryByURL((content?.categories?.items?.[0]?.url) ? (content?.categories?.items?.[0]?.url) : ('/' + (content?.title?.toLowerCase?.() ?? '')), locale, true, 2) || content?.categories?.items?.[0];
       const categoryData = {
         ...(category || {}),
         name: content.title || category?.name,
@@ -83,13 +83,13 @@ export default function CategoryBanner({ content, locale }) {
           {category.description && typeof category.description === 'string' ? parse(category.description) : ''}
         </div>
 
-        {category.plp && category.plp.length > 0 && category.plp[0].url && (
+        {category?.plp?.length > 0 && category?.plp?.[0]?.url && (
           <Link
-            href={category.plp[0].url}
+            href={category?.plp?.[0]?.url}
             className="inline-flex items-center mt-4 px-6 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition-colors font-medium text-sm uppercase tracking-wider w-fit"
             {...content?.$?.plp}
           >
-            <span {...content?.$?.plp_link_text}>{content.plp_link_text || 'Learn More'}</span>
+            <span {...content?.$?.plp_link_text}>{content?.plp_link_text || 'Learn More'}</span>
             <ArrowRightIcon className="h-4 w-4 ml-2" />
           </Link>
         )}

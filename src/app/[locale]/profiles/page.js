@@ -28,7 +28,7 @@ export default function Profiles({ }) {
 
     const getAudiences = async () => {
         const entry = await ContentstackClient.getElementByType("config", "en");
-        setAudiences(entry[0].audience);
+        setAudiences(entry?.[0]?.audience ?? []);
     }
 
     const getProfiles = async (user_id) => {

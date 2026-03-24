@@ -92,21 +92,22 @@ export default function Page({  }) {
       );
       if (query && query.length > 0){
         console.log(query)
+        const q0 = query[0];
 
         jsonToHTML({
-          entry: query[0],
+          entry: q0,
           paths: ['modular_blocks_top.category_banner.description', 'modular_blocks_bottom.category_banner.description']
         });
         
-        if(query?.[0]?.product && Array.isArray(query?.[0]?.product) && query?.[0]?.product?.length > 0) {
-          query[0].product = query[0].product[0];
+        if(q0?.product && Array.isArray(q0?.product) && q0?.product?.length > 0) {
+          q0.product = q0.product[0];
         }
-        if(query?.[0]?.variants && Array.isArray(query?.[0]?.variants) && query?.[0]?.variants?.length > 0) {
-          query[0].variants = query[0].variants[0];
+        if(q0?.variants && Array.isArray(q0?.variants) && q0?.variants?.length > 0) {
+          q0.variants = q0.variants[0];
         }
-        setProduct(query?.[0]?.product?.items?.[0])
-        setEntry(query?.[0]);
-        setVariants(query?.[0]?.variants?.items);
+        setProduct(q0?.product?.items?.[0])
+        setEntry(q0);
+        setVariants(q0?.variants?.items);
         setIsLoading(false);
     } else {
       console.log("can't find contentstack entry, fetching product by url")
@@ -233,16 +234,16 @@ export default function Page({  }) {
                 {(product?.media && product?.media?.length > 0) && (entry?.images?.length === 0 || !entry?.images) && (
                   <img
                     className="object-cover mx-auto h-[500px] w-full"
-                    src={product?.media[imageIndex].path}
+                    src={product?.media?.[imageIndex]?.path}
                     alt={product?.name || "Product image"}
                   />
                 )}
                 {(!product?.media || !product.media?.[0]?.media?.[0]) && entry?.images?.[imageIndex]?.image?.url && (
                   <img
                     className="object-cover mx-auto h-[500px] w-full"
-                    src={entry.images[imageIndex].image.url}
+                    src={entry?.images?.[imageIndex]?.image?.url}
                     alt={entry?.product_name || "Product image"}
-                    {...entry.images[imageIndex].$?.image}
+                    {...entry?.images?.[imageIndex]?.$?.image}
                   />
                 )}
               </div>

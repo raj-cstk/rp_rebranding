@@ -32,7 +32,7 @@ export default function Header({ color, locale }) {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const pathname = usePathname();
-  const slug = pathname.slice(3);
+  const slug = pathname.split('/').slice(2).join('/');
   const jstag = useJstag();
   const params = useParams();
   const { togglePanel } = useSlidePanel();
@@ -102,7 +102,7 @@ export default function Header({ color, locale }) {
       "menu_items.page",
       "menu_items.sub_items.page",
     ]);
-    setEntry(entry[0]);
+    setEntry(entry?.[0] ?? {});
     setIsLoading(false);
   };
 
@@ -112,7 +112,7 @@ export default function Header({ color, locale }) {
       if (!response.ok) throw response;
       const result = await response.json();
 
-      const tempProfiles = result.profiles.map(profile => ({
+      const tempProfiles = (result?.profiles ?? []).map(profile => ({
         fname: profile.first_name,
         lname: profile.last_name,
         audience: profile.audience,
@@ -150,7 +150,7 @@ export default function Header({ color, locale }) {
   if (isLoading) return;
 
   function changeLang(language) {
-    const path = language + slug;
+    const path = language + '/' + slug;
     router.push("/" + path);
   }
 
@@ -232,7 +232,7 @@ export default function Header({ color, locale }) {
                         sub?.page && (
                         <Link
                           key={subIdx}
-                          href={sub?.page?.length > 0 ? sub.page[0].url : "#"}
+                          href={sub?.page?.length > 0 ? sub?.page?.[0]?.url : "#"}
                           className="text-nowrap font-light"
                           {...sub.$?.text}
                         >
@@ -251,7 +251,7 @@ export default function Header({ color, locale }) {
                 <div {...item.$?.page}>
                   {item?.page && (
                   <Link
-                    href={(item?.page?.length > 0 && item?.page[0].url) ? item.page[0].url : "#"}
+                    href={(item?.page?.length > 0 && item?.page?.[0]?.url) ? item?.page?.[0]?.url : "#"}
                     {...item.$?.text}
                   >
                     {item.text}
@@ -391,14 +391,14 @@ export default function Header({ color, locale }) {
                         />
                       </Disclosure.Button>
                       <Disclosure.Panel className="mt-2 space-y-2 pb-2 font-paragraph">
-                        {item.sub_items.map((item, index) => (
+                        {item.sub_items.map((subItem, subIdx) => (
                           <Disclosure.Button
-                            key={index + item.text}
+                            key={subIdx + subItem?.text}
                             as="a"
-                            href={item.page[0]?.url}
+                            href={subItem?.page?.[0]?.url ?? "#"}
                             className="block rounded-lg pt-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50 font-paragraph"
                           >
-                            {item.text}
+                            {subItem?.text}
                           </Disclosure.Button>
                         ))}
                       </Disclosure.Panel>
@@ -410,7 +410,7 @@ export default function Header({ color, locale }) {
               return (
                 <Link
                   key={index}
-                  href={(item?.page?.length > 0 && item?.page[0].url) ? item.page[0].url : "#"}
+                  href={(item?.page?.length > 0 && item?.page?.[0]?.url) ? item?.page?.[0]?.url : "#"}
                 >
                   {item.text}
                 </Link>

@@ -25,7 +25,7 @@ export default function Page({ }) {
                 'modular_blocks.articles.articles'
             ]
         );
-        setEntry(entry[0]);
+        setEntry(entry?.[0] ?? {});
     };
 
     useEffect(() => {
@@ -45,7 +45,7 @@ export default function Page({ }) {
                     return <TextSection key={index} content={block.text_block} />;
                 }
                 else if (block.hasOwnProperty("hero_banner")) {
-                    return <Hero key={index} content={block.hero_banner.hero_banner} locale={params.locale} withHeader={false} />
+                    return <Hero key={index} content={block?.hero_banner?.hero_banner} locale={params.locale} withHeader={false} />
                 }
                 else if (block.hasOwnProperty("image_grid")) {
                     return <LandingPageGrid key={index} content={block.image_grid} isKiosk={true}/>

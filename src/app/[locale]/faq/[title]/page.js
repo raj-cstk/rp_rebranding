@@ -21,7 +21,7 @@ export default function Page({ }) {
             //     'modular_blocks.articles.articles'
             // ]
         );
-        setEntry(entry[0]);
+        setEntry(entry?.[0] ?? {});
     };
 
     useEffect(() => {

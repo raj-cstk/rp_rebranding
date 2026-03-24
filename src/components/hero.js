@@ -14,41 +14,43 @@ export default function Hero({ content, locale, withHeader, cslp }) {
 
  
   if (content && content?.length > 0){
-    if (content[0].text_position === "Top Left") {
+    const c0 = content?.[0];
+    if (c0?.text_position === "Top Left") {
     positionClass = "top-16 left-16";
-    } else if (content[0].text_position === "Top Center") {
+    } else if (c0?.text_position === "Top Center") {
       positionClass = "top-16 left-1/2 transform -translate-x-1/2 ";
-    } else if (content[0].text_position === "Top Right") {
+    } else if (c0?.text_position === "Top Right") {
       positionClass = "top-16 right-16";
-    } else if (content[0].text_position === "Left") {
+    } else if (c0?.text_position === "Left") {
       positionClass = "top-1/2 left-16 transform -translate-y-1/2";
-    } else if (content[0]?.text_position === "Center") {
+    } else if (c0?.text_position === "Center") {
       positionClass =
         "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2";
-    } else if (content[0]?.text_position === "Right") {
+    } else if (c0?.text_position === "Right") {
       positionClass = "top-1/2 right-16 transform -translate-y-1/2";
       headlineClass = "text-right";
       bodyClass = "text-right";
       buttonClass = "justify-end";
-    } else if (content[0].text_position === "Bottom Left") {
+    } else if (c0?.text_position === "Bottom Left") {
       positionClass = "bottom-16 left-16";
-    } else if (content[0]?.text_position === "Bottom Center") {
+    } else if (c0?.text_position === "Bottom Center") {
       positionClass = "bottom-16 left-1/2 transform -translate-x-1/2";
-    } else if (content[0].text_position === "Bottom Right") {
+    } else if (c0?.text_position === "Bottom Right") {
       positionClass = "bottom-16 right-16";
     }
   }
 
   if (content && content?.length > 0){  
-    if (content[0].alignment === "Left") {
+    const c0 = content?.[0];
+    if (c0?.alignment === "Left") {
       headlineClass = "text-left";
       bodyClass = "text-left";
       buttonClass = "justify-start";
-    } else if (content[0].alignment === "Center") {
+    } else if (c0?.alignment === "Center") {
       headlineClass = "text-center";
       bodyClass = "";
       buttonClass = "justify-center";
-    } else if (content[0].alignment === "Right") {
+    } else if (c0?.alignment === "Right") {
       headlineClass = "text-right";
       bodyClass = "text-right";
       buttonClass = "justify-end";
@@ -56,7 +58,7 @@ export default function Hero({ content, locale, withHeader, cslp }) {
   }
 
   if(content && content?.length) {  
-    if (content[0].header_overlay !== true) {
+    if (content?.[0]?.header_overlay !== true) {
       withHeader = false
     }
   }
@@ -169,7 +171,7 @@ export default function Hero({ content, locale, withHeader, cslp }) {
                       </p>
 
                       {
-                        hero.button_text !== "" && (
+                        hero?.button_text !== "" && (
                           <div
                             className={
                               "mt-10 flex items-center gap-x-6 " + buttonClass
@@ -178,12 +180,12 @@ export default function Hero({ content, locale, withHeader, cslp }) {
                             {hero?.page && (
                                 <Link
                                 href={
-                                  (hero?.page?.length > 0 && hero?.page[0]?.url) ? hero.page[0].url : "#"
+                                  (hero?.page?.length > 0 && hero?.page?.[0]?.url) ? hero?.page?.[0]?.url : "#"
                                 }
                                 className="rounded-md button px-8 py-4 text-md tracking-widest uppercase font-bold text-white shadow-sm ring-2 ring-inset ring-gray-300 hover:text-neutral-700 hover:bg-gray-50"
                                 {...hero?.$?.button_text}
                               >
-                                {hero.button_text}
+                                {hero?.button_text}
                               </Link>
                             )}
                           </div>

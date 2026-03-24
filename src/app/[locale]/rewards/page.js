@@ -25,7 +25,7 @@ export default function Page({ }) {
 
     const getContent = async () => {
         const entry = await ContentstackClient.getElementByUrl('rewards', '/rewards', params.locale);
-        setEntry(entry[0]);
+        setEntry(entry?.[0] ?? {});
         setIsLoading(false);
     }
 
