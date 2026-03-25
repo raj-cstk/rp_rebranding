@@ -56,7 +56,12 @@ export default function Home({ }) {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && entry?.modal && !inLivePreview()) {
+    const modalData = entry?.modal?.[0];
+    const hasValidModal =
+      modalData &&
+      ((Array.isArray(modalData.modular_blocks) && modalData.modular_blocks.length > 0) ||
+        Boolean(modalData.button_text));
+    if (!isLoading && hasValidModal && !inLivePreview()) {
       const key = `homepage_modal_shown_${params.locale}`;
       const hasShownModal = localStorage.getItem(key);
 
