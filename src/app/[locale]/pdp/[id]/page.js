@@ -27,27 +27,34 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import RPCommerce from "@/lib/rpcommerce";
 import { pdpReferences } from "@/helpers/referencePaths";
-import { useDataContext } from "@/context/data.context";
+import { useDataContext, useCommerceFallback } from "@/context/data.context";
 import { jsonToHTML } from '@contentstack/utils';
 
 
 export default function Page({  }) {
-  const [entry, setEntry] = useState({});
-  const [product, setProduct] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [imageIndex, setImageIndex] = useState(0);
   const params = useParams();
+  const initialData = useDataContext();
+  const commerceFallback = useCommerceFallback();
+  const jstag = useJstag();
+
+  const [entry, setEntry] = useState({});
+  const [product, setProduct] = useState(() => commerceFallback?.product ?? {});
+  const [isLoading, setIsLoading] = useState(() => {
+    const hasStack = Array.isArray(initialData) && initialData.length > 0;
+    const hasCommercePrefetch = Boolean(commerceFallback?.product);
+    return !(hasStack || hasCommercePrefetch);
+  });
+  const [imageIndex, setImageIndex] = useState(0);
   const router = useRouter();
-  const [variants, setVariants] = useState([]);
+  const [variants, setVariants] = useState(
+    () => commerceFallback?.variants ?? commerceFallback?.product?.variants ?? []
+  );
   const [variantsOpen, setVariantsOpen] = useState(false);
   const [variantImageIndices, setVariantImageIndices] = useState({});
   const [translations, setTranslations] = useState({});
   const [purchaseOpen, setPurchaseOpen] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
   const [inputValue, setInputValue] = useState("");
-
-  const initialData = useDataContext();
-  const jstag = useJstag();
 
   const handleGoBack = () => {
     router.back();
@@ -70,19 +77,26 @@ export default function Page({  }) {
   }
 
   const getProductsbyURL = useCallback(async (id) => {
-      const products = await RPCommerce.getProductByUrl(id, params.locale);
-      if(products && products.length > 0) {
-          setVariants(products?.[0]?.variants);
-          setProduct(products?.[0]);
-          setIsLoading(false);
-        } else {
-          setIsLoading(false);
+      try {
+        const products = await RPCommerce.getProductByUrl(id, params.locale);
+        if (products && products.length > 0) {
+          setVariants(products[0]?.variants);
+          setProduct(products[0]);
         }
+      } catch (e) {
+        console.error("getProductByUrl failed:", e);
+      } finally {
+        setIsLoading(false);
+      }
     }, [params.locale]);
 
   const getContent = useCallback(async () => {
     if (params.id === "untitled" || !params.id) return;
-    setIsLoading(true);
+    const hasStackPrefetch = Array.isArray(initialData) && initialData.length > 0;
+    const hasCommercePrefetch = Boolean(commerceFallback?.product);
+    if (!hasStackPrefetch && !hasCommercePrefetch) {
+      setIsLoading(true);
+    }
       const query = await ContentstackClient.getElementByUrlWithRefs(
         "pdp",
         "/pdp/" + params.id,
@@ -109,11 +123,16 @@ export default function Page({  }) {
         setEntry(q0);
         setVariants(q0?.variants?.items);
         setIsLoading(false);
+    } else if (commerceFallback?.product) {
+      setVariants(commerceFallback.variants ?? commerceFallback.product?.variants ?? []);
+      setProduct(commerceFallback.product);
+      setEntry({});
+      setIsLoading(false);
     } else {
       console.log("can't find contentstack entry, fetching product by url")
       await getProductsbyURL(params.id);
     }
-  }, [params.id, params.locale, initialData, getProductsbyURL]);
+  }, [params.id, params.locale, initialData, commerceFallback, getProductsbyURL]);
 
   const getTranslations = useCallback(async () => {
     try {

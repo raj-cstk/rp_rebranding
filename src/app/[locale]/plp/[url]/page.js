@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ContentstackClient } from "@/lib/contentstack-client"
 import Footer from "@/components/footer";
 import Header from "@/components/header";
@@ -26,25 +26,71 @@ import FilterPanel from "@/components/filterPanel";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilterList } from '@awesome.me/kit-610837e1f9/icons/classic/solid';
 import { jsonToHTML } from '@contentstack/utils';
-import { useDataContext } from "@/context/data.context";
+import { useDataContext, usePlpCommercePrefetch } from "@/context/data.context";
 import { plpReferences } from "@/helpers/referencePaths";
 
 export default function PLP() {
+  const params = useParams();
+  const initialData = useDataContext();
+  const plpCommercePrefetch = usePlpCommercePrefetch();
+  const jstag = useJstag();
+
   const [entry, setEntry] = useState({});
-  const [category, setCategory] = useState({});
-  const [products, setProducts] = useState([]);
-  const [categoryFilters, setCategoryFilters] = useState(null);
+  const [category, setCategory] = useState(() => {
+    const p = plpCommercePrefetch?.category;
+    return p ? { ...p } : {};
+  });
+  const [products, setProducts] = useState(() => plpCommercePrefetch?.products ?? []);
+  const [categoryFilters, setCategoryFilters] = useState(
+    () => plpCommercePrefetch?.filters ?? null
+  );
   const [filter, setFilter] = useState([]);
   const [sortBy, setSortBy] = useState("top_sellers");
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    const p = plpCommercePrefetch;
+    return !(p?.category?.id != null && p.products != null);
+  });
 
-  const jstag = useJstag();
-  const params = useParams();
-  const initialData = useDataContext();
+  const applyCategoryFromEntry = useCallback(
+    async (entryList) => {
+      const plpFirst = entryList?.[0];
+      if (
+        plpFirst?.product_category &&
+        Array.isArray(plpFirst.product_category) &&
+        plpFirst.product_category.length > 0
+      ) {
+        plpFirst.product_category = plpFirst.product_category[0];
+      }
+      const csFallback = plpFirst?.product_category?.items?.[0];
+      let resolved =
+        plpCommercePrefetch?.category ||
+        (await RPCommerce.getCategoryByURL(
+          "/" + params.url,
+          params.locale,
+          true,
+          2
+        )) ||
+        csFallback;
+      const categoryData = {
+        ...(resolved || {}),
+        name: plpFirst?.headline || resolved?.name,
+        description:
+          plpFirst?.description &&
+          plpFirst?.description != "<p></p>" &&
+          plpFirst?.description != ""
+            ? plpFirst?.description
+            : resolved?.description,
+        image: plpFirst?.image?.url || resolved?.image,
+        video: plpFirst?.video?.url || null,
+        $: plpFirst?.$,
+      };
+      setCategory(categoryData);
+    },
+    [plpCommercePrefetch, params.url, params.locale]
+  );
 
-
-  const getContent = async () => {
+  const getContent = useCallback(async () => {
     const entry = await ContentstackClient.getElementByUrlWithRefs(
       "plp",
       "/plp/" + params.url,
@@ -57,59 +103,75 @@ export default function PLP() {
     if (firstEntry) {
       jsonToHTML({
         entry: firstEntry,
-        paths: ['modular_blocks_top.category_banner.description', 'modular_blocks_bottom.category_banner.description', 'description']
-      })
+        paths: [
+          "modular_blocks_top.category_banner.description",
+          "modular_blocks_bottom.category_banner.description",
+          "description",
+        ],
+      });
     }
 
     const plpFirst = entry?.[0];
-    if(plpFirst?.product_category && Array.isArray(plpFirst.product_category) && plpFirst.product_category.length > 0) {
+    if (
+      plpFirst?.product_category &&
+      Array.isArray(plpFirst.product_category) &&
+      plpFirst.product_category.length > 0
+    ) {
       plpFirst.product_category = plpFirst.product_category[0];
     }
     setEntry(entry);
-    getCategory(entry);
-  };
+    await applyCategoryFromEntry(entry);
+  }, [params.url, params.locale, initialData, applyCategoryFromEntry]);
 
   useEffect(() => {
-    const getProducts = async (id) => {
-      const products = await RPCommerce.getProductsByCategory(id, params.locale);
-      setProducts(products);
+    if (!category?.id) return;
+
+    if (
+      plpCommercePrefetch?.category?.id === category.id &&
+      plpCommercePrefetch.products != null
+    ) {
+      setProducts(plpCommercePrefetch.products);
+      setCategoryFilters(plpCommercePrefetch.filters ?? null);
+      setIsLoading(false);
+      return;
     }
+
+    setIsLoading(true);
+    const getProducts = async (id) => {
+      try {
+        const list = await RPCommerce.getProductsByCategory(id, params.locale);
+        setProducts(list ?? []);
+      } catch (e) {
+        console.error("getProductsByCategory failed:", e);
+        setProducts([]);
+      }
+    };
 
     const getFilters = async (id) => {
-      const filters = await RPCommerce.getCategoryFilters(id, params.locale);
-      setCategoryFilters(filters);
-    }
-
-    if (category?.id) {
-      setIsLoading(true);
-      Promise.all([
-        getProducts(category.id),
-        getFilters(category.id)
-      ]).finally(() => {
-        setIsLoading(false);
-      })
-    }
-  }, [category, params.locale]);
-
-  const getCategory = async (entry) => {
-    const category = await RPCommerce.getCategoryByURL('/' + params.url, params.locale, true, 2) || entry?.[0]?.product_category?.items?.[0];
-    const categoryData = {
-      ...(category || {}),
-      name: entry?.[0]?.headline || category?.name,
-      description: (entry?.[0]?.description && entry?.[0]?.description != "<p></p>" && entry?.[0]?.description != "") ? entry?.[0]?.description : category?.description,
-      image: entry?.[0]?.image?.url || category?.image,
-      video: entry?.[0]?.video?.url || null,
-      $: entry?.[0]?.$
+      try {
+        const filters = await RPCommerce.getCategoryFilters(id, params.locale);
+        setCategoryFilters(filters);
+      } catch (e) {
+        console.error("getCategoryFilters failed:", e);
+        setCategoryFilters(null);
+      }
     };
-    setCategory(categoryData);
-  }
+
+    Promise.all([getProducts(category.id), getFilters(category.id)]).finally(
+      () => {
+        setIsLoading(false);
+      }
+    );
+  }, [category, params.locale, plpCommercePrefetch]);
 
   useEffect(() => {
     ContentstackClient.onEntryChange(getContent);
+  }, [getContent]);
+
+  useEffect(() => {
     jstag.send({ lead_score: 25 });
-    jstag.call('resetPolling');
-    //fetchTaxonomyContent("6_day");
-  }, [])
+    jstag.call("resetPolling");
+  }, [jstag, params.url]);
 
   /**
    * FILTER MANAGEMENT

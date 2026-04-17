@@ -4,8 +4,9 @@ import { headers } from "next/headers";
 import ContentstackServer from "@/lib/cstack";
 import { pdpReferences } from "@/helpers/referencePaths";
 import DataContextProvider from "@/context/data.context";
+import RPCommerce from "@/lib/rpcommerce";
 
-const fetchData = cache(async (locale, id) => {
+const fetchPdpPageData = cache(async (locale, id) => {
     const headersList = await headers();
     const variantParam = headersList.get('x-personalize-variants');
 
@@ -17,32 +18,54 @@ const fetchData = cache(async (locale, id) => {
         {},
         variantParam
     );
-    return data;
+
+    let commerceFallback = null;
+    if (!data?.length && id && id !== "untitled") {
+        try {
+            const products = await RPCommerce.getProductByUrl(id, locale, {
+                next: { revalidate: 300 },
+            });
+            if (products?.length > 0) {
+                const p = products[0];
+                commerceFallback = {
+                    product: p,
+                    variants: p?.variants ?? [],
+                };
+            }
+        } catch {
+            commerceFallback = null;
+        }
+    }
+
+    return { data, commerceFallback };
 });
 
 export const generateMetadata = async ({ params }) => {
     const parameters = await params;
     const locale = parameters.locale;
-    const data = await fetchData(locale, parameters.id);
+    const { data, commerceFallback } = await fetchPdpPageData(locale, parameters.id);
     const entry = data?.[0];
+    const product = commerceFallback?.product;
 
     return {
-        title: entry?.seo?.title || entry?.product_name || "Red Panda Resort",
+        title: entry?.seo?.title || entry?.product_name || product?.name || "Red Panda Resort",
         description:
             entry?.seo?.description ||
             entry?.description ||
+            product?.description ||
             "Red Panda Resort is a demo website made using Contentstack.",
         robots: {
             index: !entry?.seo?.no_index,
             follow: !entry?.seo?.no_follow,
         },
         openGraph: {
-            title: entry?.seo?.og_meta_tags?.title || entry?.product_name || "Red Panda Resort",
+            title: entry?.seo?.og_meta_tags?.title || entry?.product_name || product?.name || "Red Panda Resort",
             description:
                 entry?.seo?.og_meta_tags?.description ||
                 entry?.description ||
+                product?.description ||
                 "Red Panda Resort is a demo website made using Contentstack.",
-            images: entry?.seo?.og_meta_tags?.image || entry?.images?.[0]?.image?.url,
+            images: entry?.seo?.og_meta_tags?.image || entry?.images?.[0]?.image?.url || product?.media?.[0]?.path,
         },
     }
 };
@@ -53,7 +76,7 @@ export default async function PDPLayout({
 }) {
     const parameters = await params;
     const locale = parameters.locale;
-    const data = await fetchData(locale, parameters.id);
+    const { data, commerceFallback } = await fetchPdpPageData(locale, parameters.id);
     const entry = data?.[0];
 
     const faqSchema =
@@ -73,7 +96,7 @@ export default async function PDPLayout({
             : null;
 
     return (
-        <DataContextProvider data={data}>
+        <DataContextProvider data={data} commerceFallback={commerceFallback}>
             {faqSchema && (
                 <script
                     type="application/ld+json"
