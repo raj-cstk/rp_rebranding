@@ -34,6 +34,9 @@ export const generateMetadata = async ({ params }) => {
       index: !entry?.seo?.no_index,
       follow: !entry?.seo?.no_follow,
     },
+    verification: {
+      google: "XZdHtz7b1Mm1JIMYW3wrY35I8TRdWIprwdPZCsl8SbE",
+    },
     openGraph: {
       title: entry?.seo?.og_meta_tags?.title,
       description: entry?.seo?.og_meta_tags?.description,
