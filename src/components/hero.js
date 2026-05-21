@@ -122,6 +122,7 @@ export default function Hero({ content, locale, withHeader, cslp }) {
                           }
                   >
                     <source src={videoFile} />
+                    {...hero?.$?.video_options?.video}
                   </video>
                 ) : imageFile ? (
                   <img
@@ -130,7 +131,7 @@ export default function Hero({ content, locale, withHeader, cslp }) {
                       opacity: mediaOpacity
                     }}
                     src={imageFile}
-                    {...hero?.$?.image_options?.image}
+                    {...hero?.image_options?.$?.image}
                   />
                 ) : null}
 
