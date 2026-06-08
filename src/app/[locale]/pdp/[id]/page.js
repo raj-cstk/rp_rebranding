@@ -30,6 +30,19 @@ import { pdpReferences } from "@/helpers/referencePaths";
 import { useDataContext, useCommerceFallback } from "@/context/data.context";
 import { jsonToHTML } from '@contentstack/utils';
 
+/**
+ * Returns a user-facing block message if the product/variant cannot be added
+ * to the cart (unavailable or out of stock), or null if it can.
+ */
+function getAddToCartBlockMessage(product, variant) {
+  const item = variant || product;
+  if (!item) return null;
+  if (item.available === false) return "This product is currently unavailable.";
+  if (typeof item.stock_quantity === "number" && item.stock_quantity <= 0) {
+    return "This product is out of stock.";
+  }
+  return null;
+}
 
 export default function Page({  }) {
   const params = useParams();
@@ -54,6 +67,8 @@ export default function Page({  }) {
   const [translations, setTranslations] = useState({});
   const [purchaseOpen, setPurchaseOpen] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
+  const [addToCartMessage, setAddToCartMessage] = useState("");
+  const [addingToCart, setAddingToCart] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
   const handleGoBack = () => {
@@ -119,7 +134,8 @@ export default function Page({  }) {
         if(q0?.variants && Array.isArray(q0?.variants) && q0?.variants?.length > 0) {
           q0.variants = q0.variants[0];
         }
-        setProduct(q0?.product?.items?.[0])
+        setProduct(q0?.product?.items?.[0]);
+        setAddToCartMessage("");
         setEntry(q0);
         setVariants(q0?.variants?.items);
         setIsLoading(false);
@@ -187,6 +203,22 @@ export default function Page({  }) {
 
   return (
     <div className="relative">
+      {addToCartMessage ? (
+        <div
+          role="alert"
+          className="fixed inset-x-0 bottom-0 z-[9999] flex min-h-10 items-center justify-center gap-2 border-t border-amber-800/40 bg-amber-950 px-3 py-2 pr-11 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 text-center text-xs font-medium leading-snug text-amber-50 shadow-[0_-4px_14px_rgba(0,0,0,0.12)] sm:px-6 sm:pr-14 sm:text-sm"
+        >
+          <span className="max-w-2xl">{addToCartMessage}</span>
+          <button
+            type="button"
+            onClick={() => setAddToCartMessage("")}
+            className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-amber-100 transition-colors hover:bg-amber-900/80 hover:text-white"
+            aria-label="Dismiss"
+          >
+            <XMarkIcon className="h-4 w-4" />
+          </button>
+        </div>
+      ) : null}
       <Header locale={params.locale} />
       <div className="max-w-8xl mx-auto px-8 pt-10 flex flex-col font-paragraph mb-12">
         <div className="w-full md:flex gap-16">
@@ -295,17 +327,65 @@ export default function Page({  }) {
                 </button>
               )}
               <button
-                className="mt-4 rounded-[60px] md:w-full lg:w-3/4 xl:w-4/6 text-nowrap relative button px-8 py-4 text-md tracking-widest uppercase bg-white font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:bg-cyan-600 hover:text-white"
-                onClick={() => {
+                type="button"
+                disabled={addingToCart}
+                aria-busy={addingToCart}
+                className="mt-4 rounded-[60px] md:w-full lg:w-3/4 xl:w-4/6 text-nowrap relative button px-8 py-4 text-md tracking-widest uppercase bg-white font-bold text-cyan-600 shadow-sm ring-2 ring-inset ring-cyan-600 hover:bg-cyan-600 hover:text-white disabled:pointer-events-none disabled:opacity-60 disabled:hover:bg-white disabled:hover:text-cyan-600 inline-flex items-center justify-center gap-3 min-h-[52px]"
+                onClick={async () => {
+                  if (addingToCart) return;
+                  setAddToCartMessage("");
                   const productName = entry?.product_name || product?.name || "";
                   if (typeof jstag?.send === "function") {
                     jstag.send({ product_name: productName });
                   }
+                  const productId = product?.id;
+                  if (
+                    typeof window !== "undefined" &&
+                    window.RedPandaCart &&
+                    typeof window.RedPandaCart.addItem === "function" &&
+                    productId
+                  ) {
+                    const blocked = getAddToCartBlockMessage(product, null);
+                    if (blocked) {
+                      setAddToCartMessage(blocked);
+                      return;
+                    }
+                    setAddingToCart(true);
+                    try {
+                      await window.RedPandaCart.addItem(productId, 1, {
+                        locale: params.locale,
+                      });
+                      if (typeof window.RedPandaCart.open === "function") {
+                        window.RedPandaCart.open();
+                      }
+                      return;
+                    } catch (err) {
+                      console.error("RedPandaCart.addItem failed", err);
+                      setAddToCartMessage(
+                        err?.message ||
+                          "Could not add this product to your cart. It may be out of stock."
+                      );
+                      return;
+                    } finally {
+                      setAddingToCart(false);
+                    }
+                  }
                   setPurchaseOpen(true);
                 }}
               >
-               {getTranslation("cart_button", "Add to Cart")}
+                {addingToCart ? (
+                  <>
+                    <span
+                      className="inline-block h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-cyan-600 border-t-transparent"
+                      aria-hidden
+                    />
+                    <span>{getTranslation("cart_adding", "Adding…")}</span>
+                  </>
+                ) : (
+                  getTranslation("cart_button", "Add to Cart")
+                )}
               </button>
+
             </div>
 
             
@@ -499,10 +579,9 @@ export default function Page({  }) {
                         </p>
                       )}
                       {variant?.description && (
-                        <p className="text-sm text-gray-600 mt-2 line-clamp-2" dangerouslySetInnerHTML={{
+                        <div className="text-sm text-gray-600 mt-2 line-clamp-2" dangerouslySetInnerHTML={{
                           __html: variant?.description,
-                        }}>
-                        </p>
+                        }} />
                       )}
                       </Link>
                     </div>
@@ -588,7 +667,7 @@ export default function Page({  }) {
             </form>
 
             <div className="flex mt-3">
-              <input type="checkbox" checked />
+              <input type="checkbox" defaultChecked readOnly />
               <label className="ml-2">Use card on file</label>
             </div>
 

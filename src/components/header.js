@@ -10,7 +10,7 @@ import { faCircleUser as loggedOut } from '@awesome.me/kit-610837e1f9/icons/clas
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Disclosure, Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import { Bars3Icon, XMarkIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, Squares2X2Icon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useJstag } from '../context/lyticsTracking';
@@ -64,7 +64,7 @@ export default function Header({ color, locale }) {
 
   async function logout() {
     const supabase = createClient();
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: 'local' });
     deleteCookie('oauth_user');
     deleteCookie('oauth_token');
     deleteCookie('oauth_session');
@@ -194,8 +194,20 @@ export default function Header({ color, locale }) {
         )}
       </Link>
 
-      <div className="flex lg:hidden">
-        <button className="" onClick={() => setMenuOpen(true)}>
+      <div className="flex lg:hidden items-center gap-3">
+        <button
+          type="button"
+          className={classNames(
+            "rp-cart outline-none inline-flex items-center justify-center rounded-full p-1.5 text-current ring-2 ring-inset transition-colors",
+            color === "white"
+              ? "ring-white hover:bg-white/15"
+              : "ring-cyan-600 hover:bg-cyan-600 hover:text-white"
+          )}
+          aria-label="Shopping cart (embed)"
+        >
+          <ShoppingBagIcon className="h-6 w-6" aria-hidden />
+        </button>
+        <button type="button" className="outline-none" onClick={() => setMenuOpen(true)} aria-label="Open menu">
           <Bars3Icon className="h-8 w-8" />
         </button>
       </div>
@@ -265,7 +277,21 @@ export default function Header({ color, locale }) {
       </div>
 
 
-      <div className="hidden lg:flex justify-center align-top items-center" style={{ width: '150px', justifyContent: 'end' }}>
+      <div className="hidden shrink-0 lg:flex items-center justify-end gap-0">
+
+        <button
+          type="button"
+          className={classNames(
+            "rp-cart outline-none mr-3 inline-flex items-center justify-center rounded-full p-1.5 text-current ring-2 ring-inset transition-colors",
+            color === "white"
+              ? "ring-white hover:bg-white/15"
+              : "ring-cyan-600 hover:bg-cyan-600 hover:text-white"
+          )}
+          aria-label="Shopping cart (embed)"
+        >
+          <ShoppingBagIcon className="h-6 w-6" aria-hidden />
+        </button>
+
 
         <button
           onClick={togglePanel}
@@ -308,6 +334,10 @@ export default function Header({ color, locale }) {
               >
                 Log In
               </button>
+              <div className="my-1 h-px bg-black/25" />
+              <Link href={`/${locale}/orders-embed`} className="font-light text-nowrap">
+                MY ORDERS
+              </Link>
             </PopoverPanel>
           </Popover>
         }
@@ -341,6 +371,10 @@ export default function Header({ color, locale }) {
               ))}
               <div className="my-1 h-px bg-black/25" />
               <Link href="/profiles" className="font-light">MANAGE PROFILES</Link>
+              <div className="my-1 h-px bg-black/25" />
+              <Link href={`/${locale}/orders-embed`} className="font-light text-nowrap">
+                MY ORDERS
+              </Link>
               <div className="my-1 h-px bg-black/25" />
               <button
                 className="text-nowrap font-light cursor-pointer text-left"
@@ -417,6 +451,14 @@ export default function Header({ color, locale }) {
               );
             }
           })}
+          <button
+            type="button"
+            className="rp-cart mt-10 flex w-full items-center gap-3 border-2 border-cyan-600 px-4 py-3 text-left text-neutral-700 outline-none transition-colors hover:bg-cyan-600 hover:text-white"
+            aria-label="Shopping cart"
+          >
+            <ShoppingBagIcon className="h-8 w-8 shrink-0" aria-hidden />
+            <span className="font-paragraph text-xl uppercase tracking-wide">Cart</span>
+          </button>
         </div>
       </div>
     </div>

@@ -1,0 +1,36 @@
+"use client";
+
+import { useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
+
+/**
+ * Syncs the logged-in Supabase user ID to window.__RPC_CART_EMBED__.customerId.
+ * embed.js watches that property via Object.defineProperty and automatically
+ * calls refreshCartEmbed() whenever it changes — no manual call needed here.
+ */
+export default function RpcCartLinkCustomer() {
+  useEffect(() => {
+    const supabase = createClient();
+
+    const sync = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (typeof window === "undefined") return;
+      window.__RPC_CART_EMBED__ = window.__RPC_CART_EMBED__ || {};
+      if (user?.id) {
+        window.__RPC_CART_EMBED__.customerId = user.id;
+      } else {
+        window.__RPC_CART_EMBED__.customerId = null;
+      }
+    };
+
+    sync();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      sync();
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  return null;
+}
