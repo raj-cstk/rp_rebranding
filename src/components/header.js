@@ -335,7 +335,7 @@ export default function Header({ color, locale }) {
                 Log In
               </button>
               <div className="my-1 h-px bg-black/25" />
-              <Link href={`/${locale}/orders-embed`} className="font-light text-nowrap">
+              <Link href={`/${locale}/orders`} className="font-light text-nowrap">
                 MY ORDERS
               </Link>
             </PopoverPanel>
@@ -372,7 +372,7 @@ export default function Header({ color, locale }) {
               <div className="my-1 h-px bg-black/25" />
               <Link href="/profiles" className="font-light">MANAGE PROFILES</Link>
               <div className="my-1 h-px bg-black/25" />
-              <Link href={`/${locale}/orders-embed`} className="font-light text-nowrap">
+              <Link href={`/${locale}/orders`} className="font-light text-nowrap">
                 MY ORDERS
               </Link>
               <div className="my-1 h-px bg-black/25" />
