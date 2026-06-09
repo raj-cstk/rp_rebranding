@@ -16,11 +16,7 @@ export default function RpcCartLinkCustomer() {
       const { data: { user } } = await supabase.auth.getUser();
       if (typeof window === "undefined") return;
       window.__RPC_CART_EMBED__ = window.__RPC_CART_EMBED__ || {};
-      if (user?.id) {
-        window.__RPC_CART_EMBED__.customerId = user.id;
-      } else {
-        window.__RPC_CART_EMBED__.customerId = null;
-      }
+      window.__RPC_CART_EMBED__.customerId = user?.id ?? null;
     };
 
     sync();
