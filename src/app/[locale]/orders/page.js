@@ -3,32 +3,24 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Header from '@/components/header';
-import { createClient } from '@/utils/supabase/client';
 
-export default function OrdersEmbedPage() {
+export default function OrdersPage() {
     const { locale = 'en' } = useParams();
     const [src, setSrc] = useState(null);
-
+2
     useEffect(() => {
         const cfg = window.__RPC_CART_EMBED__;
         if (!cfg?.commerceOrigin || !cfg?.storeId || !cfg?.storeToken) return;
 
-        const init = async () => {
-            const supabase = createClient();
-            const { data: { session } } = await supabase.auth.getSession();
-            const userId    = session?.user?.id || '';
-            const sessionId = localStorage.getItem(`rpc_cart_session_${cfg.storeId}`) || '';
-            const origin    = cfg.commerceOrigin.replace(/\/$/, '');
+        const userId    = cfg.customerId || '';
+        const sessionId = localStorage.getItem(`rpc_cart_session_${cfg.storeId}`) || '';
+        const origin    = cfg.commerceOrigin.replace(/\/$/, '');
 
-            const q = new URLSearchParams({ storeId: cfg.storeId, sessionId });
-            if (cfg.primaryColor) q.set('color', cfg.primaryColor);
-            if (userId) q.set('customerId', userId);
+        const q = new URLSearchParams({ storeId: cfg.storeId, sessionId });
+        if (cfg.primaryColor) q.set('color', cfg.primaryColor);
+        if (userId) q.set('customerId', userId);
 
-            // Token goes in the hash so it isn't logged by servers
-            setSrc(`${origin}/embed/orders?${q}#token=${encodeURIComponent(cfg.storeToken)}`);
-        };
-
-        init();
+        setSrc(`${origin}/embed/orders?${q}#token=${encodeURIComponent(cfg.storeToken)}`);
     }, []);
 
     return (
