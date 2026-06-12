@@ -61,7 +61,7 @@ export default function Mobile({ }) {
 
     async function logout() {
         const supabase = createClient();
-        await supabase.auth.signOut();
+        await supabase.auth.signOut({ scope: 'local' });
         deleteCookie('oauth_user');
         deleteCookie('oauth_token');
         deleteCookie('oauth_session');

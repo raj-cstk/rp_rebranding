@@ -16,6 +16,7 @@ import {
   Rokkitt,
   Spectral,
 } from "next/font/google";
+import { headers } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -120,6 +121,34 @@ function fontPicker(fontName) {
   return map[fontName] || "inherit";
 }
 
+function CommerceCartEmbedScripts({ urlTillLocale }) {
+  const origin   = (process.env.RED_PANDA_COMMERCE_API_URL || "").replace(/\/$/, "");
+  const storeId  = process.env.RED_PANDA_COMMERCE_STORE_ID  || "";
+  const storeToken = process.env.RED_PANDA_COMMERCE_STORE_TOKEN || "";
+  if (!origin || !storeId || !storeToken) return null;
+
+  const cfg = JSON.stringify({
+    commerceOrigin: origin,
+    storeId,
+    storeToken,
+    position: "left",
+    buttonPosition: "left",
+    showButton: false,
+    customCartButtonClass: "rp-cart",
+    productUrlFormat: `${urlTillLocale}/pdp/{url}`,
+  }).replace(/</g, "\\u003c");
+
+  return (<>
+    <script dangerouslySetInnerHTML={{ __html: `window.__RPC_CART_EMBED__=${cfg};` }} />
+    <Script
+      id="rpc-commerce-cart-embed"
+      src={`${origin}/api/embed-script`}
+      data-show-button="false"
+      strategy="afterInteractive"
+    />
+  </>);
+}
+
 export const metadata = {
   title: "Red Panda Resort",
   description: "Red Panda Resort is a demo website made using Contentstack.",
@@ -151,7 +180,28 @@ export default async function RootLayout({
   const buttonFont = fontPicker(config.button_font);
   const paragraphFont = fontPicker(config.paragraph_font);
 
-  
+  const headersList = await headers();
+  const host =
+    headersList.get("x-forwarded-host") ?? headersList.get("host") ?? "";
+  const proto =
+    headersList.get("x-forwarded-proto")?.split(",")[0]?.trim() ?? "http";
+  const pathname = headersList.get("x-pathname") ?? "/";
+  const fullUrl = host
+    ? new URL(pathname, `${proto}://${host}`).href
+    : "";
+
+  const urlTillLocale = fullUrl
+    ? (() => {
+        const u = new URL(fullUrl);
+        const firstSeg =
+          u.pathname.split("/").filter(Boolean)[0] ??
+          locale ??
+          process.env.NEXT_PUBLIC_DEFAULT_LOCALE ??
+          "en";
+        return `${u.origin}/${firstSeg}`;
+      })()
+    : "";
+
   return (
     <html lang={locale}>
       <Script
@@ -186,6 +236,7 @@ export default async function RootLayout({
         <AppWrapper>
           {children}
         </AppWrapper>
+        <CommerceCartEmbedScripts urlTillLocale={urlTillLocale} />
       </body>
     </html>
   );
