@@ -5,11 +5,13 @@ import Footer from "@/components/footer";
 import { ContentstackClient } from "@/lib/contentstack-client";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useJstag } from "@/context/lyticsTracking";
 
 export default function ArticleCategory({ }) {
   const [entries, setEntries] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const params = useParams();
+  const jstag = useJstag();
 
   const getContent = async () => {
     const entries = await ContentstackClient.getElementByTypeByTaxonomy(
@@ -22,8 +24,15 @@ export default function ArticleCategory({ }) {
   };
 
   useEffect(() => {
+    getContent();
     ContentstackClient.onEntryChange(getContent);
   }, []);
+
+  useEffect(() => {
+    if (!isLoading && jstag && params.title) {
+      jstag.send({ topic_browsed: params.title });
+    }
+  }, [isLoading, params.title, jstag]);
 
   if (isLoading) return;
 

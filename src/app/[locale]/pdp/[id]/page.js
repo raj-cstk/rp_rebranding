@@ -44,7 +44,7 @@ function getAddToCartBlockMessage(product, variant) {
   return null;
 }
 
-export default function Page({  }) {
+export default function Page({ }) {
   const params = useParams();
   const initialData = useDataContext();
   const commerceFallback = useCommerceFallback();
@@ -80,30 +80,20 @@ export default function Page({  }) {
     setInputValue(event.target.value);
   };
 
-  function buyClick(price) {
-    jstag.send({
-      shopify_total_spend: price,
-      _e: "purchase",
-      email: inputValue,
-    });
-    jstag.call("resetPolling");
-    setInputValue("");
-    setPurchaseSuccess(true);
-  }
 
   const getProductsbyURL = useCallback(async (id) => {
-      try {
-        const products = await RPCommerce.getProductByUrl(id, params.locale);
-        if (products && products.length > 0) {
-          setVariants(products[0]?.variants);
-          setProduct(products[0]);
-        }
-      } catch (e) {
-        console.error("getProductByUrl failed:", e);
-      } finally {
-        setIsLoading(false);
+    try {
+      const products = await RPCommerce.getProductByUrl(id, params.locale);
+      if (products && products.length > 0) {
+        setVariants(products[0]?.variants);
+        setProduct(products[0]);
       }
-    }, [params.locale]);
+    } catch (e) {
+      console.error("getProductByUrl failed:", e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [params.locale]);
 
   const getContent = useCallback(async () => {
     if (params.id === "untitled" || !params.id) return;
@@ -112,33 +102,33 @@ export default function Page({  }) {
     if (!hasStackPrefetch && !hasCommercePrefetch) {
       setIsLoading(true);
     }
-      const query = await ContentstackClient.getElementByUrlWithRefs(
-        "pdp",
-        "/pdp/" + params.id,
-        params.locale,
-        pdpReferences,
-        initialData
-      );
-      if (query && query.length > 0){
-        console.log(query)
-        const q0 = query[0];
+    const query = await ContentstackClient.getElementByUrlWithRefs(
+      "pdp",
+      "/pdp/" + params.id,
+      params.locale,
+      pdpReferences,
+      initialData
+    );
+    if (query && query.length > 0) {
+      console.log(query)
+      const q0 = query[0];
 
-        jsonToHTML({
-          entry: q0,
-          paths: ['modular_blocks_top.category_banner.description', 'modular_blocks_bottom.category_banner.description']
-        });
-        
-        if(q0?.product && Array.isArray(q0?.product) && q0?.product?.length > 0) {
-          q0.product = q0.product[0];
-        }
-        if(q0?.variants && Array.isArray(q0?.variants) && q0?.variants?.length > 0) {
-          q0.variants = q0.variants[0];
-        }
-        setProduct(q0?.product?.items?.[0]);
-        setAddToCartMessage("");
-        setEntry(q0);
-        setVariants(q0?.variants?.items);
-        setIsLoading(false);
+      jsonToHTML({
+        entry: q0,
+        paths: ['modular_blocks_top.category_banner.description', 'modular_blocks_bottom.category_banner.description']
+      });
+
+      if (q0?.product && Array.isArray(q0?.product) && q0?.product?.length > 0) {
+        q0.product = q0.product[0];
+      }
+      if (q0?.variants && Array.isArray(q0?.variants) && q0?.variants?.length > 0) {
+        q0.variants = q0.variants[0];
+      }
+      setProduct(q0?.product?.items?.[0]);
+      setAddToCartMessage("");
+      setEntry(q0);
+      setVariants(q0?.variants?.items);
+      setIsLoading(false);
     } else if (commerceFallback?.product) {
       setVariants(commerceFallback.variants ?? commerceFallback.product?.variants ?? []);
       setProduct(commerceFallback.product);
@@ -186,7 +176,20 @@ export default function Page({  }) {
     ContentstackClient.onEntryChange(getContent);
   }, [getTranslations, getContent]);
 
-  
+  useEffect(() => {
+    if (isLoading || !jstag) return;
+    const productName = entry?.product_name || product?.name;
+    if (productName) {
+      jstag.send({ product_viewed: productName });
+    }
+    if (product?.categories?.length > 0) {
+      product.categories.forEach((c) => {
+        jstag.send({ product_viewed_category: c.name });
+      });
+    }
+  }, [isLoading, entry?.uid, entry?.product_name, product?.categories, product?.name, jstag]);
+
+
   if (isLoading || (!entry && !product)) {
     return (
       <div className="relative">
@@ -231,31 +234,31 @@ export default function Page({  }) {
               <p className="inline-block">{getTranslation("back_button", "Back to previous products")}</p>
             </button>
             <div className="mt-4 flex gap-4">
-              
+
               {/* Thumbnails column */}
               <div className="flex flex-col gap-3">
                 {((entry?.images?.length === 0 || !entry?.images) &&
                   (product?.media && product?.media?.length > 0)) && (
-                  <div className="flex flex-col gap-3">
-                    {product.media?.map((image, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        className={
-                          "border p-1 cursor-pointer bg-white my-[6px] " +
-                          (imageIndex === index ? "border-black" : "border-gray-300")
-                        }
-                        onClick={() => setImageIndex(index)}
-                      >
-                        <img
-                          className="h-[68px] w-[68px] object-cover"
-                          src={image?.path}
-                          alt={product?.name || `Product image ${index + 1}`}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                )}
+                    <div className="flex flex-col gap-3">
+                      {product.media?.map((image, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          className={
+                            "border p-1 cursor-pointer bg-white my-[6px] " +
+                            (imageIndex === index ? "border-black" : "border-gray-300")
+                          }
+                          onClick={() => setImageIndex(index)}
+                        >
+                          <img
+                            className="h-[68px] w-[68px] object-cover"
+                            src={image?.path}
+                            alt={product?.name || `Product image ${index + 1}`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 {entry?.images?.length > 0 && (
                   <div className="flex flex-col gap-3">
                     {entry?.images?.map((image, index) => (
@@ -312,7 +315,7 @@ export default function Page({  }) {
             )}
             {(product?.price || entry?.price) && (
               <div className="text-[32px] mt-4">
-                
+
                 {entry?.currency_symbol ? entry?.currency_symbol : product?.currency_symbol}{entry?.price ? entry?.price : product?.price}
               </div>
             )}
@@ -335,9 +338,7 @@ export default function Page({  }) {
                   if (addingToCart) return;
                   setAddToCartMessage("");
                   const productName = entry?.product_name || product?.name || "";
-                  if (typeof jstag?.send === "function") {
-                    jstag.send({ product_name: productName });
-                  }
+
                   const productId = product?.id;
                   if (
                     typeof window !== "undefined" &&
@@ -363,7 +364,7 @@ export default function Page({  }) {
                       console.error("RedPandaCart.addItem failed", err);
                       setAddToCartMessage(
                         err?.message ||
-                          "Could not add this product to your cart. It may be out of stock."
+                        "Could not add this product to your cart. It may be out of stock."
                       );
                       return;
                     } finally {
@@ -388,7 +389,7 @@ export default function Page({  }) {
 
             </div>
 
-            
+
           </div>
         </div>
         <div className="text-[32px] leading-none normal-case mt-8">
@@ -497,9 +498,8 @@ export default function Page({  }) {
         ></div>
       )}
       <div
-        className={`fixed w-[450px] z-50 h-full top-0 right-0 border-l bg-white shadow-lg transition-transform duration-300 ease-in-out ${
-          variantsOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed w-[450px] z-50 h-full top-0 right-0 border-l bg-white shadow-lg transition-transform duration-300 ease-in-out ${variantsOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-center p-4 border-b">
@@ -565,28 +565,28 @@ export default function Page({  }) {
                         </div>
                       )}
                       <Link href={variant?.url ? variant?.url : "#"}>
-                      <div className="text-lg font-semibold mb-2">
-                        {variant.name}
-                      </div>
-                      {variant?.price && (
-                        <p className="text-xl font-bold text-cyan-600">
-                          {variant.price}
-                        </p>
-                      )}
-                      {product?.price && (
-                        <p className="text-xl font-bold text-cyan-600">
-                          {product?.currency_symbol}{product?.price}
-                        </p>
-                      )}
-                      {variant?.description && (
-                        <div className="text-sm text-gray-600 mt-2 line-clamp-2" dangerouslySetInnerHTML={{
-                          __html: variant?.description,
-                        }} />
-                      )}
+                        <div className="text-lg font-semibold mb-2">
+                          {variant.name}
+                        </div>
+                        {variant?.price && (
+                          <p className="text-xl font-bold text-cyan-600">
+                            {variant.price}
+                          </p>
+                        )}
+                        {product?.price && (
+                          <p className="text-xl font-bold text-cyan-600">
+                            {product?.currency_symbol}{product?.price}
+                          </p>
+                        )}
+                        {variant?.description && (
+                          <div className="text-sm text-gray-600 mt-2 line-clamp-2" dangerouslySetInnerHTML={{
+                            __html: variant?.description,
+                          }} />
+                        )}
                       </Link>
                     </div>
                   );
-              }))}
+                }))}
             </div>
           </div>
         </div>

@@ -76,6 +76,9 @@ function CallbackContent() {
           email: data.user.email,
           authenticatedAt: new Date().toISOString(),
         }));
+        if (typeof jstag !== 'undefined' && data.user.email) {
+          jstag.send({ email: data.user.email });
+        }
       }
       setCookie('oauth_session', Date.now().toString());
 

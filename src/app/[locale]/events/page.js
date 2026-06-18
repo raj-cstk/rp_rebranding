@@ -4,7 +4,8 @@ import { useDataContext } from "@/context/data.context";
 import { useParams } from "next/navigation";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { ContentstackClient } from "@/lib/contentstack-client"
+import { ContentstackClient } from "@/lib/contentstack-client";
+import { useJstag } from "@/context/lyticsTracking";
 
 // Sample events data for Red Panda Resort
 // This array contains 20 resort-appropriate events with title, description, dateTime, location, and optional image
@@ -207,6 +208,7 @@ export default function Page(){
     const [events, setEvents] = useState([]); // Will be used once JSON structure is provided
     const [isLoading, setIsLoading] = useState(true);
     const initialData = useDataContext();
+    const jstag = useJstag();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -239,6 +241,11 @@ export default function Page(){
     const openModal = (event) => {
         setSelectedEvent(event);
         setIsModalOpen(true);
+        if (jstag && event?.taxonomies?.length > 0) {
+            event.taxonomies.forEach((t) => {
+                jstag.send({ topic_browsed: t.term_uid });
+            });
+        }
     };
 
     const closeModal = () => {

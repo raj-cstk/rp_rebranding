@@ -9,14 +9,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faUser, faCalendar } from "@awesome.me/kit-610837e1f9/icons/classic/light";
 import { useParams } from "next/navigation";
 import { useDataContext } from "@/context/data.context";
-// import { useJstag } from "@/context/lyticsTracking";
+import { useJstag } from "@/context/lyticsTracking";
 
 export default function Page({ }) {
     const [entry, setEntry] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const params = useParams();
     const initialData = useDataContext();
-    //const jstag = useJstag();
+    const jstag = useJstag();
 
     const getContent = async () => {
         const entry = await ContentstackClient.getElementByUrl(
@@ -25,16 +25,25 @@ export default function Page({ }) {
             params.locale,
             initialData
         );
-        setEntry(entry?.[0] ?? {});
+        const resolved = entry?.[0] ?? {};
+        setEntry(resolved);
         setIsLoading(false);
-        //jstag.send({"taxonomy" : entry?.taxonomies[0]?.term_uid});
     };
 
     useEffect(() => {
+        if (!isLoading && jstag && entry?.taxonomies?.length > 0) {
+            entry.taxonomies.forEach((t) => {
+                jstag.send({ topic_browsed: t.term_uid });
+            });
+        }
+    }, [isLoading, entry?.taxonomies]);
+
+    useEffect(() => {
+        getContent();
         ContentstackClient.onEntryChange(getContent);
     }, []);
 
-    if (isLoading) 
+    if (isLoading)
         return;
 
     // video helpers
@@ -62,8 +71,8 @@ export default function Page({ }) {
                                 videoControls === "Autoplay"
                                     ? true
                                     : videoControls === "Show Controls"
-                                    ? videoLoop
-                                    : false
+                                        ? videoLoop
+                                        : false
                             }
                         >
                             <source src={videoFile} />
@@ -87,14 +96,14 @@ export default function Page({ }) {
                     {entry?.isevent && <>
                         <div className="flex items-center mt-6 justify-between">
                             {
-                                entry?.event_details?.event_date ? 
+                                entry?.event_details?.event_date ?
                                     <div className="flex items-center gap-x-2" {...entry?.event_details?.$?.event_date}>
                                         <FontAwesomeIcon icon={faCalendar} className="text-md text-neutral-700" />
                                         <span className="font-paragraph font-light text-md text-left whitespace-pre-wrap tracking-wide leading-8 text-neutral-700" >
                                             {new Date(entry?.event_details?.event_date).toLocaleDateString(params.locale, { year: 'numeric', month: 'long', day: 'numeric' })} - {new Date(entry?.event_details?.event_date).toLocaleTimeString(params.locale, { hour: '2-digit', minute: '2-digit' })}
                                         </span>
-                                    </div> 
-                                : null
+                                    </div>
+                                    : null
                             }
                             {
                                 entry?.event_details?.event_type ?
@@ -103,8 +112,8 @@ export default function Page({ }) {
                                         <span className="font-paragraph font-light text-md text-left whitespace-pre-wrap tracking-wide leading-8 text-neutral-700 capitalize" >
                                             {entry?.event_details?.event_type?.replace(/-/g, ' ')}
                                         </span>
-                                    </div> 
-                                : null
+                                    </div>
+                                    : null
                             }
                         </div>
                         {entry?.event_details?.venue && <div className="flex items-center gap-x-2 mt-2" {...entry?.event_details?.$?.venue}>
@@ -114,7 +123,7 @@ export default function Page({ }) {
                             </span>
                         </div>}
                     </>}
-                    
+
                     {entry?.article_body &&
                         <div>
                             {entry?.article_body?.children?.length === 1 && entry?.article_body?.children?.[0]?.children?.[0]?.text === "" &&

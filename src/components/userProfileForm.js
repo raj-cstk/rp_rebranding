@@ -40,13 +40,6 @@ export default function UserProfileForm({ content }) {
       }
     });
 
-    // Send to jstag
-    if (typeof jstag !== "undefined") {
-      jstag.send(jstagData);
-      console.log("Sent to jstag:", jstagData);
-    } else {
-      console.warn("jstag is not available");
-    }
 
     // Reset form
     setFormData({});

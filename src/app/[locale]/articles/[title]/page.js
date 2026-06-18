@@ -6,6 +6,7 @@ import { ContentstackClient } from "@/lib/contentstack-client";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useDataContext } from "@/context/data.context";
+import { useJstag } from "@/context/lyticsTracking";
 
 export default function ArticlesList({ }) {
   const [entry, setEntry] = useState({});
@@ -13,6 +14,7 @@ export default function ArticlesList({ }) {
   const [isLoading, setIsLoading] = useState(true);
   const params = useParams();
   const initialData = useDataContext();
+  const jstag = useJstag();
 
   const getContent = async () => {
     const entry = await ContentstackClient.getElementByUrl(
@@ -36,8 +38,17 @@ export default function ArticlesList({ }) {
   };
 
   useEffect(() => {
+    getContent();
     ContentstackClient.onEntryChange(getContent);
   }, []);
+
+  useEffect(() => {
+    if (!isLoading && jstag && entry?.taxonomies?.length > 0) {
+      entry.taxonomies.forEach((t) => {
+        jstag.send({ topic_browsed: t.term_uid });
+      });
+    }
+  }, [isLoading, entry?.taxonomies, jstag]);
 
   if (isLoading) return;
 
