@@ -6,6 +6,28 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: FAQ pages
+
+Files:
+- src/app/[locale]/faq/[title]/page.js
+- src/app/[locale]/faqs/[title]/page.js
+- src/app/[locale]/faqs/[title]/section/[id]/page.js
+- src/app/[locale]/faqs/[title]/section/[id]/[qid]/page.js
+
+All four pages now use a dark `#0a0a0a` background with the shared design language used across the rest of the site.
+
+faq/[title]: Hero image with dark gradient overlay, Header overlaid at the top, Montserrat gold eyebrow, Cormorant italic h1. Categories render with a gold line + Cormorant italic heading. Accordion rows use Raleway — question turns gold and bolds when open, answer fades in with AnimatePresence height animation. Gold chevron rotates on open.
+
+faqs/[title]: Same hero treatment with a glass search input (semi-transparent dark bg, white text) and a gold search button. "Browse Topics" eyebrow section below with category tiles: faint gold border that brightens on hover. Removed `styled-components` and `@emotion/is-prop-valid` dependencies — tile styling is now consistent inline CSS. All search and navigation logic preserved.
+
+faqs/[title]/section/[id]: Montserrat breadcrumb (gold home link, muted current category), Cormorant h1 with "Category" eyebrow, 3-column question grid with gold arrow icons and hover gold-tint background.
+
+faqs/[title]/section/[id]/[qid]: Two-column layout — main answer on the left (gold dividers flanking the Cormorant italic question, Raleway body), sidebar on the right with a gold left border showing all other questions in the category as links. Both columns animate in on load (main fades up, sidebar slides in from right).
+
+`<Footer locale={params.locale} />` cleaned up to `<Footer />` across all pages — locale is now read internally by the Footer component.
+
+---
+
 ### Redesign: Footer component
 
 Files: src/components/footer.js, src/components/ui/animated-tooltip.jsx (new)
