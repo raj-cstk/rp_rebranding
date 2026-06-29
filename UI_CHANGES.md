@@ -6,6 +6,24 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: Events page
+
+File: src/app/[locale]/events/page.js
+
+White background. Two sections: a page header and the event content below.
+
+Page header: Same pattern as articles — gold eyebrow, Cormorant italic h1 from CMS `headline`, Raleway subtext from `details`. Below the heading, a compact dark/gold toggle switches between List and Calendar views.
+
+List view: Each event renders as a horizontal card with a 3px gold left accent bar, a 220px image (hover scale), and a content column with Cormorant italic title, expanding gold rule, Montserrat date/time and location icons, 2-line-clamped Raleway description, and a fade-in "View Details" arrow link. Staggered scroll animation per card.
+
+Calendar view: Dark `#0f0e0c` background section. 7-column grid (Sun–Sat) with gold "MON/TUE/..." headers and gold dividers. Each event tile is dark `#1a1814` with a gold border on hover. Shows time in Maldives timezone, Cormorant italic title, and muted location text.
+
+Modal: Opens on list card click or calendar tile click. Framer Motion AnimatePresence with blur backdrop. Off-white `#faf9f7` panel — 320px hero image with gradient overlay, audience taxonomy tags and Cormorant italic title at the bottom of the image, then date/location meta and Raleway description body below.
+
+jstag tracking preserved from the original — fires `topic_browsed` per taxonomy on modal open. All `console.log` calls removed.
+
+---
+
 ### Redesign: Rewards page
 
 File: src/app/[locale]/rewards/page.js
