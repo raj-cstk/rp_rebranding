@@ -137,7 +137,7 @@ export default function Hero({ content, locale, withHeader, cslp }) {
 
                 {withHeader ? <Header color="white" locale={locale} /> : <></>}
                 <div className={"absolute max-w-2xl " + positionClass}>
-                  <div className=" md:w-[42rem]">
+                  <div className="hidden md:block md:w-[42rem]">
                     <motion.div
                       variants={{
                         hidden: {
@@ -156,42 +156,74 @@ export default function Hero({ content, locale, withHeader, cslp }) {
                       animate="visible"
                       {...hero?.$?.text_position}
                     >
+                      {/* Eyebrow */}
+                      <div className="flex items-center gap-3 mb-6">
+                        <span className="block h-px bg-[#D1A261]" style={{ width: '32px' }} />
+                        <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontWeight: 800, fontSize: '0.78rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#D1A261' }}>
+                          Red Panda Resort
+                        </span>
+                      </div>
+
                       <h1
-                        className={"mt-8 text-white " + headlineClass}
+                        className={"text-white " + headlineClass}
+                        style={{
+                          fontFamily: 'var(--font-raleway), sans-serif',
+                          fontWeight: 200,
+                          fontStyle: 'normal',
+                          fontSize: 'clamp(1.4rem, 3.5vw, 3rem)',
+                          lineHeight: 1.1,
+                          letterSpacing: '-0.01em',
+                          textShadow: '0 2px 40px rgba(0,0,0,0.4)',
+                        }}
                         {...hero?.$?.header}
                       >
                         {hero?.header}
                       </h1>
 
+                      {/* Gold rule */}
+                      <div className="my-6 hidden lg:block" style={{ width: '40px', height: '1px', background: '#D1A261' }} />
+
                       <p
-                        className={"mt-8 text-left text-white " + bodyClass}
-                        style={{fontSize: hero?.body_text_size ? hero?.body_text_size : "16px"}}
+                        className={"text-white/85 text-center hidden lg:block"}
+                        style={{
+                          fontFamily: 'var(--font-raleway), sans-serif',
+                          fontWeight: 300,
+                          fontSize: hero?.body_text_size ? hero?.body_text_size : 'clamp(0.8rem, 1.2vw, 0.95rem)',
+                          lineHeight: 1.85,
+                          letterSpacing: '0.02em',
+                        }}
                         {...hero?.$?.body}
                       >
                         {hero?.body}
                       </p>
 
-                      {
-                        hero?.button_text !== "" && (
-                          <div
-                            className={
-                              "mt-10 flex items-center gap-x-6 " + buttonClass
-                            }
-                          >
-                            {hero?.page && (
-                                <Link
-                                href={
-                                  (hero?.page?.length > 0 && hero?.page?.[0]?.url) ? hero?.page?.[0]?.url : "#"
-                                }
-                                className="rounded-md button px-8 py-4 text-md tracking-widest uppercase font-bold text-white shadow-sm ring-2 ring-inset ring-gray-300 hover:text-neutral-700 hover:bg-gray-50"
-                                {...hero?.$?.button_text}
-                              >
-                                {hero?.button_text}
-                              </Link>
-                            )}
-                          </div>
-                        )
-                      }
+                      {hero?.button_text !== "" && (
+                        <div className={"mt-6 lg:mt-10 flex items-center gap-x-6 " + buttonClass}>
+                          {hero?.page && (
+                            <Link
+                              href={(hero?.page?.length > 0 && hero?.page?.[0]?.url) ? hero?.page?.[0]?.url : "#"}
+                              className="group inline-flex items-center gap-3 transition-all duration-300 md:px-5 md:py-2.5 lg:px-8 lg:py-[14px]"
+                              style={{
+                                fontFamily: 'var(--font-montserrat), sans-serif',
+                                fontWeight: 500,
+                                fontSize: '0.7rem',
+                                letterSpacing: '0.22em',
+                                textTransform: 'uppercase',
+                                color: '#D1A261',
+                                border: '1px solid #D1A261',
+                              }}
+                              onMouseEnter={e => { e.currentTarget.style.background = '#D1A261'; e.currentTarget.style.color = '#000'; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#D1A261'; }}
+                              {...hero?.$?.button_text}
+                            >
+                              {hero?.button_text}
+                              <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                              </svg>
+                            </Link>
+                          )}
+                        </div>
+                      )}
                     </motion.div>
                   </div>
                 </div>
