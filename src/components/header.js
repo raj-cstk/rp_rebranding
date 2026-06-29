@@ -1,5 +1,6 @@
 "use client";
 import { Fragment, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { cslp } from '@/lib/cstack';
 import { useRouter } from 'next/navigation';
 import { ContentstackClient } from "@/lib/contentstack-client";
@@ -24,6 +25,7 @@ function deleteCookie(name) {
 
 export default function Header({ color, locale }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [entry, setEntry] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [profiles, setProfiles] = useState([]);
@@ -71,7 +73,6 @@ export default function Header({ color, locale }) {
     localStorage.setItem('profile', "");
     setPersonalizeLiveAttributesCookie({ client_type: "" });
     if (jstag) jstag.clearCookies();
-    window.location.reload();
     window.location.reload();
   }
 
@@ -138,6 +139,7 @@ export default function Header({ color, locale }) {
   }
 
   useEffect(() => {
+    setMounted(true);
     const init = async () => {
       const currentUser = await getUser();
       if (currentUser) {
@@ -214,14 +216,14 @@ export default function Header({ color, locale }) {
         </button>
       </div>
 
-      <div className="hidden gap-8 lg:flex " {...entry?.$?.menu_items}>
+      <div className="hidden gap-8 lg:flex " style={{ fontFamily: 'var(--font-raleway), sans-serif', fontSize: '0.82rem', letterSpacing: '0.1em', fontWeight: 400 }} {...entry?.$?.menu_items}>
         {(entry?.menu_items && entry?.menu_items?.length > 0) && (
           entry?.menu_items?.map((item, index) => {
             if (item?.sub_items?.length > 0) {
               return (
                 <Popover key={index} className="relative px-5" {...cslp(entry, 'menu_items__', index)}>
                   <div {...item.$?.page}>
-                    <PopoverButton className=" font-paragraph flex items-center outline-none bg-transparent" {...item.$?.text}>
+                    <PopoverButton className="flex items-center outline-none bg-transparent" {...item.$?.text}>
                       {item?.text}
                       <ChevronDownIcon
                         className="h-5 w-5 flex-none"
@@ -396,43 +398,50 @@ export default function Header({ color, locale }) {
 
       </div>
 
+      {mounted && createPortal(
       <div
-        className={`p-5 right-0 top-0 w-full z-50 duration-200 ease-in-out bg-white fixed h-full ${menuOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+        className={`fixed top-0 left-0 w-full duration-300 ease-in-out ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
+        style={{ background: '#0a0a0a', zIndex: 9999, height: '100dvh' }}
       >
-        <div className="text-right">
-          <button
-            className="cursor-pointer ms-auto text-neutral-700"
-            type="button"
-            onClick={() => setMenuOpen(false)}
-          >
-            <XMarkIcon className="h-10" />
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-7 py-7" style={{ borderBottom: '1px solid rgba(209,162,97,0.15)' }}>
+          <div className="flex items-center gap-3">
+            <span className="block h-px bg-[#D1A261]" style={{ width: '24px' }} />
+            <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.55rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#D1A261', fontWeight: 600 }}>
+              Red Panda Resort
+            </span>
+          </div>
+          <button type="button" onClick={() => setMenuOpen(false)} className="outline-none" aria-label="Close menu">
+            <XMarkIcon className="h-6 w-6" style={{ color: 'rgba(255,255,255,0.6)' }} />
           </button>
         </div>
-        <div className="flex flex-col text-neutral-700 text-2xl leading-10 uppercase font-paragraph">
+
+        {/* Nav links */}
+        <div className="flex flex-col px-7 pt-10 pb-8 overflow-y-auto" style={{ height: 'calc(100% - 73px)', fontFamily: 'var(--font-raleway), sans-serif', fontWeight: 400, letterSpacing: '0.08em' }}>
           {entry?.menu_items?.map((item, index) => {
             if (item.sub_items?.length > 0) {
               return (
-                <Disclosure as="div" className="-mx-3" key={index + item.text}>
+                <Disclosure as="div" key={index + item.text}>
                   {({ open }) => (
                     <>
-                      <Disclosure.Button className="flex w-full items-center pl-3 pr-3.5 uppercase font-paragraph">
+                      <Disclosure.Button
+                        className="flex w-full items-center justify-between py-4 outline-none"
+                        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', color: open ? '#D1A261' : 'rgba(255,255,255,0.85)', fontSize: '1.15rem', transition: 'color 0.2s' }}
+                      >
                         {item.text}
                         <ChevronDownIcon
-                          className={classNames(
-                            open ? "rotate-180" : "",
-                            "ml-2 h-7 w-7 flex-none"
-                          )}
-                          aria-hidden="true"
+                          className={classNames(open ? "rotate-180" : "", "h-4 w-4 flex-none transition-transform duration-200")}
+                          style={{ color: '#D1A261' }}
                         />
                       </Disclosure.Button>
-                      <Disclosure.Panel className="mt-2 space-y-2 pb-2 font-paragraph">
+                      <Disclosure.Panel className="pb-2">
                         {item.sub_items.map((subItem, subIdx) => (
                           <Disclosure.Button
                             key={subIdx + subItem?.text}
                             as="a"
                             href={subItem?.page?.[0]?.url ?? "#"}
-                            className="block rounded-lg pt-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50 font-paragraph"
+                            className="block py-2.5 pl-4 outline-none"
+                            style={{ fontFamily: 'var(--font-raleway), sans-serif', fontSize: '0.85rem', fontWeight: 300, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.06em', borderBottom: '1px solid rgba(255,255,255,0.04)' }}
                           >
                             {subItem?.text}
                           </Disclosure.Button>
@@ -447,22 +456,29 @@ export default function Header({ color, locale }) {
                 <Link
                   key={index}
                   href={(item?.page?.length > 0 && item?.page?.[0]?.url) ? item?.page?.[0]?.url : "#"}
+                  className="py-4 block"
+                  style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.85)', fontSize: '1.15rem', transition: 'color 0.2s' }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#D1A261'}
+                  onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.85)'}
                 >
                   {item.text}
                 </Link>
               );
             }
           })}
+
+          {/* Cart */}
           <button
             type="button"
-            className="rp-cart mt-10 flex w-full items-center gap-3 border-2 border-cyan-600 px-4 py-3 text-left text-neutral-700 outline-none transition-colors hover:bg-cyan-600 hover:text-white"
+            className="rp-cart mt-2 pt-4 flex items-center gap-3 outline-none"
             aria-label="Shopping cart"
           >
-            <ShoppingBagIcon className="h-8 w-8 shrink-0" aria-hidden />
-            <span className="font-paragraph text-xl uppercase tracking-wide">Cart</span>
+            <ShoppingBagIcon className="h-5 w-5 shrink-0" style={{ color: '#D1A261' }} aria-hidden />
+            <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.6rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#D1A261', fontWeight: 500 }}>Cart</span>
           </button>
         </div>
       </div>
+      , document.body)}
     </div>
   );
 }
