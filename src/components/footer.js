@@ -2,8 +2,11 @@
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { AnimatedTooltip } from './ui/animated-tooltip';
 import { ContentstackClient } from '@/lib/contentstack-client';
+
+const MaldivesMap = dynamic(() => import('./ui/maldives-map'), { ssr: false });
 
 const socialLinks = [
   {
@@ -73,7 +76,7 @@ export default function Footer() {
     <footer style={{ background: '#0a0a0a', position: 'relative', zIndex: 100 }}>
 
       {/* Main footer body */}
-      <div className="max-w-7xl mx-auto px-8 pt-20 pb-12">
+      <div className="max-w-7xl mx-auto px-8 pt-20 pb-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
           {/* Brand column */}
@@ -120,6 +123,45 @@ export default function Footer() {
               ))}
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Map section */}
+      <div>
+        <div className="max-w-7xl mx-auto px-8 pt-4 pb-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-start">
+
+            {/* Location info */}
+            <div>
+              <div className="flex items-center gap-3 mb-5">
+                <span style={{ width: '28px', height: '1px', background: '#D1A261', display: 'inline-block' }} />
+                <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.55rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#D1A261', fontWeight: 500 }}>
+                  Our Location
+                </span>
+              </div>
+              {content?.map_address && (
+                <p style={{ fontFamily: '"Cormorant Garamond", Georgia, serif', fontWeight: 300, fontStyle: 'italic', fontSize: '1.7rem', color: '#fff', lineHeight: 1.2, marginBottom: '1rem' }} {...content?.$?.map_address}>
+                  {content.map_address}
+                </p>
+              )}
+              {(content?.map_latitude != null && content?.map_longitude != null) && (
+                <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.6rem', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.2)' }}>
+                  {content.map_latitude}° N, {content.map_longitude}° E
+                </p>
+              )}
+              <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#D1A261', boxShadow: '0 0 0 3px rgba(209,162,97,0.25)', flexShrink: 0 }} />
+                <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.55rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
+                  Resort Location
+                </span>
+              </div>
+            </div>
+
+            {/* Map */}
+            <div className="lg:col-span-2" style={{ height: '260px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', position: 'relative' }}>
+              <MaldivesMap lat={content?.map_latitude} lng={content?.map_longitude} />
+            </div>
+          </div>
         </div>
       </div>
 

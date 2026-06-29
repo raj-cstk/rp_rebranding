@@ -6,6 +6,28 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Footer: Maldives map
+
+Added an interactive map to the footer showing the Maldives location. Sits between the main link columns and the bottom copyright bar.
+
+Layout: 1/3 location details + 2/3 map. Location column shows "Maldives" in Cormorant italic, "Indian Ocean" subtitle, coordinates in muted Montserrat, and a small pulsing gold dot labelled "Resort Location". Map column is 260px tall with a subtle border.
+
+Map uses CartoDB Dark Matter tiles (free, no API key) via react-leaflet. A custom gold pulsing marker sits on coordinates pulled from the CMS. Default zoom is 1 (world-level view). Scroll-wheel zoom disabled; custom +/− buttons styled in the footer's dark gold palette replace the default Leaflet controls. Attribution overlay is minimal and near-invisible. Map is dynamically imported (ssr: false) to avoid SSR conflicts.
+
+Location info column shows the address label in Cormorant italic and the lat/lng coordinates in muted Montserrat — all driven by CMS. Nothing in the map section is hardcoded.
+
+Installed packages: react-leaflet, leaflet.
+
+### CMS Changes — Footer map fields
+
+Add three fields to the footer content type:
+
+- `map_address` (Short Text) — the location label shown in Cormorant italic above the coordinates, e.g. "Maldives, Indian Ocean"
+- `map_latitude` (Number) — decimal latitude used to position the map marker, e.g. 3.2028
+- `map_longitude` (Number) — decimal longitude used to position the map marker, e.g. 73.2207
+
+---
+
 ### Redesign: Articles pages
 
 Files:
