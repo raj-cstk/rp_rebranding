@@ -6,6 +6,34 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: People component
+
+File: src/components/people.js
+
+Dark `#0a0a0a` background section with 7rem vertical padding. Gold centered eyebrow with flanking lines, Cormorant italic heading. Heading fades and slides up on scroll via Framer Motion.
+
+Cards in a responsive grid (2 col mobile, 3 col tablet, 4 col desktop) with 3:4 portrait aspect ratio. Each card staggers into view (fade + 80px slide up) with an 80ms delay per card.
+
+Hover effects: image scales to 106%, an extra dark scrim fades in, a corner gold bracket appears top-right. Text block sits at the bottom — name in Cormorant italic is always visible, job title in gold Montserrat reveals on hover (opacity transition). A short gold line expands from 20px to 40px width on hover via a ref-based event listener. All transitions use a custom ease curve for a silky feel.
+
+Loading skeleton: 4 dark placeholder boxes matching the card aspect ratio.
+
+---
+
+### Redesign: PageHero component
+
+File: src/components/pageHero.js
+
+Supports two modes — Full (full-bleed image or video with text overlay) and Half (split image/text layout) — both controlled by the CMS media_style field.
+
+Full mode: image or video fills the frame at clamp(480px, 60vh, 760px) height. Dark overlay using the CMS overlay value. Text positioned left, center, or right per the CMS layout field. Gold Montserrat eyebrow with a short line, Cormorant italic headline, gold 32px rule, Raleway body copy.
+
+Half mode: 50/50 split on desktop, stacked on mobile. Image side fills its half with object-cover. Text side on white background. Same Cormorant/Raleway/gold typography as the full mode. "Text Left" puts the image on the right; "Text Right" and "Center" put the image on the left.
+
+Replaced: `text-[#005D94]` blue headline color, `text-[60px]` sizing, `bg-gray-300/500` placeholder fallbacks, and the duplicate mobile/desktop layout blocks from the original. All CMS field bindings and CSLP attributes preserved.
+
+---
+
 ### Redesign: PDP page
 
 File: src/app/[locale]/pdp/[id]/page.js

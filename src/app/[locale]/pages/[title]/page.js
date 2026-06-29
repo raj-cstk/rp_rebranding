@@ -94,16 +94,18 @@ export default function Page({ }) {
             });
         }
     }, [isLoading, entry?.taxonomies, jstag]);
+    const firstBlockIsHero = entry?.modular_blocks?.[0]?.hasOwnProperty?.('hero');
+
     return (
         <div >
-            {entry?._applied_variants?.title !== "cs76fdee0e83c5c333" &&
+            {entry?._applied_variants?.title !== "cs76fdee0e83c5c333" && !firstBlockIsHero &&
                 <Header locale={params.locale} />
             }
             <div className={entry?.modular_blocks?.length === 0 ? "visual-builder__empty-block-parent" : ""} {...entry?.$?.modular_blocks}>
                 {entry?.modular_blocks?.map((block, index) => (
                     <div key={index} {...entry?.$?.['modular_blocks__' + index]}>
                         {block.hasOwnProperty("hero") &&
-                            <PageHero key={index} content={block.hero} {...entry?.$?.['modular_blocks__' + index]}/>
+                            <PageHero key={index} content={block.hero} locale={params.locale} withHeader={index === 0} {...entry?.$?.['modular_blocks__' + index]}/>
                         }
                         {block.hasOwnProperty("people") &&
                             <People key={index} content={block.people} isKiosk={entry?._applied_variants?.title === "cs76fdee0e83c5c333"} />
