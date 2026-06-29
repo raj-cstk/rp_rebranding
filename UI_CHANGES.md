@@ -40,6 +40,22 @@ CTA link restyled: gold Montserrat with `ArrowRightIcon` that nudges right on ho
 
 ---
 
+### Redesign: Tabs component
+
+File: src/components/tabs.js
+
+Added `AnimatePresence` from framer-motion. Added direction tracking (`dir` state) so panels slide in from the correct side based on which tab was clicked.
+
+Tab bar moved from below the content to above it. Active tab indicator replaced with a shared animated underline (`layoutId="tab-underline"`, spring physics) in gold `#D1A261`. Inactive tabs are muted `#9a9590`, active tabs go bold `#0a0a0a`.
+
+Panel fills `calc(100vh - 73px)` with a `-73px` top margin so it slides behind the tab bar. Background colour transitions smoothly between tabs (0.3s ease) using the per-tab `background_color` field.
+
+Image side gets a pill/stadium border radius (direction mirrors the layout field) and a Ken-burns scale-in entrance. Text side: Montserrat gold eyebrow using `tab_text`, Cormorant italic headline, 36px gold divider, Raleway body.
+
+Note: `text_dark` field is present in the CMS but has no effect in this version — headline colour is fixed at `#0a0a0a`.
+
+---
+
 ### Redesign: HalfSquares component
 
 File: src/components/halfSquares.js
