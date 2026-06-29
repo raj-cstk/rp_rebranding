@@ -103,7 +103,7 @@ export default function Home({ }) {
           {...entry?.$?.modular_blocks}
         >
           {entry?.modular_blocks?.map((block, index) => (
-            <div key={index} className={(block.text_block?.sticky || block.cards?.sticky || block.review?.sticky) ? 'sticky top-0' : 'relative'} style={{ zIndex: index + 1 }} {...entry?.$?.["modular_blocks__" + index]}>
+            <div key={index} className={(block.text_block?.sticky || block.cards?.sticky || block.review?.sticky || block.text_and_image?.sticky) ? 'sticky top-0' : 'relative'} style={{ zIndex: index + 1 }} {...entry?.$?.["modular_blocks__" + index]}>
               {block.hasOwnProperty("text_block") && (
                 <TextBlock key={index} content={block.text_block} />
               )}

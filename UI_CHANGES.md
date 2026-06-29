@@ -24,6 +24,22 @@ Sticky supported via `block.review?.sticky` in `src/app/[locale]/page.js`.
 
 ---
 
+### Redesign: ProductFeature component
+
+File: src/components/productFeature.js
+
+Section wrapped in a full-width `<section>` with warm cream background `#f5f1e3`. Container constrained to `max-w-7xl`.
+
+Header reworked into a flex row (stacks on mobile): left side has a Montserrat gold eyebrow "The Collection" and a Cormorant Garamond italic headline; right side shows the description in Raleway weight 300. Both separated by a bottom border.
+
+Product cards gain an `overflow-hidden` container with a `group-hover:scale-105` zoom on the image and a dark overlay with a centred "View" label that fades and slides up on hover.
+
+Product name restyled to Cormorant italic. Price restyled to Montserrat with letter-spacing. `large_cards` field behaviour unchanged.
+
+CTA link restyled: gold Montserrat with `ArrowRightIcon` that nudges right on hover. `plp_link_text` field now falls back to "View All" if empty.
+
+---
+
 ### Redesign: HalfSquares component
 
 File: src/components/halfSquares.js
@@ -131,6 +147,29 @@ No new dependencies.
 ---
 
 ## CMS Changes
+
+### ProductFeature global field — Background color
+
+Field label: Background
+Field UID: `background`
+Field type: Custom (color picker)
+Global field: ProductFeature
+
+Controls the section background. Reads `content?.background?.hex`, falls back to `#f5f1e3` if not set.
+
+---
+
+### Text and Image modular block — Sticky toggle
+
+Field label: Sticky
+Field UID: `sticky`
+Field type: Boolean
+Default value: false
+Location: text_and_image modular block on homepage content type
+
+Handled in `src/app/[locale]/page.js` via `block.text_and_image?.sticky`.
+
+---
 
 ### Text and Image modular block — Background color
 
