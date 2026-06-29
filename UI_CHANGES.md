@@ -6,6 +6,18 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: ImageGrid component
+
+File: src/components/imageGrid.js
+
+Complete architectural replacement — the old multi-layout static grid (1/2/3/4+ image arrangements) is gone. Replaced with a full-screen carousel (`clamp(420px, 72vh, 860px)` tall).
+
+Carousel features: Ken-burns slow zoom per slide, clip-path wipe transition between slides, auto-advance every 5s with pause-on-hover, keyboard arrow key navigation, touch/pointer swipe support, image preloading for the next slide, and prefers-reduced-motion fallback (crossfade instead of slide).
+
+Custom SVG arrow buttons with a draw-in ring animation on hover. Dot indicators (active dot expands to a pill) and a slide counter bottom-right. Per-slide caption rendered as plain text (Raleway weight 200, `#E8D5B0`) at bottom-left when a `text` field is set on the image.
+
+---
+
 ### Redesign: Cards component
 
 File: src/components/cards.js
