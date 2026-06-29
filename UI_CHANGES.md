@@ -6,6 +6,22 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: Rewards page
+
+File: src/app/[locale]/rewards/page.js
+
+Dark `#0a0a0a` full-page background. Two sections:
+
+Hero: Full-width 50/50 split. Left half is the CMS image with a pill-shaped right border (border-radius 9999px on the right side only) creating a curved edge against the dark background. Right half contains a gold "Membership" eyebrow, Cormorant italic h1, gold divider, and Raleway body text in muted white. Layout collapses to stacked on mobile via a `matchMedia` listener.
+
+Form: White `#ffffff` background section below the hero. Centered narrow column (max-w-lg). Gold eyebrow "Enrol Now" flanked by gold rules, Cormorant italic h2, Raleway body. Three fields — name, email, category select — all full-width with gold focus border transition. Custom gold chevron on the select. Gold submit button. On submit: sets the Personalize cookie (`client_type`) and opens a success modal.
+
+Success modal: Dark `#111` panel with a gold border, Cormorant italic headline, Raleway body, and a full-width gold close button. Overlay is near-black. Replaced the default Headlessui/Tailwind modal styling from the previous version.
+
+Also removed a `console.log(entry)` that was present in the old version.
+
+---
+
 ### Footer: Maldives map
 
 Added an interactive map to the footer showing the Maldives location. Sits between the main link columns and the bottom copyright bar.
