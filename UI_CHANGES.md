@@ -6,6 +6,28 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: Articles pages
+
+Files:
+- src/app/[locale]/articles/page.js
+- src/app/[locale]/articles/[title]/page.js
+- src/app/[locale]/articles/entry/[title]/page.js
+- src/app/[locale]/articles/categories/[title]/page.js
+
+All four pages now use the same luxury design language as the rest of the site.
+
+articles/page.js: White background. Page header with Montserrat gold eyebrow ("Red Panda Resort") and Cormorant italic h1 "Journal & Stories". Article count shown in muted Montserrat. 3-column responsive grid. `console.log` that was present in the old version has been removed.
+
+articles/[title]/page.js: White background. Page header shows an Articles breadcrumb link and the current category name in gold. h1 pulls from the CMS `header` field with optional `subtext` description below. Grid of articles filtered by taxonomy. All jstag tracking and useDataContext preserved from the original.
+
+articles/entry/[title]/page.js: 75vh hero section with the banner image or video filling the full viewport height. A gradient overlay runs from transparent at the top to near-black at the bottom. Breadcrumb + taxonomy tags sit above the Cormorant italic headline at the lower-left of the hero. For events, FontAwesome date/time, event type, and venue icons appear below the title. Article body renders on a warm off-white (#faf9f7) background in a centered 720px column with `.article-body` typographic styles (Raleway body, Cormorant headings, gold links). All jstag tracking, useDataContext, and the full video controls logic (Show Controls / Autoplay / loop) preserved from the original.
+
+articles/categories/[title]/page.js: White background. Same page header pattern as the articles/[title] page with the category slug as the h1. Same 3-column card grid. jstag tracking preserved from the original.
+
+All four pages share the same ArticleCard component pattern: 4:3 aspect ratio media block (image or video) with a hover scale effect, gold taxonomy tag links, Cormorant italic title, an expanding gold rule (24px → 48px on hover), 3-line-clamped Raleway teaser, and a fade-in "Read More" link with arrow. Staggered scroll-triggered animation per card (Framer Motion whileInView).
+
+---
+
 ### Redesign: FAQ pages
 
 Files:
