@@ -24,6 +24,20 @@ Sticky supported via `block.review?.sticky` in `src/app/[locale]/page.js`.
 
 ---
 
+### Redesign: HalfSquares component
+
+File: src/components/halfSquares.js
+
+Added framer-motion. Both panels now span full viewport height (`min-height: 100vh`) in a flex row, replacing the old `aspect-square` 50/50 layout.
+
+Media side: image now uses a CSS `background-image` div with a scale-in entrance animation (`scale 1.08 → 1`) instead of a plain `<img>` tag. A subtle edge vignette overlay added. Video behaviour unchanged.
+
+Text panel: dark `#111` background. Content animates in from the side (direction inverted based on `media_align`). Ghost Cormorant number accent (`01`) added above the eyebrow. Eyebrow label in Montserrat all-caps gold. Headline changed to Cormorant Garamond italic `clamp(2.8rem, 5vw, 4.2rem)` white. Gold 40px divider. Body in Raleway weight 300 at 55% white opacity. CTA replaced with gold underline link and animated arrow SVG.
+
+`vertical_margin` CMS field no longer used — component is always full height.
+
+---
+
 ### Redesign: ImageGrid component
 
 File: src/components/imageGrid.js
@@ -118,6 +132,17 @@ No new dependencies.
 
 ## CMS Changes
 
+### Text and Image modular block — Background color
+
+Field label: Background
+Field UID: `background`
+Field type: Custom (color picker)
+Location: text_and_image modular block on homepage content type
+
+Controls the background color of the text panel in the HalfSquares component. Reads `content?.background?.hex`, falls back to `#111` if not set.
+
+---
+
 ### Reviews global field — Background color + Sticky
 
 Background color field:
@@ -126,7 +151,7 @@ Field UID: `background`
 Field type: Custom (color picker)
 Global field: Reviews
 
-The component reads `content?.background` and applies it as the section background, falling back to `var(--color-section-bg)` if not set. Note: if your color picker extension returns an object (e.g. `{ hex: '#...' }`), update the reference in `reviews.js` to `content?.background?.hex`.
+The component reads `content?.background?.hex` and applies it as the section background, falling back to `var(--color-section-bg)` if not set.
 
 Sticky field:
 Field label: Sticky
