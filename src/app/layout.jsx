@@ -136,6 +136,7 @@ function CommerceCartEmbedScripts({ urlTillLocale }) {
     showButton: false,
     customCartButtonClass: "rp-cart",
     productUrlFormat: `${urlTillLocale}/pdp/{url}`,
+    primaryColor: "#D1A261",
   }).replace(/</g, "\\u003c");
 
   return (<>

@@ -44,7 +44,7 @@ export default function OrdersPage() {
     }, [locale]);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div style={{ minHeight: '100vh', background: '#fff' }}>
             <Header color="dark" locale={locale} />
             <div className="max-w-3xl mx-auto px-4 py-12">
                 {src ? (
@@ -54,8 +54,11 @@ export default function OrdersPage() {
                         style={{ width: '100%', minHeight: 700, border: 'none' }}
                     />
                 ) : (
-                    <div className="flex justify-center py-16">
-                        <div className="w-8 h-8 rounded-full border-2 border-neutral-200 border-t-neutral-700 animate-spin" />
+                    <div className="flex flex-col items-center justify-center py-24 gap-5">
+                        <div className="animate-spin rounded-full h-10 w-10" style={{ border: '1px solid rgba(209,162,97,0.2)', borderTopColor: '#D1A261' }} />
+                        <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontWeight: 500, fontSize: '0.58rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.3)' }}>
+                            Loading Orders
+                        </p>
                     </div>
                 )}
             </div>

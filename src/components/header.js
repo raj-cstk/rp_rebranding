@@ -205,7 +205,7 @@ export default function Header({ color, locale }) {
             "rp-cart outline-none inline-flex items-center justify-center rounded-full p-1.5 text-current ring-2 ring-inset transition-colors",
             color === "white"
               ? "ring-white hover:bg-white/15"
-              : "ring-cyan-600 hover:bg-cyan-600 hover:text-white"
+              : "ring-[#D1A261] hover:bg-[#D1A261] hover:text-black"
           )}
           aria-label="Shopping cart (embed)"
         >
@@ -289,7 +289,7 @@ export default function Header({ color, locale }) {
             "rp-cart outline-none mr-3 inline-flex items-center justify-center rounded-full p-1.5 text-current ring-2 ring-inset transition-colors",
             color === "white"
               ? "ring-white hover:bg-white/15"
-              : "ring-cyan-600 hover:bg-cyan-600 hover:text-white"
+              : "ring-[#D1A261] hover:bg-[#D1A261] hover:text-black"
           )}
           aria-label="Shopping cart (embed)"
         >
