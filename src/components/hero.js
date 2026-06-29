@@ -120,9 +120,9 @@ export default function Hero({ content, locale, withHeader, cslp }) {
                             ? videoLoop
                             : false
                           }
+                    {...hero?.$?.video_options?.video}
                   >
                     <source src={videoFile} />
-                    {...hero?.$?.video_options?.video}
                   </video>
                 ) : imageFile ? (
                   <img
