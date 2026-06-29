@@ -6,6 +6,24 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: Cards component
+
+File: src/components/cards.js
+
+Added `'use client'`, `framer-motion`, and `useState`. Cards are now full image-background tiles (540px tall) in a 2-column grid, replacing the old flex-row layout with bordered card boxes.
+
+Section background now reads from `content?.background_color?.hex` (CMS-driven) instead of being hardcoded. Falls back to `#0a0a0a` if not set.
+
+Section eyebrow added: animated gold line + "Our Experiences" label slides in on scroll.
+
+Each card has a CSS background-image with a scale-up on hover, two gradient overlays (second one deepens on hover), and a gold rule that expands width on hover. Body text and CTA link are hidden by default and revealed with Framer Motion height animation on hover. Tags field is supported — falls back to a numbered index if no tags are present.
+
+Note: the old `card_background_color` per-card field is no longer used — cards are now image-background based.
+
+Sticky support added via the same pattern as TextBlock — handled in `src/app/[locale]/page.js` by checking `block.cards?.sticky`.
+
+---
+
 ### Redesign: TextBlock component
 
 File: src/components/textBlock.js
@@ -69,6 +87,18 @@ No new dependencies.
 ---
 
 ## CMS Changes
+
+### Cards global field — Sticky toggle
+
+Field label: Sticky
+Field UID: `sticky`
+Field type: Boolean
+Default value: false
+Global field: Cards
+
+Same behavior as TextBlock sticky — when true, the cards section sticks at the top while subsequent sections scroll over it. Handled in `src/app/[locale]/page.js` via `block.cards?.sticky`.
+
+---
 
 ### TextBlock global field — Sticky toggle
 
