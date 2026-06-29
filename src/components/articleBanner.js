@@ -93,7 +93,7 @@ export default function ArticleBanner({ content }) {
                     )}
                   </div>
 
-                  <h3 style={{ fontFamily: '"Cormorant Garamond", var(--font-cormorant-garamond), Georgia, serif', fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(1.6rem, 2.5vw, 2.1rem)', lineHeight: 1.2, color: '#fff', marginTop: '0.5rem', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 1, overflow: 'hidden' }} {...article?.$?.title}>
+                  <h3 style={{ fontFamily: '"Cormorant Garamond", var(--font-cormorant-garamond), Georgia, serif', fontWeight: 300, fontStyle: 'italic', fontSize: article?.title?.length > 70 ? '1.1rem' : article?.title?.length > 40 ? 'clamp(1.3rem, 2vw, 1.6rem)' : 'clamp(1.6rem, 2.5vw, 2.1rem)', lineHeight: 1.25, color: '#fff', marginTop: '0.5rem' }} {...article?.$?.title}>
                     {article?.title}
                   </h3>
 

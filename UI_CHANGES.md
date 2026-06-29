@@ -6,6 +6,24 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: Footer component
+
+Files: src/components/footer.js, src/components/ui/animated-tooltip.jsx (new)
+
+Complete redesign replacing the old plain white footer. Now uses a dark `#0a0a0a` background with a 12-column grid: a brand column on the left (4 cols) and link columns on the right (8 cols).
+
+Brand column: Cormorant Garamond italic brand name, gold 32px divider, Raleway description, and a "Follow Us" label above the social icon row. Social links (Facebook, Instagram, X, YouTube) are rendered with an `AnimatedTooltip` component — overlapping circular icon buttons that lift and scale on hover and show a colored tooltip with the platform name.
+
+Link columns are driven by the `column[]` CMS field — each column renders a Montserrat gold header and a list of Raleway links. `Link` elements use `href` + `title` from the CMS link field. External vs internal routing is handled transparently by Next.js `<Link>`.
+
+Bottom bar: copyright text is pulled from the `copyright_text` CMS field (falls back to a year-stamped default). Clicking it still triggers `resetModalFlags()` and `resetSegment()` as before. Privacy/Terms/Cookie links remain hardcoded in the bottom bar.
+
+The `AnimatedTooltip` component is a new file at `src/components/ui/animated-tooltip.jsx`. It uses framer-motion `AnimatePresence` for the tooltip pop and `motion.a` for the lift-and-scale hover on each icon circle.
+
+Footer fetches its own CMS data via `ContentstackClient.getElementByTypeWithRefs('footer', locale, [], null)` inside a `useEffect`, using `useParams()` to get the locale. Live preview updates are wired via `onEntryChange`.
+
+---
+
 ### Redesign: ArticleBanner component
 
 File: src/components/articleBanner.js
@@ -181,6 +199,22 @@ No new dependencies.
 ---
 
 ## CMS Changes
+
+### Footer content type
+
+Content type UID: `footer`
+Type: Singleton
+
+Fields used in the component:
+
+- `title` (text) — brand name rendered in Cormorant italic in the brand column. Falls back to "Red Panda Resort".
+- `description` (multiline text) — tagline rendered in Raleway beneath the gold divider. Falls back to a default description.
+- `column[]` (group, multiple) — each group has a `column_header` (Montserrat gold label) and a `link[]` array (each link has `title` + `href`). Renders as the nav columns in the right 8 cols of the footer grid.
+- `copyright_text` (text) — rendered in the bottom bar in Cormorant italic gold. Falls back to a year-stamped copyright string.
+
+Social links are hardcoded in the component and are not driven by CMS.
+
+---
 
 ### ArticleBanner global field — Background color
 
