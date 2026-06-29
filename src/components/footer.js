@@ -152,7 +152,7 @@ export default function Footer() {
               <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#D1A261', boxShadow: '0 0 0 3px rgba(209,162,97,0.25)', flexShrink: 0 }} />
                 <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.55rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
-                  Resort Location
+                  Location
                 </span>
               </div>
             </div>

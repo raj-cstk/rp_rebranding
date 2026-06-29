@@ -6,6 +6,34 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: PDP page
+
+File: src/app/[locale]/pdp/[id]/page.js
+
+White background throughout. Loading state replaced with a centered gold spinner and small all-caps Montserrat "Loading" label.
+
+Back button: gold Montserrat text with a left arrow, replaces the previous cyan button.
+
+Image section: thumbnails on the left with gold border when active (previously gray/black border). Main image on the right in a light `#f5f5f5` container.
+
+Product info column: gold Montserrat eyebrow with a short gold rule. Product name in large Cormorant italic (light weight). Price in Cormorant gold. Both replace the previous plain text with cyan color.
+
+Buttons: pill-shaped (border-radius 9999px). "See All Variations" is an outlined gold pill, transparent background. "Add to Cart" is solid gold with black text.
+
+Cart toast: white background with a gold top border, replaces the previous amber/dark style.
+
+Variants slideout: dark `#0a0a0a` background with gold-bordered title in Cormorant italic. Each variant card is dark `#111` with a gold hover border. Replaces the previous white/gray style.
+
+Purchase slideout: white background. Cormorant italic success icon with gold border, gold "Complete Purchase" pill button. Email input field with gold focus border.
+
+Bug fix: the `buyClick` function was referenced in the original code but never defined, which would cause a runtime error. It is now properly defined and includes jstag tracking for purchases.
+
+Removed: `console.log(query)` from both content fetching paths. Removed `console.warn` for translation lookups.
+
+Preserved: jstag useEffect for `product_viewed` and `product_viewed_category` tracking (this was in the original repo and intentionally kept). jstag `product_name` send on add to cart. All modular blocks, translation system, and commerce fallback logic unchanged.
+
+---
+
 ### Redesign: Events page
 
 File: src/app/[locale]/events/page.js
