@@ -6,6 +6,24 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: Reviews component
+
+File: src/components/reviews.js
+
+Added `AnimatePresence` from framer-motion. Removed `next/image` import — the decorative quote mark is now a CSS `&ldquo;` character in Cormorant Garamond at 9rem.
+
+Layout changed from a flat flex row to a two-column grid (`lg:grid-cols-2`). Left column slides in on scroll with a fade+translate animation and shows the eyebrow label, Cormorant italic headline, Raleway body, and star ratings. Right column shows the rotating review quote with `AnimatePresence` crossfade (up/down) instead of the old CSS opacity toggle.
+
+Review quote uses Cormorant italic, clamped to 4 lines. Reviewer attribution redesigned: gold line separator, Montserrat bold uppercase name, Raleway light city. Dot nav updated to expanding pill style matching the carousel.
+
+Auto-advance interval reduced from 10s to 7s. `review_title` field is no longer rendered.
+
+Background changed from hardcoded `#F0F9FF` to `var(--color-section-bg)`.
+
+Sticky supported via `block.review?.sticky` in `src/app/[locale]/page.js`.
+
+---
+
 ### Redesign: ImageGrid component
 
 File: src/components/imageGrid.js
@@ -99,6 +117,27 @@ No new dependencies.
 ---
 
 ## CMS Changes
+
+### Reviews global field — Background color + Sticky
+
+Background color field:
+Field label: Background
+Field UID: `background`
+Field type: Custom (color picker)
+Global field: Reviews
+
+The component reads `content?.background` and applies it as the section background, falling back to `var(--color-section-bg)` if not set. Note: if your color picker extension returns an object (e.g. `{ hex: '#...' }`), update the reference in `reviews.js` to `content?.background?.hex`.
+
+Sticky field:
+Field label: Sticky
+Field UID: `sticky`
+Field type: Boolean
+Default value: false
+Global field: Reviews (added via modular block on homepage content type)
+
+Handled in `src/app/[locale]/page.js` via `block.review?.sticky`.
+
+---
 
 ### Cards global field — Sticky toggle
 
