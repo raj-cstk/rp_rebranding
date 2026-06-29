@@ -6,6 +6,24 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: ArticleBanner component
+
+File: src/components/articleBanner.js
+
+Added `'use client'`, `framer-motion`, and `useState`. Cards are now full image-background tiles (520px tall) in a 3-column grid, replacing the old layout where the image sat above the text in a bordered card.
+
+Section header reworked: animated gold line + Montserrat eyebrow using the `heading` field slides in on scroll.
+
+Each card has a CSS background-image div that scales up on hover. If the article has a video (`video_options.video.url`), a muted autoplay `<video>` is rendered as the background instead. Two gradient overlays are stacked — the second deepens on hover. A gold rule expands on hover. Article teaser and "Read Article" link are hidden by default and revealed with a height animation on hover.
+
+Headline styled in Cormorant Garamond italic weight 300, clamped to one line. Teaser in Raleway weight 300.
+
+Taxonomy tags are rendered as Next.js `<Link>` elements pointing to `/articles/categories/[term_uid]`, styled with a gold Montserrat label and a faint gold border. If no taxonomy tags are present, a numbered fallback (`01`, `02`, etc.) is shown instead. This replaces the old approach where tags were plain `<span>` elements.
+
+The old empty state with three placeholder boxes was replaced with a single `visual-builder__empty-block-parent` div.
+
+---
+
 ### Redesign: Reviews component
 
 File: src/components/reviews.js
@@ -163,6 +181,17 @@ No new dependencies.
 ---
 
 ## CMS Changes
+
+### ArticleBanner global field — Background color
+
+Field label: Background
+Field UID: `background`
+Field type: Custom (color picker)
+Global field: ArticleBanner
+
+Controls the section background. Reads `content?.background?.hex`, falls back to `var(--color-section-bg)` if not set.
+
+---
 
 ### ProductFeature global field — Background color
 
