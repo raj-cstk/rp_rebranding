@@ -51,7 +51,7 @@ export default function PageHero({ content, locale, withHeader }) {
         className="absolute inset-0 flex flex-col px-8 lg:px-20 py-16 justify-center"
         style={{ alignItems: flexAlign, textAlign }}
       >
-        <div style={{ maxWidth: '520px' }}>
+        <div style={{ maxWidth: '520px', marginTop: 'clamp(40px, 8vh, 100px)' }}>
           <div className="flex items-center gap-3 mb-5" style={{ justifyContent: flexAlign }}>
             <span style={{ width: '28px', height: '1px', background: '#D1A261', display: 'block', flexShrink: 0 }} />
             <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontWeight: 600, fontSize: '0.58rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#D1A261' }}>

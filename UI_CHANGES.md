@@ -20,6 +20,20 @@ Loading skeleton: 4 dark placeholder boxes matching the card aspect ratio.
 
 ---
 
+### Addition: PageHero feature strip
+
+File: src/components/pageHero.js
+
+Added a hardcoded feature strip anchored to the bottom of the PageHero. Dark semi-transparent bar (rgba 10,10,10 at 72% opacity) with a subtle gold top border and backdrop blur.
+
+Three columns with Font Awesome icons, bold gold-accented labels in Montserrat, and short Raleway body copy: Mountain Sanctuary, Private Dining, and Wellness & Spa — each separated by faint gold vertical dividers.
+
+Right side has a "Scroll to Discover" label in tiny all-caps Montserrat with a 28px animated gold dot that slides down a vertical line on a 1.6s loop.
+
+The existing hero text block has its bottom padding increased to 120px so it never overlaps with the strip.
+
+---
+
 ### Redesign: PageHero component
 
 File: src/components/pageHero.js
