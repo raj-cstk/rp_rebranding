@@ -20,6 +20,7 @@ import ProductFeature from "@/components/productFeature";
 import RecommendationsBanner from "@/components/recommendationsBanner";
 import ArticleBanner from "@/components/articleBanner";
 import CtaStrip from "@/components/ctaStrip";
+import PropositionsSection from "@/components/propositionsSection";
 import Modal from "@/components/modal";
 import { useParams } from "next/navigation";
 import { useDataContext } from "@/context/data.context";
@@ -158,6 +159,9 @@ export default function Page({ }) {
                          )}
                         {block.hasOwnProperty("strip") && (
                             <CtaStrip key={index} content={block.strip} />
+                        )}
+                        {block.hasOwnProperty("propositions_section") && (
+                            <PropositionsSection key={index} content={block.propositions_section} />
                         )}
                     </div>
                 ))}

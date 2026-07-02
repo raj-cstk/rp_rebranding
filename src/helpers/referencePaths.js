@@ -29,6 +29,7 @@ export const pagesReferences = [
     'modular_blocks.cards.card.page',
     'modular_blocks.text_and_image.page',
     'modular_blocks.article_banner.articles',
+    'modular_blocks.propositions_section.propositions',
 ]
 
 export const plpReferences = [

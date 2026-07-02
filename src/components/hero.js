@@ -167,12 +167,11 @@ export default function Hero({ content, locale, withHeader, cslp }) {
                       <h1
                         className={"text-white " + headlineClass}
                         style={{
-                          fontFamily: 'var(--font-raleway), sans-serif',
-                          fontWeight: 200,
-                          fontStyle: 'normal',
+                          fontFamily: 'var(--font-cinzel), Georgia, serif',
+                          fontWeight: 500,
                           fontSize: 'clamp(1.4rem, 3.5vw, 3rem)',
-                          lineHeight: 1.1,
-                          letterSpacing: '-0.01em',
+                          lineHeight: 1.15,
+                          letterSpacing: '0.04em',
                           textShadow: '0 2px 40px rgba(0,0,0,0.4)',
                         }}
                         {...hero?.$?.header}

@@ -6,11 +6,61 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: Events page "List" view → editorial photo grid
+
+File: src/app/[locale]/events/page.js
+
+Replaced the single-column stacked `EventListCard` list with a gapless 3-column grid (`EventGridCard`, 1 col mobile / 2 col tablet / 3 col desktop) of full-bleed `aspect-ratio: 3/4` cells — each event's image fills the entire cell, no card chrome/background/border. Cells sit flush against each other (no grid gap) so the whole thing reads as one continuous photo mosaic. Toggle label renamed "List" → "Grid" to match (state name/logic unchanged, still `viewMode === 'list'`).
+
+Each cell picks a font AND a text position for its title from one of 9 hand-authored layouts, keyed by `index % 9` (stable across hovers/re-renders, not re-randomized every render): Cormorant Garamond italic, Playfair Display, Spectral italic, Rokkitt, Cinzel, and Poppins bold, positioned at the bottom, top, or vertically centered on the image (left/right/center aligned). The date/location meta line keeps one consistent font everywhere (Montserrat) but its corner also relocates per layout so it never sits under wherever that cell's title landed.
+
+The 9 layouts are grouped into 3 triplets, each deliberately containing one bottom-anchored, one top-anchored, and one center-anchored entry with 3 different fonts — because this is a 3-column grid, a naive layout order (all bottoms, then all tops, then all centers) means every 3rd row lands exactly on a triplet boundary and gets one uniform position for the whole row (this actually happened — a whole row rendered with every title centered). Grouping by row-triplet instead guarantees every row mixes positions and fonts across its own 3 cells.
+
+Had to override the title `<h3>` with `textTransform: 'none'` — there's a pre-existing global rule in `globals.css` (`h1,h2,h3,h4,h5 { text-transform: uppercase }`) that was flattening every title to caps and hiding most of the font variety; flagging this since it's a site-wide rule affecting other headings too, not something touched here beyond this one local override.
+
+On hover: image scales to 108%, a dark scrim deepens over it, and a gold "View Details" link with an arrow fades in near the title. Clicking anywhere on a cell opens the existing event modal (unchanged). Entrance animation is a staggered fade+scale-in (`whileInView`, `delay: (index % 6) * 0.08`) as the grid scrolls into view.
+
+### Update: Hero headline font (PageHero + Hero)
+
+Files: src/components/pageHero.js, src/components/hero.js, src/app/layout.jsx
+
+Requested font (Safira March) isn't available on Google Fonts, so `next/font/google` can't load it. Settled on **Cinzel** — already registered in layout.jsx (`--font-cinzel`, used by the CMS-driven `fontPicker`) so no new font needed loading. Applied to both hero-style components' main title, in each case at weight 500 with `0.04em` letter-spacing for Cinzel's classic engraved look (Cinzel has no italic style — the family only ships `normal`):
+
+- PageHero (`modular_blocks.hero`): replaced italic Cormorant Garamond, size adjusted to `clamp(1.8rem, 3.8vw, 3.2rem)` to suit Cinzel's wider glyphs/tracking.
+- Hero (`modular_blocks.hero_banner`, the full-page hero variant): replaced Raleway weight 200, kept the existing `clamp(1.4rem, 3.5vw, 3rem)` size since that component's layout is already tuned to it.
+
+### Addition: Propositions section
+
+Files:
+- src/components/propositionsSection.js (new)
+- src/app/[locale]/pages/[title]/page.js
+- src/app/layout.jsx
+- src/helpers/referencePaths.js
+
+New modular block on the Page content type, rendered via a new `PropositionsSection` component, which switches on the block's `layout` field. Only Layout 1 and Layout 2 exist — Layouts 3/4 were dropped from the CMS dropdown, so the component only ever needs to branch between the two.
+
+**Layout 1** — a stats grid: 2 columns on mobile, 4 on desktop. Each cell has a gold vertical divider on both its left and right edges (no horizontal lines) so every cell — including a lone leftover one — looks symmetric. Full rows render as a CSS grid; any incomplete last row (e.g. the 5th item left over from 5 total on a 4-column desktop grid) renders as a separate centered flex row instead of sitting flush left, so the layout stays visually symmetric for any count from 4 to 10 on both breakpoints. Each cell stacks the `value` field large and bold on top (up to `3.2rem`) with the `title`/proposition label below it in the site's gold accent (`#D1A261`), since the value is the shorter numeric/stat text and needs the visual weight. Section padding is `3.5rem 0` with `clamp(1.1rem, 2vw, 1.75rem)` padding per cell, kept tight rather than the more spacious padding used elsewhere on the site.
+
+**Layout 2** — a bento/mosaic grid on desktop: hand-tiled `grid-template-areas` per item count (4 through 10, matching the CMS's constraint on how many propositions a block can hold) so cells vary in size — a mix of 2x2, 2x1 and 1x1 — while the whole grid still tiles into one clean rectangle with no gaps. Cells sit directly on the section's own background (no separate card background) with gold divider borders, value and title text centered both ways within each cell, and larger cells get proportionally larger `value` text (`sm`/`md`/`lg` tiers). Each cell's border is trimmed per-side based on its actual row/column span in the template, so cells touching the grid's outer edge drop the border on that side — the perimeter reads as open rather than a frame, only the internal divider lines between cells remain. Falls back to a simple uniform 2-column grid on mobile (same edge-trimming logic, computed from index/row/column instead of the template), since the mosaic sizing doesn't hold up at narrow widths.
+
+Both layouts use the robotic/display Audiowide font (added to layout.jsx alongside the other `next/font/google` fonts as `--font-audiowide`), render both `value` and `title` in uppercase (`text-transform: uppercase`, applied in CSS regardless of how the CMS content is cased), and fade/slide their items into view on scroll.
+
+Added `modular_blocks.propositions_section.propositions` to `pagesReferences` in referencePaths.js so the referenced Value Propositions entries resolve with the page entry.
+
+### CMS Changes — Value Propositions content type & Propositions section block
+
+- New content type `Value Propositions` (uid: `value_propositions`) with fields `Proposition` (title, text, mandatory/unique) and `Value` (text).
+- New modular block `Propositions section` (uid: `propositions_section`) added to the Page content type's modular blocks, with:
+  - `propositions` — multi-reference field to `Value Propositions`, constrained to `min_instance: 4` / `max_instance: 10` in the CMS (matches what the component's layouts are built to handle)
+  - `layout` — dropdown with options Layout 1, Layout 2 (Layout 3 and Layout 4 were removed from the dropdown — only two layouts are planned)
+
+---
+
 ### Redesign: People component (filmstrip layout)
 
 File: src/components/people.js
 
-Replaced the card-grid layout with an editorial filmstrip on desktop/tablet (`md:` and up): tall portrait panels (`clamp(520px, 78vh, 780px)`) sitting edge-to-edge in a single row, each `flex: 1 1 0` so they fill the section width evenly, capped at a 1800px max-width and centered so the outer panels keep breathing room from the viewport edge. Alternating panels (odd index) sit `clamp(40px, 6vw, 90px)` lower than the others for a staggered two-level look.
+Replaced the card-grid layout with an editorial filmstrip on desktop/tablet (`md:` and up): tall portrait panels (`clamp(520px, 78vh, 780px)`) sitting edge-to-edge in a single row, each `flex: 1 1 0` so they fill the section width evenly, capped at a 1800px max-width and centered so the outer panels keep breathing room from the viewport edge. Alternating panels (odd index) sit `clamp(40px, 6vw, 90px)` lower than the others for a staggered two-level look — those panels are also shortened by that same offset (`calc(height - offset)`) so their bottom edge lands on the same line as the non-offset panels instead of extending further down; only the top edges stagger. Section bottom padding trimmed to `2.5rem` (top padding unchanged at `7rem`).
 
 Each panel shows the photo edge-to-edge with no border chrome around the numbers — name/title/bio render directly inside the image over a bottom-anchored dark gradient overlay, the same two-layer `linear-gradient` treatment used in the Cards component (a base gradient always visible, a deeper one fading in on hover). On hover: the photo scales to 106%, the overlay deepens, the panel border turns gold, and the divider/title brighten to gold.
 

@@ -4,6 +4,7 @@ import Script from 'next/script';
 import { LyticsTracking } from "@/context/lyticsTracking";
 import AppWrapper from "@/components/appWrapper";
 import {
+  Audiowide,
   Cinzel,
   Cormorant,
   Inter,
@@ -78,6 +79,12 @@ const cormorant = Cormorant({
   subsets: ["latin"],
   variable: "--font-cormorant",
   weight: ["300","400","500","600","700"],
+});
+
+const audiowide = Audiowide({
+  subsets: ["latin"],
+  variable: "--font-audiowide",
+  weight: "400",
 });
 
 
@@ -231,6 +238,7 @@ export default async function RootLayout({
           spectral.variable,
           rokkitt.variable,
           cormorant.variable,
+          audiowide.variable,
         ].join(" ")}
       >
         {process.env.LYTICS_TAG && <LyticsTracking />}

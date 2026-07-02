@@ -81,7 +81,7 @@ export default function People({ content, isKiosk }) {
   const [active, setActive] = useState(null);
 
   return (
-    <section style={{ background: '#0a0a0a', padding: '6rem 0', paddingTop: '7rem' }}>
+    <section style={{ background: '#0a0a0a', paddingTop: '7rem', paddingBottom: '2.5rem' }}>
       <div className="max-w-7xl mx-auto px-8">
 
         {/* Heading */}
@@ -114,7 +114,8 @@ export default function People({ content, isKiosk }) {
         <div className="flex items-start mx-auto w-full" style={{ maxWidth: '1800px', gap: 'clamp(4px, 0.8vw, 10px)' }} {...content?.$?.people}>
           {people.length === 0 && [0, 1, 2, 3].map((_, i) => (
             <div key={i} className="animate-pulse" style={{
-              flex: '1 1 0', minWidth: '240px', height: PANEL_HEIGHT,
+              flex: '1 1 0', minWidth: '240px',
+              height: i % 2 === 1 ? `calc(${PANEL_HEIGHT} - ${LEVEL_OFFSET})` : PANEL_HEIGHT,
               marginTop: i % 2 === 1 ? LEVEL_OFFSET : 0,
               background: 'rgba(255,255,255,0.06)',
             }} />
@@ -126,7 +127,7 @@ export default function People({ content, isKiosk }) {
               person={person}
               index={index}
               isActive={active === index}
-              height={PANEL_HEIGHT}
+              height={index % 2 === 1 ? `calc(${PANEL_HEIGHT} - ${LEVEL_OFFSET})` : PANEL_HEIGHT}
               marginTop={index % 2 === 1 ? LEVEL_OFFSET : 0}
               fill
               onEnter={() => setActive(index)}

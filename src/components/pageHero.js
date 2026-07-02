@@ -61,11 +61,11 @@ export default function PageHero({ content, locale, withHeader }) {
 
           <h2
             style={{
-              fontFamily: '"Cormorant Garamond", Georgia, serif',
-              fontWeight: 300,
-              fontStyle: 'italic',
-              fontSize: 'clamp(2rem, 4vw, 3.5rem)',
-              lineHeight: 1.1,
+              fontFamily: 'var(--font-cinzel), Georgia, serif',
+              fontWeight: 500,
+              fontSize: 'clamp(1.8rem, 3.8vw, 3.2rem)',
+              letterSpacing: '0.04em',
+              lineHeight: 1.2,
               color: '#fff',
               marginBottom: '1.25rem',
               textShadow: '0 2px 30px rgba(0,0,0,0.35)',

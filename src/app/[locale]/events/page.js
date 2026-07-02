@@ -194,7 +194,7 @@ export default function Page() {
                   transition: 'background 0.2s, color 0.2s',
                 }}
               >
-                {mode === 'list' ? 'List' : 'Calendar'}
+                {mode === 'list' ? 'Grid' : 'Calendar'}
               </button>
             ))}
           </div>
@@ -204,9 +204,9 @@ export default function Page() {
       {/* List View */}
       {viewMode === 'list' && (
         <div className="w-full px-8 md:px-16 py-20">
-          <div className="max-w-5xl mx-auto space-y-6">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {displayEvents.map((event, index) => (
-              <EventListCard key={event.uid || index} event={event} index={index} onOpen={openModal} />
+              <EventGridCard key={event.uid || index} event={event} index={index} onOpen={openModal} />
             ))}
           </div>
         </div>
@@ -361,75 +361,90 @@ export default function Page() {
   );
 }
 
-function EventListCard({ event, index, onOpen }) {
+// A different display font AND a different position per cell (both keyed off
+// index, not re-randomized on every render, so it's stable across hovers)
+// so the grid reads like an editorial mood board rather than a uniform card
+// list. Meta text (date/location) intentionally stays off this list and uses
+// one consistent font everywhere instead — see META_FONT below. Each layout
+// also relocates the meta corners so they never collide with wherever the
+// title lands that cell.
+//
+// Ordering matters here: this is a 3-column grid, so every group of 3
+// consecutive entries lands in one row. With 9 layouts total, a naive
+// bottom/bottom/bottom.../top/top/top.../middle/middle/middle ordering means
+// one whole row always gets the same vertical position (and it did — every
+// 3rd row was all "middle"). Each consecutive triplet below is deliberately
+// built from one bottom + one top + one middle layout, using three different
+// fonts, so no row ever repeats a position or a font across its own cells.
+const TITLE_LAYOUTS = [
+  { font: { fontFamily: '"Cormorant Garamond", var(--font-cormorant-garamond), Georgia, serif', fontWeight: 400, fontStyle: 'italic' }, title: 'bottom-6 left-6 right-6 text-left', meta: 'top' },
+  { font: { fontFamily: 'var(--font-playfair), Georgia, serif', fontWeight: 600, fontStyle: 'normal' }, title: 'top-6 left-6 right-6 text-left', meta: 'bottom' },
+  { font: { fontFamily: 'var(--font-poppins), sans-serif', fontWeight: 700, fontStyle: 'normal' }, title: 'top-1/2 left-6 right-6 -translate-y-1/2 text-right', meta: 'top' },
+
+  { font: { fontFamily: 'var(--font-spectral), Georgia, serif', fontWeight: 500, fontStyle: 'italic' }, title: 'bottom-6 left-6 right-6 text-right', meta: 'top' },
+  { font: { fontFamily: '"Cormorant Garamond", var(--font-cormorant-garamond), Georgia, serif', fontWeight: 400, fontStyle: 'italic' }, title: 'top-6 left-6 right-6 text-right', meta: 'bottom' },
+  { font: { fontFamily: 'var(--font-rokkitt), serif', fontWeight: 600, fontStyle: 'normal' }, title: 'top-1/2 left-6 right-6 -translate-y-1/2 text-left', meta: 'top' },
+
+  { font: { fontFamily: 'var(--font-spectral), Georgia, serif', fontWeight: 500, fontStyle: 'italic' }, title: 'bottom-6 left-6 right-6 text-left', meta: 'top' },
+  { font: { fontFamily: 'var(--font-cinzel), Georgia, serif', fontWeight: 600, fontStyle: 'normal' }, title: 'top-6 left-6 right-6 text-right', meta: 'bottom' },
+  { font: { fontFamily: 'var(--font-playfair), Georgia, serif', fontWeight: 600, fontStyle: 'normal' }, title: 'top-1/2 left-6 right-6 -translate-y-1/2 text-center', meta: 'top' },
+];
+
+const META_FONT = { fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.55rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.85)' };
+
+function EventGridCard({ event, index, onOpen }) {
   const [hovered, setHovered] = useState(false);
+  const layout = TITLE_LAYOUTS[index % TITLE_LAYOUTS.length];
+  const swapCorners = index % 2 === 1;
+  const metaSide = layout.meta === 'top' ? 'top-5' : 'bottom-5';
 
   return (
     <motion.div
-      className="flex overflow-hidden cursor-pointer"
-      style={{ background: '#fff', border: '1px solid #e8e4de' }}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.6, delay: (index % 4) * 0.06, ease: [0.16, 1, 0.3, 1] }}
+      className="relative overflow-hidden cursor-pointer"
+      style={{ aspectRatio: '3 / 4' }}
+      initial={{ opacity: 0, scale: 0.94, y: 24 }}
+      whileInView={{ opacity: 1, scale: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.7, delay: (index % 6) * 0.08, ease: [0.16, 1, 0.3, 1] }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={() => onOpen(event)}
     >
-      {/* Gold left accent */}
-      <div style={{ width: '3px', background: '#D1A261', flexShrink: 0 }} />
+      {/* Background image */}
+      <div
+        style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(${event.image || DEFAULT_EVENT_IMAGE})`,
+          backgroundSize: 'cover', backgroundPosition: 'center',
+          transform: hovered ? 'scale(1.08)' : 'scale(1)',
+          transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      />
 
-      {/* Image */}
-      <div className="relative overflow-hidden shrink-0" style={{ width: '220px', minHeight: '180px' }}>
-        <div
-          style={{
-            position: 'absolute', inset: 0,
-            backgroundImage: `url(${event.image || DEFAULT_EVENT_IMAGE})`,
-            backgroundSize: 'cover', backgroundPosition: 'center',
-            transform: hovered ? 'scale(1.05)' : 'scale(1)',
-            transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
-          }}
-        />
-      </div>
+      {/* Gradient overlays */}
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.1) 100%)' }} />
+      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.18)', opacity: hovered ? 1 : 0, transition: 'opacity 0.4s' }} />
 
-      {/* Content */}
-      <div className="flex flex-col justify-center px-8 py-6 flex-1">
-        {event.audiences?.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3">
-            {event.audiences.map((a, i) => (
-              <span key={i} style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.48rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#D1A261', border: '1px solid rgba(209,162,97,0.4)', padding: '2px 8px' }}>
-                {a}
-              </span>
-            ))}
-          </div>
-        )}
+      {/* Meta — same font everywhere, corners relocate so they never sit under the title */}
+      {event.dateTime && (
+        <div className={`absolute flex items-center gap-1.5 ${metaSide} ${swapCorners ? 'right-5 flex-row-reverse' : 'left-5'}`}>
+          <CalendarIcon />
+          <span style={META_FONT}>{event.dateTime}</span>
+        </div>
+      )}
+      {event.location && (
+        <div className={`absolute flex items-center gap-1.5 ${metaSide} ${swapCorners ? 'left-5' : 'right-5 flex-row-reverse'}`}>
+          <PinIcon />
+          <span style={META_FONT}>{event.location}</span>
+        </div>
+      )}
 
-        <h3 style={{ fontFamily: '"Cormorant Garamond", var(--font-cormorant-garamond), Georgia, serif', fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(1.2rem, 1.8vw, 1.5rem)', lineHeight: 1.25, color: hovered ? '#1a1410' : '#2a2420', transition: 'color 0.3s', marginBottom: '0.5rem' }}>
+      {/* Title — randomized font and position per cell */}
+      <div className={`absolute ${layout.title}`}>
+        <h3 style={{ ...layout.font, textTransform: 'none', fontSize: 'clamp(1.4rem, 2.2vw, 1.9rem)', lineHeight: 1.15, color: '#fff', marginBottom: '10px' }}>
           {event.title}
         </h3>
-
-        <div style={{ height: '1px', background: '#D1A261', width: hovered ? '48px' : '24px', transition: 'width 0.5s cubic-bezier(0.16, 1, 0.3, 1)', marginBottom: '0.75rem' }} />
-
-        <div className="flex flex-wrap gap-x-6 gap-y-1 mb-3">
-          {event.dateTime && (
-            <div className="flex items-center gap-1.5">
-              <CalendarIcon />
-              <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.58rem', letterSpacing: '0.1em', color: '#6b6560' }}>{event.dateTime}</span>
-            </div>
-          )}
-          {event.location && (
-            <div className="flex items-center gap-1.5">
-              <PinIcon />
-              <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.58rem', letterSpacing: '0.1em', color: '#6b6560' }}>{event.location}</span>
-            </div>
-          )}
-        </div>
-
-        <p className="line-clamp-2" style={{ fontFamily: 'var(--font-raleway), sans-serif', fontWeight: 300, fontSize: '0.88rem', lineHeight: 1.8, color: '#9a9590' }}>
-          {event.description}
-        </p>
-
-        <div className="mt-4 inline-flex items-center gap-2" style={{ opacity: hovered ? 1 : 0, transform: hovered ? 'translateX(0)' : 'translateX(-6px)', transition: 'opacity 0.3s, transform 0.3s' }}>
+        <div className="inline-flex items-center gap-2" style={{ opacity: hovered ? 1 : 0, transform: hovered ? 'translateX(0)' : 'translateX(-6px)', transition: 'opacity 0.3s, transform 0.3s' }}>
           <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.55rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#D1A261' }}>View Details</span>
           <svg className="w-3 h-3" style={{ color: '#D1A261' }} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
