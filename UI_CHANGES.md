@@ -6,6 +6,16 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: Profiles page
+
+File: src/app/[locale]/profiles/page.js
+
+Restyled to match the site's aesthetic (was unstyled generic Tailwind blue-500 form chrome, entirely out of place). White `#fff` background, `max-w-4xl` centered column. Gold eyebrow "Red Panda Resort" + Cormorant Garamond italic "My Profiles" heading added above the profile list. Added `Footer` (previously missing from this page).
+
+Each profile card: dark `#111` header strip (Cormorant italic name, gold trash/confirm icons on hover) over a bordered `rgba(0,0,0,0.1)` body. Inputs restyled to the same treatment used on the rewards page — white background, `rgba(0,0,0,0.12)` border that turns gold (`#D1A261`) on focus via `onFocus`/`onBlur`, Raleway body font, uppercase Montserrat labels. Audience checkboxes became gold-outlined toggle pills (fill gold when checked) instead of native checkboxes, still backed by a hidden real checkbox input for the same `handleFieldChange` logic. Save button is solid gold Montserrat uppercase (matches rewards' primary button); "Add Profile" is a gold-on-hover outlined button with a plus icon, replacing the old giant icon-only button.
+
+No functional changes — all state, handlers (`getUser`, `getProfiles`, `handleFieldChange`, `addProfile`, `deleteProfile`, `saveProfile`), and API calls are untouched; only markup/styling changed.
+
 ### Redesign: Events page "List" view → editorial photo grid
 
 File: src/app/[locale]/events/page.js

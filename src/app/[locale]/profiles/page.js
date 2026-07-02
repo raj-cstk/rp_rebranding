@@ -1,5 +1,6 @@
 "use client"
 import Header from "@/components/header";
+import Footer from "@/components/footer";
 import { useState, useEffect } from 'react';
 import { ContentstackClient } from '@/lib/contentstack-client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -189,118 +190,208 @@ export default function Profiles({ }) {
             })
     }
 
+    const inputStyle = {
+        width: '100%',
+        background: '#fff',
+        border: '1px solid rgba(0,0,0,0.12)',
+        color: '#1a1a1a',
+        padding: '13px 16px',
+        fontFamily: 'var(--font-raleway), sans-serif',
+        fontWeight: 300,
+        fontSize: '0.9rem',
+        outline: 'none',
+        boxSizing: 'border-box',
+        transition: 'border-color 0.2s',
+    };
+    const focusGold = (e) => { e.currentTarget.style.borderColor = '#D1A261'; };
+    const blurDefault = (e) => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.12)'; };
+    const labelStyle = {
+        fontFamily: 'var(--font-montserrat), sans-serif',
+        fontWeight: 500,
+        fontSize: '0.58rem',
+        letterSpacing: '0.2em',
+        textTransform: 'uppercase',
+        color: 'rgba(0,0,0,0.45)',
+    };
+
     return (
-        <div>
+        <div style={{ background: '#fff', minHeight: '100vh' }}>
             <Header locale={params.locale} />
 
-            <div className="max-w-8xl mx-auto px-8 pt-16">
+            <div className="max-w-4xl mx-auto px-6 md:px-8" style={{ paddingTop: '7rem', paddingBottom: '6rem' }}>
+                <div className="flex items-center gap-4 mb-4">
+                    <span className="w-8 h-px" style={{ background: '#D1A261' }} />
+                    <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontWeight: 600, fontSize: '0.6rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#D1A261' }}>
+                        Red Panda Resort
+                    </span>
+                </div>
+                <h1 style={{ fontFamily: '"Cormorant Garamond", Georgia, serif', fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(2.2rem, 4vw, 3rem)', lineHeight: 1.15, color: '#1a1a1a', marginBottom: '3rem' }}>
+                    My Profiles
+                </h1>
+
                 <div className={`${!authLoading && !user ? "flex" : "hidden"}`}>
-                    <div className="w-full text-center mt-32">
-                        <h3>You must be logged in.</h3>
+                    <div className="w-full text-center" style={{ marginTop: '4rem', marginBottom: '4rem' }}>
+                        <p style={{ fontFamily: '"Cormorant Garamond", Georgia, serif', fontWeight: 300, fontStyle: 'italic', fontSize: '1.6rem', color: '#1a1a1a' }}>
+                            You must be logged in.
+                        </p>
                     </div>
                 </div>
-                <div className={`mb-16 ${user ? "" : "hidden"}`}>
-                    <div className="flex flex-col gap-y-8">
+
+                <div className={`${user ? "" : "hidden"}`}>
+                    <div className="flex flex-col gap-y-10">
                         {profiles.map((profile, index) => (
-                            <div key={profile?.id}>
-                                <div className="w-full bg-blue-500 text-white py-4 px-5 rounded-t-lg items-center flex justify-between">
-                                    <p className="font-medium">{profile?.fname === "" ? (profile?.isNew ? "New Profile": "Enter Name") : profile?.fname}</p>
-                                    <div className="flex">
-                                        <p className={`mr-4 font-medium ${deleting === profile?.id ? 'block' : 'hidden'}`}>Are you sure?</p>
+                            <div key={profile?.id} style={{ border: '1px solid rgba(0,0,0,0.1)' }}>
+                                <div
+                                    className="w-full py-4 px-6 items-center flex justify-between"
+                                    style={{ background: '#111', borderBottom: '1px solid rgba(209,162,97,0.25)' }}
+                                >
+                                    <p style={{ fontFamily: '"Cormorant Garamond", Georgia, serif', fontWeight: 400, fontStyle: 'italic', fontSize: '1.2rem', color: '#fff' }}>
+                                        {profile?.fname === "" ? (profile?.isNew ? "New Profile" : "Enter Name") : profile?.fname}
+                                    </p>
+                                    <div className="flex items-center">
+                                        {deleting === profile?.id &&
+                                            <span style={{ ...labelStyle, color: 'rgba(255,255,255,0.5)', marginRight: '1rem' }}>Are you sure?</span>
+                                        }
                                         {deleting === profile?.id &&
                                             <button
                                                 onClick={() => deleteProfile(profile?.id)}
-                                                className="text-white hover:text-red-400"
+                                                style={{ color: '#D1A261' }}
+                                                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                                                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                                             >
-                                                <FontAwesomeIcon icon={faCheck} className="text-2xl" />
+                                                <FontAwesomeIcon icon={faCheck} className="text-lg" />
                                             </button>
                                         }
                                         {deleting !== profile?.id &&
                                             <button
                                                 onClick={() => setDeleting(profile?.id)}
-                                                className="text-white hover:text-red-400"
+                                                style={{ color: 'rgba(255,255,255,0.5)' }}
+                                                onMouseEnter={(e) => e.currentTarget.style.color = '#D1A261'}
+                                                onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.5)'}
                                             >
-                                                <FontAwesomeIcon icon={faTrash} className="text-2xl" />
+                                                <FontAwesomeIcon icon={faTrash} className="text-lg" />
                                             </button>
                                         }
                                     </div>
                                 </div>
-                                <div className={`border border-blue-500 p-4 grid grid-cols-6 w-full ${saving === profile?.id ? 'opacity-25 pointer-events-none' : ''}`}>
-                                    <div className="col-span-8 md:col-span-4 ">
-                                        <label htmlFor="fname">First Name*</label>
+                                <div
+                                    className={`grid grid-cols-1 md:grid-cols-2 gap-x-6 ${saving === profile?.id ? 'opacity-25 pointer-events-none' : ''}`}
+                                    style={{ padding: '2rem', transition: 'opacity 0.3s' }}
+                                >
+                                    <div>
+                                        <label htmlFor="fname" style={labelStyle}>First Name*</label>
                                         <div className="mt-2">
                                             <input
                                                 name="fname"
                                                 id="fname"
                                                 value={profile?.fname || ''}
                                                 onChange={(e) => handleFieldChange(profile?.id, 'fname', e.target.value)}
-                                                className="border p-2 w-full"
+                                                onFocus={focusGold}
+                                                onBlur={blurDefault}
+                                                style={inputStyle}
                                             />
                                         </div>
                                     </div>
 
-                                    <div className="col-span-8 md:col-span-4 mt-5">
-                                        <label htmlFor="lname">Last Name</label>
+                                    <div className="mt-5 md:mt-0">
+                                        <label htmlFor="lname" style={labelStyle}>Last Name</label>
                                         <div className="mt-2">
                                             <input
                                                 name="lname"
                                                 id="lname"
                                                 value={profile?.lname || ''}
                                                 onChange={(e) => handleFieldChange(profile?.id, 'lname', e.target.value)}
-                                                className="border p-2 w-full"
+                                                onFocus={focusGold}
+                                                onBlur={blurDefault}
+                                                style={inputStyle}
                                             />
                                         </div>
                                     </div>
 
-                                    <div className="my-10 col-span-full">
-                                        <div className="max-w-[96px]">
-                                            <label htmlFor={"upload-image" + profile?.id} className="max-w-[96px]">
-                                                {profile?.image !== '' &&
-                                                    <img className="size-[96px] rounded-full ml-5" src={profile?.image} />
-                                                }
-                                                {profile?.image === '' &&
-                                                    <FontAwesomeIcon icon={faCircleUser} className="text-8xl ml-5 text-neutral-700 cursor-pointer" />
-                                                }
-                                            </label>
-                                            <input
-                                                id={"upload-image" + profile?.id}
-                                                type="file"
-                                                hidden
-                                                accept="image/*"
-                                                className="max-w-min"
-                                                onChange={ (e) => {
-                                                    console.log('in on change', index,  profiles[index].id);
-                                                    let selectedFiles = e.target.files;
-                                                    if (selectedFiles && selectedFiles[0]) {
-                                                        let blobUrl = URL.createObjectURL(selectedFiles[0]);
-                                                        handleFieldChange(profile?.id, 'image', blobUrl);
-                                                        handleFieldChange(profile?.id, 'file', e.target.files[0]);
-                                                    }
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-5 col-span-full">
-                                        <p>Audiences</p>
-                                        {audiences.map((audience, audienceIdx) => (
-                                            <div className="mt-2" key={audienceIdx}>
-                                                <input 
-                                                    type="checkbox" 
-                                                    id={profile?.id + audience} 
-                                                    name={"audience" + index}
-                                                    value={audience}
-                                                    checked={profile?.audience?.includes(audience)}
-                                                    onChange={(e) => handleFieldChange(profile?.id, 'audience', e.target.value, e.target.checked)}
+                                    <div className="col-span-full" style={{ marginTop: '2.5rem', marginBottom: '0.5rem' }}>
+                                        <label htmlFor={"upload-image" + profile?.id} className="cursor-pointer" style={{ display: 'inline-block' }}>
+                                            {profile?.image !== '' &&
+                                                <img
+                                                    className="rounded-full"
+                                                    style={{ width: '88px', height: '88px', objectFit: 'cover', border: '1px solid rgba(209,162,97,0.4)' }}
+                                                    src={profile?.image}
                                                 />
-                                                <label htmlFor={profile?.id + audience} className="ml-2">{audience}</label>
-                                            </div>
-                                        ))}
+                                            }
+                                            {profile?.image === '' &&
+                                                <FontAwesomeIcon icon={faCircleUser} className="text-8xl" style={{ color: 'rgba(0,0,0,0.2)' }} />
+                                            }
+                                        </label>
+                                        <input
+                                            id={"upload-image" + profile?.id}
+                                            type="file"
+                                            hidden
+                                            accept="image/*"
+                                            onChange={ (e) => {
+                                                let selectedFiles = e.target.files;
+                                                if (selectedFiles && selectedFiles[0]) {
+                                                    let blobUrl = URL.createObjectURL(selectedFiles[0]);
+                                                    handleFieldChange(profile?.id, 'image', blobUrl);
+                                                    handleFieldChange(profile?.id, 'file', e.target.files[0]);
+                                                }
+                                            }}
+                                        />
+                                    </div>
+
+                                    <div className="col-span-full" style={{ marginTop: '1.5rem', marginBottom: '2rem' }}>
+                                        <p style={{ ...labelStyle, marginBottom: '0.75rem' }}>Audiences</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {audiences.map((audience, audienceIdx) => {
+                                                const checked = profile?.audience?.includes(audience);
+                                                return (
+                                                    <label
+                                                        key={audienceIdx}
+                                                        htmlFor={profile?.id + audience}
+                                                        className="cursor-pointer"
+                                                        style={{
+                                                            fontFamily: 'var(--font-montserrat), sans-serif',
+                                                            fontSize: '0.6rem',
+                                                            letterSpacing: '0.12em',
+                                                            textTransform: 'uppercase',
+                                                            padding: '7px 14px',
+                                                            border: `1px solid ${checked ? '#D1A261' : 'rgba(0,0,0,0.15)'}`,
+                                                            background: checked ? '#D1A261' : 'transparent',
+                                                            color: checked ? '#000' : 'rgba(0,0,0,0.55)',
+                                                            transition: 'all 0.2s',
+                                                        }}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            id={profile?.id + audience}
+                                                            name={"audience" + index}
+                                                            value={audience}
+                                                            checked={checked}
+                                                            onChange={(e) => handleFieldChange(profile?.id, 'audience', e.target.value, e.target.checked)}
+                                                            style={{ display: 'none' }}
+                                                        />
+                                                        {audience}
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                     <div className="flex justify-end col-span-full">
                                         <button
                                             onClick={() => saveProfile(profile?.id)}
-                                            className="border border-blue-500 rounded py-2 px-5 hover:bg-blue-500 hover:text-white"
+                                            style={{
+                                                background: '#D1A261',
+                                                color: '#000',
+                                                border: 'none',
+                                                padding: '13px 32px',
+                                                fontFamily: 'var(--font-montserrat), sans-serif',
+                                                fontWeight: 600,
+                                                fontSize: '0.6rem',
+                                                letterSpacing: '0.22em',
+                                                textTransform: 'uppercase',
+                                                cursor: 'pointer',
+                                                transition: 'opacity 0.2s',
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.85'}
+                                            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                                         >
                                             Save
                                         </button>
@@ -309,16 +400,36 @@ export default function Profiles({ }) {
                             </div>
                         ))}
                     </div>
-                    <div className="mt-5 flex justify-center">
+                    <div className="mt-10 flex justify-center">
                         <button
                             onClick={() => addProfile()}
-                            className="text-neutral-700  border border-neutral-700 rounded py-2 px-16"
+                            style={{
+                                background: 'transparent',
+                                color: '#1a1a1a',
+                                border: '1px solid rgba(0,0,0,0.2)',
+                                padding: '13px 32px',
+                                fontFamily: 'var(--font-montserrat), sans-serif',
+                                fontWeight: 500,
+                                fontSize: '0.6rem',
+                                letterSpacing: '0.22em',
+                                textTransform: 'uppercase',
+                                cursor: 'pointer',
+                                transition: 'border-color 0.2s, color 0.2s',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#D1A261'; e.currentTarget.style.color = '#D1A261'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.2)'; e.currentTarget.style.color = '#1a1a1a'; }}
                         >
-                            <FontAwesomeIcon icon={faPlus} className="text-5xl" />
+                            <FontAwesomeIcon icon={faPlus} className="text-xs" />
+                            Add Profile
                         </button>
                     </div>
                 </div>
             </div>
+
+            <Footer />
         </div>
     )
 }
