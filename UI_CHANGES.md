@@ -6,17 +6,17 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
-### Redesign: People component
+### Redesign: People component (filmstrip layout)
 
 File: src/components/people.js
 
-Dark `#0a0a0a` background section with 7rem vertical padding. Gold centered eyebrow with flanking lines, Cormorant italic heading. Heading fades and slides up on scroll via Framer Motion.
+Replaced the card-grid layout with an editorial filmstrip on desktop/tablet (`md:` and up): tall portrait panels (`clamp(520px, 78vh, 780px)`) sitting edge-to-edge in a single row, each `flex: 1 1 0` so they fill the section width evenly, capped at a 1800px max-width and centered so the outer panels keep breathing room from the viewport edge. Alternating panels (odd index) sit `clamp(40px, 6vw, 90px)` lower than the others for a staggered two-level look.
 
-Cards in a responsive grid (2 col mobile, 3 col tablet, 4 col desktop) with 3:4 portrait aspect ratio. Each card staggers into view (fade + 80px slide up) with an 80ms delay per card.
+Each panel shows the photo edge-to-edge with no border chrome around the numbers — name/title/bio render directly inside the image over a bottom-anchored dark gradient overlay, the same two-layer `linear-gradient` treatment used in the Cards component (a base gradient always visible, a deeper one fading in on hover). On hover: the photo scales to 106%, the overlay deepens, the panel border turns gold, and the divider/title brighten to gold.
 
-Hover effects: image scales to 106%, an extra dark scrim fades in, a corner gold bracket appears top-right. Text block sits at the bottom — name in Cormorant italic is always visible, job title in gold Montserrat reveals on hover (opacity transition). A short gold line expands from 20px to 40px width on hover via a ref-based event listener. All transitions use a custom ease curve for a silky feel.
+Below `md`, the filmstrip is replaced with normal vertically-stacked cards (one per row, 5:6 aspect ratio) reusing the same panel/overlay/caption treatment, so mobile gets a standard card list instead of the tall scrolling filmstrip.
 
-Loading skeleton: 4 dark placeholder boxes matching the card aspect ratio.
+Loading skeleton matches each breakpoint's layout (staggered placeholder blocks on desktop, stacked 5:6 blocks on mobile).
 
 ---
 

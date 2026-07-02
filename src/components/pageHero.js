@@ -85,7 +85,7 @@ export default function PageHero({ content, locale, withHeader }) {
             <p
               style={{
                 fontFamily: 'var(--font-raleway), sans-serif',
-                fontWeight: 300,
+                fontWeight: 400,
                 fontSize: 'clamp(0.85rem, 1.1vw, 0.98rem)',
                 lineHeight: 1.9,
                 letterSpacing: '0.02em',
