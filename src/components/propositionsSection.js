@@ -267,7 +267,7 @@ export default function PropositionsSection({ content }) {
   const Layout = content?.layout === 'Layout 2' ? LayoutTwo : LayoutOne;
 
   return (
-    <section style={{ background: '#0a0a0a', padding: '3.5rem 0' }}>
+    <section style={{ background: 'linear-gradient(to bottom, #4DD9CB 0%, #0a0a0a 100%)', padding: '3.5rem 0' }}>
       <Layout content={content} propositions={propositions} />
     </section>
   );

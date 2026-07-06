@@ -48,13 +48,13 @@ export default function PageHero({ content, locale, withHeader }) {
       )}
 
       <div
-        className="absolute inset-0 flex flex-col px-8 lg:px-20 py-16 justify-center"
+        className="absolute inset-0 flex flex-col px-8 lg:px-20 py-16 justify-start"
         style={{ alignItems: flexAlign, textAlign }}
       >
-        <div style={{ maxWidth: '520px', marginTop: 'clamp(40px, 8vh, 100px)' }}>
-          <div className="flex items-center gap-3 mb-5" style={{ justifyContent: flexAlign }}>
+        <div style={{ maxWidth: '520px', marginTop: 'clamp(100px, 16vh, 160px)' }}>
+          <div className="flex items-center gap-3 mb-3" style={{ justifyContent: flexAlign }}>
             <span style={{ width: '28px', height: '1px', background: '#D1A261', display: 'block', flexShrink: 0 }} />
-            <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontWeight: 600, fontSize: '0.58rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#D1A261' }}>
+            <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontWeight: 700, fontSize: '0.58rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#D1A261' }}>
               Red Panda Resort
             </span>
           </div>
@@ -67,7 +67,7 @@ export default function PageHero({ content, locale, withHeader }) {
               letterSpacing: '0.04em',
               lineHeight: 1.2,
               color: '#fff',
-              marginBottom: '1.25rem',
+              marginBottom: '0.75rem',
               textShadow: '0 2px 30px rgba(0,0,0,0.35)',
             }}
             {...content?.$?.headline}
@@ -76,7 +76,7 @@ export default function PageHero({ content, locale, withHeader }) {
           </h2>
 
           <div style={{
-            width: '32px', height: '1px', background: '#D1A261', marginBottom: '1.25rem',
+            width: '32px', height: '1px', background: '#D1A261', marginBottom: '0.75rem',
             marginLeft: layout === "Center" ? 'auto' : '0',
             marginRight: layout === "Text Right" || layout === "Center" ? 'auto' : '0',
           }} />
@@ -85,7 +85,7 @@ export default function PageHero({ content, locale, withHeader }) {
             <p
               style={{
                 fontFamily: 'var(--font-raleway), sans-serif',
-                fontWeight: 400,
+                fontWeight: 600,
                 fontSize: 'clamp(0.85rem, 1.1vw, 0.98rem)',
                 lineHeight: 1.9,
                 letterSpacing: '0.02em',

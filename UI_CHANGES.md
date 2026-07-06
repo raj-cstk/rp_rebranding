@@ -6,6 +6,68 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Fix: Header "Events" nav link went nowhere (functional fix, not styling)
+
+File: src/components/header.js
+
+Menu items resolve their `href` from a `page` reference field's resolved entry `.url`. The `events_page` content type (a singleton that only holds the `/events` route's header text — `title`/`headline`/`details`, `options.is_page: false`) has no `url` field at all, unlike `page`/`rewards`/`faq`/`article_list` which do. So a menu item referencing it got `item.page[0].url === undefined`, and the existing `... ? url : "#"` fallback silently produced `href="#"` — the label rendered fine, the click did nothing.
+
+Added a `getMenuHref(pageRef)` helper that special-cases `_content_type_uid === "events_page"` to the app's fixed `/events` route, falling back to `.url` (or `"#"`) for every other reference type as before. Applied to all four places menu hrefs are computed (desktop top-level items, desktop sub-items, mobile top-level items, mobile sub-items).
+### Update: Articles listing page header background
+
+File: src/app/[locale]/articles/[title]/page.js
+
+Changed just the "Page header" block (breadcrumb, headline, subtext, article count — the part above the article grid, e.g. on `/articles/activities`) from white to dark `#0a0a0a`, with text colors flipped to match: breadcrumb link `rgba(0,0,0,0.35) → rgba(255,255,255,0.4)`, separator `rgba(0,0,0,0.2) → rgba(255,255,255,0.25)`, headline `#1a1410 → #fff`, subtext `#6b6560 → rgba(255,255,255,0.55)`, article count `#9a9590 → rgba(255,255,255,0.4)`, divider border `#e8e4de → rgba(255,255,255,0.08)`. The gold current-category label and hover color were already `#D1A261` and needed no change. The `Header` nav above it and the article grid below it are untouched — both still sit on the page's white background, unaffected since the `Header` isn't absolutely positioned/overlaid in this non-hero usage.
+### Fix: Tabs component image border-radius on mobile
+
+File: src/components/tabs.js
+
+The image side's large pill `border-radius` (`9999px` on one edge, curving into the adjacent text panel) only makes sense in the side-by-side desktop layout. Below the existing `md` breakpoint, the panel already collapses to `flex-col` (image stacked full-width above the text), where that same curve looked like a broken diagonal cut rather than a rounded edge. Added a `matchMedia('(min-width: 768px)')` check (same breakpoint already used for the tab-bar wrap and panel stacking) and zero out the radius when not on desktop.
+
+### Redesign: FAQ accordion page (singular /faq/[title] route)
+
+File: src/app/[locale]/faq/[title]/page.js
+
+Replaced the alternating dark/cream checkerboard grid (which read as an arbitrary color gimmick rather than something native to the site) with a tabbed category browser, reusing the sliding gold-underline tab pattern already established in `src/components/tabs.js` (`motion.span layoutId="..."`, spring transition) instead of inventing a new interaction. One unified white `#fff` section throughout (originally dark `#0a0a0a`, flipped to white so it blends with the hero's overlay/wave — see below) — no more per-category color split. Inactive tab, question, answer, and divider colors switched from white/`rgba(255,255,255,*)` tones to dark `#1a1410`/`#6b6560`/`rgba(0,0,0,*)` tones to match; the active tab and open-question color stay the gold accent `#D1A261`.
+
+Hero's dark overlay was also flipped: instead of `linear-gradient(to top, black 0.75 → black 0.35)` (darkest near the bottom, above the wave), it's now `linear-gradient(to bottom, black 0.7 → black 0.4 → black 0.1 → #fff)` — darkest near the top (where the header/title sit) and progressively lightening to solid white by the bottom, so the tinted photo blends smoothly into the wave and the white section below instead of cutting off abruptly into it.
+
+Category names render as a centered, wrapping tab bar; clicking one sets `active`/`dir` state (same `select`-with-direction pattern as Tabs) and swaps the visible question list via `AnimatePresence mode="wait"` with a directional slide (`enter`/`center`/`exit` variants, sliding right when moving to a later tab and left for an earlier one — identical variant shape to Tabs' panel transition). Within the active category, each question fades/slides up into place with a small stagger (`delay: fIdx * 0.05`) and nudges right slightly on hover (`whileHover={{ x: 4 }}`); the chevron rotation on expand is now an animated `motion.div` rotate instead of a CSS class toggle. Questions switched from Raleway to italic Cormorant Garamond to read as more editorial, matching how question text is styled on the `/faqs/[title]` category cards.
+
+The accordion behaviour itself (`expandedId` state, `questionClicked`, expand/collapse height animation) is untouched — only the surrounding browsing UI and its animations changed.
+
+Wave-shaped hero bottom edge kept, but made noticeably more pronounced (SVG path control points pushed further outside the viewBox, height increased `90px → 140px`) — same update applied to `/faqs/[title]`'s hero for consistency.
+
+### Redesign: FAQ category grid
+
+File: src/app/[locale]/faqs/[title]/page.js
+
+Replaced the small uniform 4-column tile grid (120px pills, all white, name only) with a richer gapless editorial grid (`CategoryCell`, 1 col mobile / 2 col tablet / 3 col desktop). Cells sit flush against each other rather than using a grid gap, so the alternating backgrounds read as a clean checkerboard instead of having plain white gutters break it up.
+
+Only two background tones alternate: dark `#0a0a0a` and cream `#F6EFD8` (same cream used on the rewards page), with text/muted/border colors flipped per tone so contrast holds on both. Alternation is computed as a `(row + col) % 2` checkerboard against the widest (3-column) layout rather than plain `index % 2`, since the latter makes every cell in a column the same color whenever the rendered column count divides evenly into 2 (e.g. the `sm:` 2-column breakpoint) — the same bug found and fixed on the singular `/faq/[title]` page. Each cell shows the category name in Cormorant italic, a `faqs.length` "N Questions" count when available, and a gold "Explore →" link that fades/slides in on hover alongside a widening gold underline — same hover language as Cards/ArticleBanner/PropositionsSection (border turns gold, accents brighten).
+
+Entrance animation alternates slide direction by cell (`x: -40` for dark cells, `x: 40` for cream cells, `whileInView`, staggered `delay: (index % 6) * 0.07`) rather than a uniform fade-up, echoing the alternating-side entrance already used on the propositions timeline layout.
+
+Hero photo's bottom edge is now a wave instead of a straight line — an absolutely-positioned SVG (`viewBox 0 0 1440 140`, `preserveAspectRatio="none"` so it stretches full-width) with a single asymmetric S-curve path filled white (matching the page background immediately below the hero), layered above the dark gradient overlay but below the header/search content. Curve was pushed more pronounced after an initial pass felt too subtle — see the `/faq/[title]` entry.
+
+### Update: PageHero text block — weight, spacing, and position
+
+File: src/components/pageHero.js
+
+Bolded the two text elements below the main headline: the "Red Panda Resort" eyebrow label (`fontWeight: 600 → 700`) and the `details` description paragraph (`fontWeight: 400 → 600`).
+
+Tightened the spacing so the eyebrow and description sit closer to the headline: eyebrow-to-headline gap `mb-5 → mb-3`, headline-to-divider gap `1.25rem → 0.75rem`, divider-to-description gap `1.25rem → 0.75rem`. Also moved the whole text block up — the wrapper switched from `justify-center` (vertically centered in the hero) to `justify-start`, with the block's own top margin changed from `clamp(40px, 8vh, 100px)` to `clamp(100px, 16vh, 160px)` so it sits in the upper portion of the hero (clearing the header) instead of dead-center.
+
+### Redesign: Rewards page hero
+
+File: src/app/[locale]/rewards/page.js
+
+Replaced the 50/50 split hero (image in a pill-curved left panel, text in a separate right panel) with a single full-bleed hero, `min-height` reduced from `80vh` to `52vh`: the image is now a full-width/height background (`position: absolute, inset: 0, backgroundSize: cover`) with a `rgba(0,0,0,0.55)` dark overlay, and all text (eyebrow, headline, divider, body) is centered on top of it — matching the overlay-hero pattern used elsewhere on the site (PageHero/Hero). Headline font switched from italic Cormorant Garamond to Cinzel (weight 500, `0.04em` letter-spacing, no italic — same treatment applied to PageHero/Hero earlier), and body copy opacity bumped from 0.48 to 0.75 for legibility now that it sits over a photo instead of a solid `#0a0a0a` panel.
+
+`Header color="white"` was previously wrapped in its own preceding `position: relative` div with no image behind it, so it rendered as a solid black bar sitting *above* the hero photo rather than floating over it. Moved it inside the hero container as an absolutely-positioned top overlay (`absolute top-0 left-0 right-0 z-20`), matching exactly how `pageHero.js` overlays its header on the home page — the nav now floats transparently over the hero image instead of sitting in its own separate bar.
+
+Form container widened from `max-w-lg` (512px) to `max-w-2xl` (672px).
+
 ### Redesign: Profiles page
 
 File: src/app/[locale]/profiles/page.js
@@ -54,6 +116,8 @@ New modular block on the Page content type, rendered via a new `PropositionsSect
 **Layout 2** — a bento/mosaic grid on desktop: hand-tiled `grid-template-areas` per item count (4 through 10, matching the CMS's constraint on how many propositions a block can hold) so cells vary in size — a mix of 2x2, 2x1 and 1x1 — while the whole grid still tiles into one clean rectangle with no gaps. Cells sit directly on the section's own background (no separate card background) with gold divider borders, value and title text centered both ways within each cell, and larger cells get proportionally larger `value` text (`sm`/`md`/`lg` tiers). Each cell's border is trimmed per-side based on its actual row/column span in the template, so cells touching the grid's outer edge drop the border on that side — the perimeter reads as open rather than a frame, only the internal divider lines between cells remain. Falls back to a simple uniform 2-column grid on mobile (same edge-trimming logic, computed from index/row/column instead of the template), since the mosaic sizing doesn't hold up at narrow widths.
 
 Both layouts use the robotic/display Audiowide font (added to layout.jsx alongside the other `next/font/google` fonts as `--font-audiowide`), render both `value` and `title` in uppercase (`text-transform: uppercase`, applied in CSS regardless of how the CMS content is cased), and fade/slide their items into view on scroll.
+
+Section background is a vertical gradient from a lighter turquoise `#4DD9CB` at the top down to solid black `#0a0a0a` at the bottom (`linear-gradient(to bottom, ...)`), originally flat black. `value` text is white (kept white rather than the dark tone tried for a flat turquoise background, since it now needs to read against both the light-turquoise top and the black bottom of the gradient); the gold `title` label color and borders were kept as-is since gold reads fine against both ends of the gradient.
 
 Added `modular_blocks.propositions_section.propositions` to `pagesReferences` in referencePaths.js so the referenced Value Propositions entries resolve with the page entry.
 

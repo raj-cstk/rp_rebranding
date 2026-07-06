@@ -1,13 +1,26 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cslp } from "@/lib/cstack";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Tabs({ content }) {
   const [active, setActive] = useState(0);
   const [dir, setDir] = useState(1);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   const select = (i) => { setDir(i > active ? 1 : -1); setActive(i); };
+
+  // The image side's pill border-radius only makes sense in the side-by-side
+  // desktop layout — once `max-md:flex-col` stacks it full-width on mobile,
+  // that same 9999px curve on one edge looks like a broken diagonal cut
+  // rather than a rounded panel. Same `md` breakpoint already used below.
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    setIsDesktop(mq.matches);
+    const handler = e => setIsDesktop(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   if (!content?.tabs?.length) return (
     <div className="h-[600px] visual-builder__empty-block-parent py-24" {...content?.$?.tabs} />
@@ -56,7 +69,7 @@ export default function Tabs({ content }) {
               {...cslp(content, 'tabs__', i)}
             >
               {/* Image side */}
-              <div className="flex-1 relative overflow-hidden" style={{ minHeight: '60vh', borderRadius: item?.layout === 'Text Right' ? '9999px 0 0 9999px' : '0 9999px 9999px 0' }}>
+              <div className="flex-1 relative overflow-hidden" style={{ minHeight: '60vh', borderRadius: !isDesktop ? '0' : item?.layout === 'Text Right' ? '9999px 0 0 9999px' : '0 9999px 9999px 0' }}>
                 {item?.image?.url ? (
                   <motion.div
                     className="absolute inset-0"

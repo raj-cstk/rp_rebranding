@@ -159,7 +159,7 @@ export default function ArticlesList() {
       <Header locale={params.locale} />
 
       {/* Page header */}
-      <div className="w-full px-8 md:px-16 pt-28 pb-16" style={{ borderBottom: '1px solid #e8e4de' }}>
+      <div className="w-full px-8 md:px-16 pt-28 pb-16" style={{ background: '#0a0a0a', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <motion.div
           className="max-w-7xl mx-auto"
           initial={{ opacity: 0, y: 24 }}
@@ -169,19 +169,19 @@ export default function ArticlesList() {
           <div className="flex items-center gap-4 mb-6">
             <Link
               href={`/${params.locale}/articles`}
-              style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.58rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)' }}
+              style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.58rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}
               className="hover:text-[#D1A261] transition-colors"
             >
               Articles
             </Link>
-            <span style={{ color: 'rgba(0,0,0,0.2)', fontSize: '0.6rem' }}>—</span>
+            <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.6rem' }}>—</span>
             <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.58rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#D1A261', fontWeight: 500 }}>
               {params.title}
             </span>
           </div>
 
           <h1
-            style={{ fontFamily: '"Cormorant Garamond", var(--font-cormorant-garamond), Georgia, serif', fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(2.8rem, 5vw, 4.5rem)', lineHeight: 1.1, color: '#1a1410' }}
+            style={{ fontFamily: '"Cormorant Garamond", var(--font-cormorant-garamond), Georgia, serif', fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(2.8rem, 5vw, 4.5rem)', lineHeight: 1.1, color: '#fff' }}
             {...entry?.$?.header}
           >
             {entry?.header || params.title}
@@ -189,7 +189,7 @@ export default function ArticlesList() {
 
           {entry?.subtext && (
             <p
-              style={{ fontFamily: 'var(--font-raleway), sans-serif', fontWeight: 300, fontSize: '1rem', lineHeight: 1.8, color: '#6b6560', marginTop: '1rem', maxWidth: '540px' }}
+              style={{ fontFamily: 'var(--font-raleway), sans-serif', fontWeight: 300, fontSize: '1rem', lineHeight: 1.8, color: 'rgba(255,255,255,0.55)', marginTop: '1rem', maxWidth: '540px' }}
               {...entry?.$?.subtext}
             >
               {entry.subtext}
@@ -197,7 +197,7 @@ export default function ArticlesList() {
           )}
 
           {articles.length > 0 && (
-            <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.6rem', letterSpacing: '0.2em', color: '#9a9590', marginTop: '1rem' }}>
+            <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.6rem', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.4)', marginTop: '1rem' }}>
               {articles.length} {articles.length === 1 ? 'article' : 'articles'}
             </p>
           )}

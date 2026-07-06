@@ -177,6 +177,18 @@ export default function Header({ color, locale }) {
     return classes.filter(Boolean).join(" ");
   }
 
+  // Most referenceable content types (page, rewards, faq, article_list, ...)
+  // carry their own `url` field, which is all a menu item needs. `events_page`
+  // is a singleton config entry for the /events route's header text only —
+  // it has no `url` field, so `item.page[0].url` comes back undefined and the
+  // link silently falls back to "#". Special-case it to the app's fixed route.
+  function getMenuHref(pageRef) {
+    if (!pageRef?.length) return "#";
+    const target = pageRef[0];
+    if (target?._content_type_uid === "events_page") return "/events";
+    return target?.url || "#";
+  }
+
   return (
     <div
       className={
@@ -248,7 +260,7 @@ export default function Header({ color, locale }) {
                             sub?.page && (
                               <Link
                                 key={subIdx}
-                                href={sub?.page?.length > 0 ? sub?.page?.[0]?.url : "#"}
+                                href={getMenuHref(sub?.page)}
                                 className="text-nowrap font-light"
                                 {...sub.$?.text}
                               >
@@ -267,7 +279,7 @@ export default function Header({ color, locale }) {
                   <div {...item.$?.page}>
                     {item?.page && (
                       <Link
-                        href={(item?.page?.length > 0 && item?.page?.[0]?.url) ? item?.page?.[0]?.url : "#"}
+                        href={getMenuHref(item?.page)}
                         {...item.$?.text}
                       >
                         {item.text}
@@ -439,7 +451,7 @@ export default function Header({ color, locale }) {
                           <Disclosure.Button
                             key={subIdx + subItem?.text}
                             as="a"
-                            href={subItem?.page?.[0]?.url ?? "#"}
+                            href={getMenuHref(subItem?.page)}
                             className="block py-2.5 pl-4 outline-none"
                             style={{ fontFamily: 'var(--font-raleway), sans-serif', fontSize: '0.85rem', fontWeight: 300, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.06em', borderBottom: '1px solid rgba(255,255,255,0.04)' }}
                           >
@@ -455,7 +467,7 @@ export default function Header({ color, locale }) {
               return (
                 <Link
                   key={index}
-                  href={(item?.page?.length > 0 && item?.page?.[0]?.url) ? item?.page?.[0]?.url : "#"}
+                  href={getMenuHref(item?.page)}
                   className="py-4 block"
                   style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.85)', fontSize: '1.15rem', transition: 'color 0.2s' }}
                   onMouseEnter={e => e.currentTarget.style.color = '#D1A261'}

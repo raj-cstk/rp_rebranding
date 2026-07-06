@@ -106,61 +106,46 @@ export default function Page({ }) {
                 </Dialog>
             </Transition.Root>
 
-            <div style={{ position: 'relative', zIndex: 100, minHeight: '80px' }}>
-                <Header color="white" locale={params.locale} />
-            </div>
+            {/* Hero — image as full-bleed background, text overlaid */}
+            <div className="relative w-full overflow-hidden" style={{ minHeight: '52vh' }}>
+                {entry?.image?.url && (
+                    <div
+                        className="absolute inset-0"
+                        style={{
+                            backgroundImage: `url(${entry.image.url})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                        }}
+                        {...entry?.image?.$?.url}
+                    />
+                )}
+                <div className="absolute inset-0" style={{ background: '#000', opacity: 0.55 }} />
 
-            {/* Hero — full width split */}
-            <div className={`flex w-full ${isLg ? 'flex-row' : 'flex-col'}`} style={{ minHeight: '80vh' }}>
-
-                {/* Image — left half, pill-curved right edge */}
-                <div
-                    className="relative overflow-hidden"
-                    style={{
-                        flex: 1,
-                        minHeight: isLg ? '80vh' : '55vw',
-                        borderRadius: isLg ? '0 9999px 9999px 0' : '0',
-                        background: '#1a1a1a',
-                    }}
-                >
-                    {entry?.image?.url && (
-                        <div
-                            className="absolute inset-0"
-                            style={{
-                                backgroundImage: `url(${entry.image.url})`,
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center',
-                            }}
-                            {...entry?.image?.$?.url}
-                        />
-                    )}
+                <div className="absolute top-0 left-0 right-0 z-20">
+                    <Header color="white" locale={params.locale} />
                 </div>
 
-                {/* Text — right half */}
                 <div
-                    className="flex items-center"
-                    style={{
-                        flex: 1,
-                        padding: isLg ? '0 5rem 0 5rem' : '3rem 1.5rem',
-                        background: '#0a0a0a',
-                    }}
+                    className="relative flex items-center justify-center text-center"
+                    style={{ minHeight: '52vh', padding: isLg ? '0 5rem' : '3rem 1.5rem' }}
                 >
                     <div style={{ maxWidth: '480px' }}>
-                        <div className="flex items-center gap-4 mb-6">
+                        <div className="flex items-center justify-center gap-4 mb-6">
                             <span className="w-8 h-px bg-[#D1A261]" />
                             <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontWeight: 600, fontSize: '0.6rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#D1A261' }}>
                                 Membership
                             </span>
+                            <span className="w-8 h-px bg-[#D1A261]" />
                         </div>
                         <h1
-                            style={{ fontFamily: '"Cormorant Garamond", Georgia, serif', fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(2.2rem, 4vw, 3.5rem)', color: '#fff', lineHeight: 1.15, marginBottom: '1.5rem' }}
+                            style={{ fontFamily: 'var(--font-cinzel), Georgia, serif', fontWeight: 500, letterSpacing: '0.04em', fontSize: 'clamp(2rem, 3.8vw, 3.2rem)', color: '#fff', lineHeight: 1.2, marginBottom: '1.5rem', textShadow: '0 2px 30px rgba(0,0,0,0.35)' }}
                             {...entry?.$?.headline}
                         >
                             {entry?.headline}
                         </h1>
-                        <div style={{ width: '32px', height: '1px', background: '#D1A261', marginBottom: '1.5rem' }} />
+                        <div style={{ width: '32px', height: '1px', background: '#D1A261', margin: '0 auto 1.5rem' }} />
                         <p
-                            style={{ fontFamily: 'var(--font-raleway), sans-serif', fontWeight: 300, fontSize: '0.95rem', lineHeight: 1.9, letterSpacing: '0.02em', color: 'rgba(255,255,255,0.48)' }}
+                            style={{ fontFamily: 'var(--font-raleway), sans-serif', fontWeight: 300, fontSize: '0.95rem', lineHeight: 1.9, letterSpacing: '0.02em', color: 'rgba(255,255,255,0.75)' }}
                             {...entry?.$?.body}
                         >
                             {entry?.body}
@@ -171,7 +156,7 @@ export default function Page({ }) {
 
             {/* Form section */}
             <div style={{ background: '#ffffff' }} className="py-20 lg:py-28">
-                <div className="max-w-lg mx-auto px-6 md:px-8">
+                <div className="max-w-2xl mx-auto px-6 md:px-8">
 
                     {/* Form heading */}
                     <div className="text-center mb-12">
