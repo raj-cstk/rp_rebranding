@@ -6,6 +6,62 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: RecommendationsBanner component
+
+File: src/components/recommendationsBanner.js
+
+Restyled to match the rest of the site, keeping `useRecommendations()` (the Lytics personalization hook) as the sole data source and the same `recommendations?.length > 0` gating untouched — only markup/styling changed.
+
+Section background is solid gold `#D1A261` (per direct request), so the accent/base relationship is inverted from the rest of the site: the section label uses dark `#0a0a0a` text and a dark underline rule instead of the usual gold-on-dark, since gold text would disappear against a gold background. Heading switched from a plain centered `text-3xl` to a Montserrat eyebrow ("Curated For You") + Cormorant Garamond italic headline, matching the label pattern used in Cards/ArticleBanner.
+
+Article cards were rebuilt using the same full image-background tile recipe as ArticleBanner (1 col mobile / 2 col tablet / 3 col desktop, two stacked dark gradient overlays that deepen on hover, image scale-up on hover): gold taxonomy-tag pills (numbered `01`/`02` fallback when no taxonomies are present), Cormorant italic title, a gold rule that expands on hover, and a teaser + "Read Article" link that reveal on hover via height/opacity animation — replacing the old plain white-card list styling (gray text, `bg-gray-50` tag pills, static teaser).
+
+Removed two leftover `console.log` debug statements (recommendations data and raw content prop) that were logging on every render.
+
+Follow-up pass after the initial redesign felt too tall and too large-type: section padding, card height (now `h-[260px] md:h-[300px]` instead of a flat 480px), and every font size in the section (eyebrow, headline, card title, tag pills, teaser, read-more link) were all scaled down. Responsive breakpoints added throughout — an `sm:grid-cols-2` step between the 1-column mobile and 3-column desktop grid (previously jumped straight from 1 to 3 col), plus responsive padding/margins/gaps (`px-4 md:px-6`, `py-10 md:py-14`, `mb-8 md:mb-10`, `p-4 md:p-5`) so the section doesn't feel oversized on small screens.
+
+Section headline switched from the sitewide Cormorant Garamond italic to a true cursive script (new `next/font/google` import in `src/app/layout.jsx`, alongside the other fonts). This is scoped to this one heading only — every other headline across the site (Hero, Cards, TextBlock, ProductFeature, CategoryBanner, etc.) still uses Cormorant Garamond italic; the script font was not adopted as a sitewide replacement. Size bumped to `clamp(2.2rem, 4.5vw, 3.2rem)` since script glyphs read smaller than serif at the same font-size.
+
+First tried **Pinyon Script** (`--font-pinyon-script`), swapped out for **Parisienne** (`--font-parisienne`) per feedback that Pinyon Script's look wasn't right for this section. Same scope/sizing, just a different registered font family.
+
+### Fix: Headings rendering all-caps (RecommendationsBanner, CategoryBanner, LeadCapture)
+
+Files: src/components/recommendationsBanner.js, src/components/categoryBanner.js, src/components/leadCapture.js
+
+The site-wide rule in `globals.css` (`h1, h2, h3, h4, h5 { text-transform: uppercase; }`) was flattening every `<h2>`/`<h3>` headline in these three components to all-caps. It went unnoticed on the Cormorant Garamond italic headlines (uppercase italic serif still reads as an intentional editorial style), but became obvious and broken on RecommendationsBanner's new Parisienne script headline, since a cursive font forced into all-caps loses its flowing connected letterforms entirely. Added `textTransform: 'none'` inline on each affected heading: RecommendationsBanner's section headline and card title, CategoryBanner's title, and LeadCapture's title.
+
+Note: this global rule is not new — it's the same one already called out in the People/Events grid entry above (`h1,h2,h3,h4,h5 { text-transform: uppercase }`), where it had to be locally overridden too. It's likely still silently forcing caps on headlines in every other already-redone component that hasn't been checked/overridden yet (Hero, Cards, TextBlock, ProductFeature, Tabs, HalfSquares, ArticleBanner, etc. all render `h2`/`h3` Cormorant italic headlines with no explicit `textTransform` set). Left those untouched here since it wasn't flagged for them and changing the global rule itself would visibly affect every headline sitewide at once.
+
+### Redesign: LeadCapture component
+
+File: src/components/leadCapture.js
+
+Restyled the email-capture strip to match the site's editorial language, keeping the `jstag.send` tracking call and input-clearing behavior untouched. Left panel (text + form) now sits on the CMS `background_color` (falling back to `#111`, same fallback convention as HalfSquares' text panel) with a Montserrat gold eyebrow ("Stay Connected"), Cormorant Garamond italic headline, gold 40px divider, and Raleway body copy. Right panel is now a CSS background-image div with the same Ken-burns scale-in entrance used in HalfSquares/CategoryBanner instead of a plain `<img>`, and falls back to the shared neutral placeholder icon when no image is set instead of rendering nothing.
+
+The input + submit button are now the same joined "glass input / solid gold button" pair used for the search bar on `/faqs/[title]` — translucent white input (`rgba(255,255,255,0.06)` background, `rgba(255,255,255,0.15)` border) flush against a solid gold Montserrat submit button, rather than the old white input in a rounded pill with a cyan-outlined button.
+
+Fix: the form's `onSubmit` handler never called `event.preventDefault()`, so submitting the form fired the `jstag.send` tracking call and then triggered a full browser page reload/navigation via the default form submission behavior. Handler now accepts the event and calls `preventDefault()` before sending.
+
+### Redesign: CategoryBanner component
+
+File: src/components/categoryBanner.js
+
+Restyled to match the rest of the site, keeping the RPCommerce category-resolution `useEffect`, the `categories`/`children`/`plp` data shape, and all CSLP visual-builder bindings untouched — styling only.
+
+Media/text split is now full-bleed (`clamp(360px, 55vh, 620px)` tall) instead of the fixed 400px box. The image side gets the same Ken-burns scale-in entrance used in HalfSquares/Tabs (via `motion.div` background-image instead of `next/image`), and falls back to the shared neutral placeholder icon instead of a plain gray "No Media" box. Sub-category links (`category.children`) are now gold-bordered pill chips matching ArticleBanner's taxonomy-tag style, with the current category filled solid gold instead of the old underline. Title switched from a plain black sans-serif `h1` to a Cormorant Garamond italic `h2` (semantic fix — this is a section component, not a page title, same reasoning as TextBlock's earlier h1→h2 change) with a gold divider and Raleway description below. The CTA is now the gold outline pill that fills gold/black on hover (identical pattern to Hero's and PDP's buttons), replacing the old solid black rounded button. Title no longer gets `line-clamp`d — it was clipping longer category names with an ellipsis; removed so the full name always renders.
+
+### CMS Changes — CategoryBanner global field — Sticky toggle
+
+Field label: Sticky
+Field UID: `sticky`
+Field type: Boolean
+Default value: false
+Global field: CategoryBanner
+
+Same behavior/pattern as the Cards/TextBlock/Reviews sticky fields. Handled in `src/app/[locale]/page.js` by adding `block.category_banner?.sticky` to the existing sticky check alongside `text_block`/`cards`/`review`/`text_and_image` — no change was needed to the z-index logic itself, since every modular block wrapper already gets `zIndex: index + 1` regardless of its type, so a sticky CategoryBanner is automatically covered by whatever section comes after it on the homepage.
+
+Note: CategoryBanner is also rendered on `plp/[url]`, `pdp/[id]`, and `pages/[title]`, but none of those pages have the sticky/z-index wrapper-div infrastructure for any block yet — this field will only take effect on the homepage until that's added elsewhere.
+
 ### Fix: Header "Events" nav link went nowhere (functional fix, not styling)
 
 File: src/components/header.js

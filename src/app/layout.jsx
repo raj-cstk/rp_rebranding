@@ -16,6 +16,7 @@ import {
   Roboto,
   Rokkitt,
   Spectral,
+  Tangerine,
 } from "next/font/google";
 import { headers } from "next/headers";
 
@@ -84,6 +85,12 @@ const cormorant = Cormorant({
 const audiowide = Audiowide({
   subsets: ["latin"],
   variable: "--font-audiowide",
+  weight: "400",
+});
+
+const tangerine = Tangerine({
+  subsets: ["latin"],
+  variable: "--font-tangerine",
   weight: "400",
 });
 
@@ -239,6 +246,7 @@ export default async function RootLayout({
           rokkitt.variable,
           cormorant.variable,
           audiowide.variable,
+          tangerine.variable,
         ].join(" ")}
       >
         {process.env.LYTICS_TAG && <LyticsTracking />}
