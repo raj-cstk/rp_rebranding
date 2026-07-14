@@ -35,7 +35,7 @@ export default function CategoryBanner({ content, locale }) {
   if (!content || !category || !category.name) return null;
 
   return (
-    <section className="w-full bg-white">
+    <section className="w-full" style={{ background: content?.background?.hex || '#fff' }}>
       <div className="flex flex-col md:flex-row w-full">
 
         {/* Media */}
@@ -72,7 +72,7 @@ export default function CategoryBanner({ content, locale }) {
         </div>
 
         {/* Text */}
-        <div className="w-full md:w-1/2 flex items-center bg-white">
+        <div className="w-full md:w-1/2 flex items-center" style={{ background: content?.background?.hex || '#fff' }}>
           <motion.div
             className="px-8 md:px-12 py-14 md:py-24 w-full"
             initial={{ opacity: 0, x: 50 }}

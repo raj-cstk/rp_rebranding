@@ -6,6 +6,12 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Update: CategoryBanner — CMS-driven background color
+
+File: src/components/categoryBanner.js
+
+Wired up the new `background` custom color-picker field added to the CategoryBanner global field (same field pattern already used by ArticleBanner/ProductFeature/Cards). Reads `content?.background?.hex`, falling back to `#fff` (the previous hardcoded `bg-white`) when not set. Applied to both the outer `<section>` and the text panel div — the media panel is unaffected since it's always covered by the category image/video.
+
 ### Redesign: RecommendationsBanner component
 
 File: src/components/recommendationsBanner.js

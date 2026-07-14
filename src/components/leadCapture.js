@@ -22,7 +22,7 @@ export default function LeadCapture({ content }) {
         {/* Text + form */}
         <div
           className={`w-full ${hasImage ? 'md:w-1/2' : ''} flex items-center ${!hasImage ? 'justify-center' : ''}`}
-          style={{ background: content?.background_color?.hex || '#111', minHeight: 'clamp(420px, 58vh, 600px)' }}
+          style={{ background: content?.background_color?.hex || '#ebebeb', minHeight: 'clamp(420px, 58vh, 600px)' }}
         >
           <motion.div
             className={`px-8 md:px-12 py-14 w-full ${!hasImage ? 'max-w-2xl mx-auto text-center' : ''}`}
@@ -35,13 +35,13 @@ export default function LeadCapture({ content }) {
               Stay Connected
             </span>
 
-            <h2 style={{ fontFamily: '"Cormorant Garamond", var(--font-cormorant-garamond), Georgia, serif', fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(2rem, 3.5vw, 3rem)', lineHeight: 1.15, color: '#fff', textTransform: 'none' }} {...content?.$?.title}>
+            <h2 style={{ fontFamily: '"Cormorant Garamond", var(--font-cormorant-garamond), Georgia, serif', fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(2rem, 3.5vw, 3rem)', lineHeight: 1.15, color: '#1a1410', textTransform: 'none' }} {...content?.$?.title}>
               {content?.title}
             </h2>
 
             <div style={{ width: '40px', height: '1px', background: '#D1A261', margin: hasImage ? '1.5rem 0' : '1.5rem auto' }} />
 
-            <p style={{ fontFamily: 'var(--font-raleway), sans-serif', fontWeight: 300, fontSize: '0.95rem', lineHeight: 1.9, color: 'rgba(255,255,255,0.6)' }} {...content?.$?.description}>
+            <p style={{ fontFamily: 'var(--font-raleway), sans-serif', fontWeight: 300, fontSize: '0.95rem', lineHeight: 1.9, color: '#6b6560' }} {...content?.$?.description}>
               {content?.description}
             </p>
 
@@ -52,10 +52,10 @@ export default function LeadCapture({ content }) {
                   fontFamily: 'var(--font-raleway), sans-serif',
                   fontWeight: 300,
                   fontSize: '0.88rem',
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.15)',
+                  background: '#fff',
+                  border: '1px solid rgba(0,0,0,0.12)',
                   borderRight: 'none',
-                  color: '#fff',
+                  color: '#1a1410',
                   padding: '14px 18px',
                   outline: 'none',
                 }}
