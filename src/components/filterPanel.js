@@ -5,6 +5,11 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
+const sectionHeaderStyle = { fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#1a1410' };
+const optionLabelStyle = { fontFamily: 'var(--font-raleway), sans-serif', fontSize: '0.85rem', color: '#4a4540' };
+const countStyle = { fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.7rem', color: '#9a9590' };
+const sectionDivider = { borderBottom: '1px solid rgba(0,0,0,0.08)' };
+
 export default function FilterPanel({
   isOpen,
   onClose,
@@ -25,49 +30,61 @@ export default function FilterPanel({
       [sectionId]: !prev[sectionId]
     }));
   };
+
+  const SectionToggle = ({ id, label }) => (
+    <button
+      onClick={() => toggleSection(id)}
+      className="w-full flex items-center justify-between text-left mb-4"
+    >
+      <span style={sectionHeaderStyle}>{label}</span>
+      <FontAwesomeIcon
+        icon={expandedSections[id] ? faChevronUp : faChevronDown}
+        style={{ color: '#D1A261' }}
+        className="w-3 h-3"
+      />
+    </button>
+  );
+
   return (
     <AnimatePresence>
       {isOpen && (
         <>
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            className="fixed inset-0 z-40"
+            style={{ background: 'rgba(0,0,0,0.4)' }}
           />
 
           <motion.div
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
-            transition={{ type: "tween", duration: 0.3 }}
-            className="fixed right-0 top-0 h-full w-full md:w-[500px] bg-white z-50 shadow-2xl flex flex-col"
+            transition={{ type: "tween", duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed right-0 top-0 h-full w-full md:w-[460px] z-50 shadow-2xl flex flex-col"
+            style={{ background: '#fff', borderLeft: '1px solid rgba(0,0,0,0.1)' }}
           >
-            <div className="pt-6 pr-6 text-right">
+            <div className="flex justify-between items-center px-8 py-6" style={sectionDivider}>
+              <span style={{ fontFamily: '"Cormorant Garamond", var(--font-cormorant-garamond), Georgia, serif', fontWeight: 300, fontStyle: 'italic', fontSize: '1.6rem', color: '#1a1410' }}>
+                Filters &amp; Sorting
+              </span>
               <button
                 onClick={onClose}
-                className="p-0 hover:opacity-60 transition-opacity"
+                style={{ color: 'rgba(0,0,0,0.35)', transition: 'color 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#000'}
+                onMouseLeave={e => e.currentTarget.style.color = 'rgba(0,0,0,0.35)'}
               >
-                <XMarkIcon className="w-6 h-6" />
+                <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-12 py-0">
-            <div className="text-3xl font-medium mb-10">Filters and Sorting</div>
-              
-              <div className="mb-2 border-b border-gray-200 pb-6">
-                <button
-                  onClick={() => toggleSection('sort')}
-                  className="w-full flex items-center justify-between text-left mb-3"
-                >
-                  <span className="text-[0.7rem] font-semibold uppercase tracking-wider">Sort By</span>
-                  <FontAwesomeIcon 
-                    icon={expandedSections['sort'] ? faChevronUp : faChevronDown} 
-                    className="w-3 h-3"
-                  />
-                </button>
-                
+            <div className="flex-1 overflow-y-auto px-8 py-6">
+
+              <div className="mb-2 pb-6" style={sectionDivider}>
+                <SectionToggle id="sort" label="Sort By" />
+
                 {expandedSections['sort'] && (
                   <div className="space-y-3">
                     {[
@@ -77,15 +94,16 @@ export default function FilterPanel({
                       { value: "price_high_low", label: "Price high to low" }
                     ].map((option) => (
                       <label key={option.value} className="flex items-center cursor-pointer group">
-                          <input
-                            type="radio"
-                            name="sort"
-                            value={option.value}
-                            checked={sortBy === option.value}
-                            onChange={(e) => setSortBy(e.target.value)}
-                            className="w-3.5 h-3.5 text-black border-gray-300 focus:ring-black accent-black"
-                          />
-                        <span className="ml-3 text-[0.8rem] group-hover:text-gray-600 transition-colors">
+                        <input
+                          type="radio"
+                          name="sort"
+                          value={option.value}
+                          checked={sortBy === option.value}
+                          onChange={(e) => setSortBy(e.target.value)}
+                          className="w-3.5 h-3.5 accent-[#D1A261]"
+                          style={{ accentColor: '#D1A261' }}
+                        />
+                        <span className="ml-3 group-hover:text-[#1a1410] transition-colors" style={optionLabelStyle}>
                           {option.label}
                         </span>
                       </label>
@@ -97,18 +115,9 @@ export default function FilterPanel({
               {categoryFilters?.filters && (
                 <div className="mb-8">
                   {categoryFilters.filters.attributes?.map((attribute) => (
-                    <div key={attribute.id} className="mb-2 border-b border-gray-200 pb-6">
-                      <button
-                        onClick={() => toggleSection(`attr_${attribute.id}`)}
-                        className="w-full flex items-center justify-between text-left mb-3"
-                      >
-                        <span className="text-base font-normal">{attribute.name}</span>
-                        <FontAwesomeIcon 
-                          icon={expandedSections[`attr_${attribute.id}`] ? faChevronUp : faChevronDown} 
-                          className="w-3 h-3"
-                        />
-                      </button>
-                      
+                    <div key={attribute.id} className="mb-2 pb-6" style={sectionDivider}>
+                      <SectionToggle id={`attr_${attribute.id}`} label={attribute.name} />
+
                       {expandedSections[`attr_${attribute.id}`] && (
                         <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
                           {attribute.values?.map((value) => (
@@ -119,17 +128,18 @@ export default function FilterPanel({
                                 onChange={(e) =>
                                   onFilterChange(`attr_${value.id}`, e.target.checked)
                                 }
-                                className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black accent-black"
+                                className="w-4 h-4 accent-[#D1A261]"
+                                style={{ accentColor: '#D1A261' }}
                               />
-                              <span className="ml-3 text-[0.8rem] group-hover:text-gray-600 transition-colors flex items-center gap-2">
+                              <span className="ml-3 group-hover:text-[#1a1410] transition-colors flex items-center gap-2" style={optionLabelStyle}>
                                 {attribute.name === 'Color' && value.custom_info && (
                                   <span
-                                    className="w-4 h-4 rounded-full border border-gray-300"
-                                    style={{ backgroundColor: value.custom_info }}
+                                    className="w-4 h-4 rounded-full"
+                                    style={{ backgroundColor: value.custom_info, border: '1px solid rgba(0,0,0,0.15)' }}
                                   />
                                 )}
                                 {value.value}
-                                <span className="text-gray-400 text-xs">({value.usage_count})</span>
+                                <span style={countStyle}>({value.usage_count})</span>
                               </span>
                             </label>
                           ))}
@@ -140,18 +150,9 @@ export default function FilterPanel({
 
                   {categoryFilters.filters.tags?.map((tagCategory) => (
                     tagCategory.tags?.length > 0 && (
-                      <div key={tagCategory.id} className="mb-2 border-b border-gray-200 pb-6">
-                        <button
-                          onClick={() => toggleSection(`tags_${tagCategory.id}`)}
-                          className="w-full flex items-center justify-between text-left mb-3"
-                        >
-                          <span className="text-base font-normal">Tags</span>
-                          <FontAwesomeIcon 
-                            icon={expandedSections[`tags_${tagCategory.id}`] ? faChevronUp : faChevronDown} 
-                            className="w-3 h-3"
-                          />
-                        </button>
-                        
+                      <div key={tagCategory.id} className="mb-2 pb-6" style={sectionDivider}>
+                        <SectionToggle id={`tags_${tagCategory.id}`} label="Tags" />
+
                         {expandedSections[`tags_${tagCategory.id}`] && (
                           <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
                             {tagCategory.tags.map((tag) => (
@@ -162,11 +163,12 @@ export default function FilterPanel({
                                   onChange={(e) =>
                                     onFilterChange(`tag_${tag.id}`, e.target.checked)
                                   }
-                                  className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black accent-black"
+                                  className="w-4 h-4 accent-[#D1A261]"
+                                  style={{ accentColor: '#D1A261' }}
                                 />
-                                <span className="ml-3 text-[0.8rem] group-hover:text-gray-600 transition-colors">
+                                <span className="ml-3 group-hover:text-[#1a1410] transition-colors" style={optionLabelStyle}>
                                   {tag.name}
-                                  <span className="text-gray-400 text-xs ml-1">({tag.product_count})</span>
+                                  <span className="ml-1" style={countStyle}>({tag.product_count})</span>
                                 </span>
                               </label>
                             ))}
@@ -177,18 +179,9 @@ export default function FilterPanel({
                   ))}
 
                   {categoryFilters.filters.brands?.length > 0 && (
-                    <div className="mb-2 border-b border-gray-200 pb-6">
-                      <button
-                        onClick={() => toggleSection('brands')}
-                        className="w-full flex items-center justify-between text-left mb-3"
-                      >
-                        <span className="text-base font-normal">Brands</span>
-                        <FontAwesomeIcon 
-                          icon={expandedSections['brands'] ? faChevronUp : faChevronDown} 
-                          className="w-3 h-3"
-                        />
-                      </button>
-                      
+                    <div className="mb-2 pb-6" style={sectionDivider}>
+                      <SectionToggle id="brands" label="Brands" />
+
                       {expandedSections['brands'] && (
                         <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
                           {categoryFilters.filters.brands.map((brand, index) => (
@@ -199,11 +192,12 @@ export default function FilterPanel({
                                 onChange={(e) =>
                                   onFilterChange(`brand_${brand.name}`, e.target.checked)
                                 }
-                                className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black accent-black"
+                                className="w-4 h-4 accent-[#D1A261]"
+                                style={{ accentColor: '#D1A261' }}
                               />
-                              <span className="ml-3 text-[0.8rem] group-hover:text-gray-600 transition-colors">
+                              <span className="ml-3 group-hover:text-[#1a1410] transition-colors" style={optionLabelStyle}>
                                 {brand.name}
-                                <span className="text-gray-400 text-xs ml-1">({brand.product_count})</span>
+                                <span className="ml-1" style={countStyle}>({brand.product_count})</span>
                               </span>
                             </label>
                           ))}
@@ -215,24 +209,53 @@ export default function FilterPanel({
               )}
             </div>
 
-            <div className="p-6 border-t space-y-3">
+            <div className="p-6 space-y-3" style={{ borderTop: '1px solid rgba(0,0,0,0.08)' }}>
               <button
                 onClick={onClose}
-                className="w-full bg-black text-white py-4 px-6 rounded-full font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors text-sm"
+                className="w-full transition-opacity"
+                style={{
+                  fontFamily: 'var(--font-montserrat), sans-serif',
+                  fontWeight: 600,
+                  fontSize: '0.68rem',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: '#000',
+                  background: '#D1A261',
+                  border: 'none',
+                  borderRadius: '9999px',
+                  padding: '14px 24px',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
               >
                 Show Products
               </button>
               <button
                 onClick={onResetAll}
-                className="w-full bg-white text-black py-4 px-6 rounded-full font-medium uppercase tracking-wider border-2 border-black hover:bg-gray-50 transition-colors text-sm"
+                className="w-full transition-all duration-300"
+                style={{
+                  fontFamily: 'var(--font-montserrat), sans-serif',
+                  fontWeight: 600,
+                  fontSize: '0.68rem',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: '#D1A261',
+                  background: 'transparent',
+                  border: '1px solid #D1A261',
+                  borderRadius: '9999px',
+                  padding: '14px 24px',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#D1A261'; e.currentTarget.style.color = '#000'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#D1A261'; }}
               >
                 Reset All
               </button>
-          </div>
-        </motion.div>
-      </>
+            </div>
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
 }
-

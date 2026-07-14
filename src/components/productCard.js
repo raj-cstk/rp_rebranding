@@ -6,11 +6,14 @@ import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 
 export default function ProductCard({ item }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Get all images from media array, fallback to single image
   const allImages = item?.media && item.media.length > 0
     ? item.media.map(m => m?.path).filter(Boolean)
     : [item?.image || item?.image_path];
+
+  const colorAttribute = item?.attributes?.find(attribute => attribute?.attribute_name?.toLowerCase() === "color")?.value;
 
   const handlePrevImage = (e) => {
     e.preventDefault();
@@ -28,46 +31,75 @@ export default function ProductCard({ item }) {
     <Link
       href={item?.url ? "/pdp/" + item.url : "#"}
       className="block group cursor-pointer"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative bg-[#e8e8e8] aspect-square mb-4 overflow-hidden rounded-[1px] shadow-sm">
+      <div className="relative overflow-hidden mb-4" style={{ background: '#f5f5f5', aspectRatio: '1 / 1' }}>
         {allImages.map((imagePath, index) => (
           <img
             key={index}
-            className={`w-full h-full object-cover transition-opacity duration-300 ${
-              index === currentImageIndex ? "opacity-100" : "opacity-0 absolute inset-0"
-            }`}
+            className="w-full h-full object-cover transition-all duration-700 ease-out"
+            style={{
+              opacity: index === currentImageIndex ? 1 : 0,
+              position: index === currentImageIndex ? 'relative' : 'absolute',
+              inset: 0,
+              transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+            }}
             src={imagePath}
             alt={`${item?.name ?? "Product"} - Image ${index + 1}`}
           />
         ))}
 
+        <div
+          className="absolute inset-0 flex items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.12)', opacity: isHovered ? 1 : 0, transition: 'opacity 0.4s' }}
+        >
+          <span
+            style={{
+              fontFamily: 'var(--font-montserrat), sans-serif',
+              fontSize: '0.6rem',
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: '#fff',
+              border: '1px solid #fff',
+              padding: '10px 20px',
+              transform: isHovered ? 'translateY(0)' : 'translateY(8px)',
+              transition: 'transform 0.4s',
+            }}
+          >
+            View
+          </span>
+        </div>
+
         {allImages.length > 1 && (
           <>
             <button
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full transition-all opacity-0 group-hover:opacity-75"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+              style={{ background: 'rgba(255,255,255,0.9)' }}
               onClick={handlePrevImage}
               aria-label="Previous image"
             >
-              <FontAwesomeIcon icon={faAngleLeft} size="2xl" className="text-black w-4 h-4 opacity-65" />
+              <FontAwesomeIcon icon={faAngleLeft} style={{ color: '#0a0a0a' }} className="w-3.5 h-3.5" />
             </button>
             <button
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full transition-all opacity-0 group-hover:opacity-75"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+              style={{ background: 'rgba(255,255,255,0.9)' }}
               onClick={handleNextImage}
               aria-label="Next image"
             >
-              <FontAwesomeIcon icon={faAngleRight} size="2xl" className="text-black w-4 h-4 opacity-65" />
+              <FontAwesomeIcon icon={faAngleRight} style={{ color: '#0a0a0a' }} className="w-3.5 h-3.5" />
             </button>
           </>
         )}
       </div>
 
-      <div className="space-y-1 px-4">
-          {item?.tags?.length > 0 && (
+      <div className="px-1">
+        {item?.tags?.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-2">
             {item.tags.map((tag, index) => (
               <span
                 key={index}
-                className="px-2 py-0.5 bg-gray-100 text-xs font-medium text-gray-700 rounded-sm"
+                style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.55rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#D1A261', border: '1px solid rgba(209,162,97,0.5)', padding: '3px 8px' }}
               >
                 {tag?.name}
               </span>
@@ -75,21 +107,23 @@ export default function ProductCard({ item }) {
           </div>
         )}
 
-        <h3 className="text-black !font-semibold !text-sm uppercase leading-tight line-clamp-1 mb-2 !font-sans !tracking-[0.05em]">
+        <h3 className="line-clamp-1" style={{ fontFamily: '"Cormorant Garamond", var(--font-cormorant-garamond), Georgia, serif', fontWeight: 400, fontStyle: 'italic', fontSize: '1.15rem', lineHeight: 1.3, color: '#1a1410' }}>
           {item?.name}
         </h3>
-        {item?.price != null && item?.price !== "" && <div className="text-black font-bold text-sm mb-2"> {item?.currency_symbol} {parseFloat(item.price).toFixed(2)}</div>}
 
-        <div className="flex justify-start items-center text-[0.7rem] text-black font-normal pt-1">
-          {item?.attributes?.find(attribute => attribute?.attribute_name?.toLowerCase() === "color")?.value && (
-            <div className="text-black mr-4">
-              {item.attributes.find(attribute => attribute?.attribute_name?.toLowerCase() === "color")?.value}
-            </div>
-          )}
-          {item.variants?.length > 0 && <div className="text-black">+ {item.variants?.length} models</div>}
-        </div>
+        {item?.price != null && item?.price !== "" && (
+          <p className="mt-1.5" style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontWeight: 400, fontSize: '0.8rem', letterSpacing: '0.05em', color: '#9a9590' }}>
+            {item.currency_symbol}{parseFloat(item.price).toFixed(2)}
+          </p>
+        )}
+
+        {(colorAttribute || item.variants?.length > 0) && (
+          <div className="flex items-center gap-3 mt-1.5" style={{ fontFamily: 'var(--font-raleway), sans-serif', fontSize: '0.75rem', color: '#9a9590' }}>
+            {colorAttribute && <span>{colorAttribute}</span>}
+            {item.variants?.length > 0 && <span>+ {item.variants.length} models</span>}
+          </div>
+        )}
       </div>
     </Link>
   );
 }
-

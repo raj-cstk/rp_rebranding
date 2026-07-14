@@ -397,8 +397,6 @@ export default function PLP() {
     ...transformEntryProducts()
   ];
 
-  console.log(entry)
-
   return (
     <div className="relative overflow-hidden">
       <Header locale={params.locale} />
@@ -523,16 +521,18 @@ export default function PLP() {
           {isLoading && (
             <div className="flex items-center justify-center py-32">
               <div className="flex flex-col items-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-cyan-600"></div>
-                <p className="mt-4 text-gray-600">Loading products...</p>
+                <div className="animate-spin rounded-full h-12 w-12" style={{ border: '1px solid rgba(209,162,97,0.2)', borderTopColor: '#D1A261' }} />
+                <p style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontWeight: 500, fontSize: '0.6rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.35)', marginTop: '1.5rem' }}>
+                  Loading Products
+                </p>
               </div>
             </div>
           )}
 
           {/* PRODUCT COUNTER: Shows filtered product count */}
           {!isLoading && allProducts?.length > 0 && <div className="w-full mx-auto px-12 mt-12 mb-8">
-            <div className="text-[0.7rem] font-normal text-black">
-              {allProducts.filter((item) => isInFilter(item)).length} RESULTS
+            <div style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.68rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#9a9590' }}>
+              {allProducts.filter((item) => isInFilter(item)).length} Results
             </div>
           </div>}
 
@@ -573,10 +573,19 @@ export default function PLP() {
       {!filterPanelOpen && !isLoading && (
         <button
           onClick={() => setFilterPanelOpen(true)}
-          className={`fixed ${(process.env.LIVE_PREVIEW_ENABLED) ? "bottom-16" : "bottom-8"} right-8 z-50 bg-white hover:bg-gray-50 text-gray-800 font-medium px-6 py-4 rounded-full shadow-lg border border-gray-400 flex items-center gap-2 transition-all duration-200 hover:shadow-xl ${filterPanelOpen ? "hidden" : ""}`}
+          className={`fixed ${(process.env.LIVE_PREVIEW_ENABLED) ? "bottom-16" : "bottom-8"} right-8 z-50 flex items-center gap-3 transition-all duration-300`}
+          style={{
+            background: '#0a0a0a',
+            color: '#D1A261',
+            padding: '14px 26px',
+            borderRadius: '9999px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+          }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
         >
-          <FontAwesomeIcon icon={faFilterList} />
-          <span className="uppercase tracking-wide text-[0.8rem] font-light">Filters and Sorting</span>
+          <FontAwesomeIcon icon={faFilterList} className="w-3.5 h-3.5" />
+          <span style={{ fontFamily: 'var(--font-montserrat), sans-serif', fontSize: '0.65rem', letterSpacing: '0.18em', textTransform: 'uppercase' }}>Filters &amp; Sorting</span>
         </button>
       )}
 

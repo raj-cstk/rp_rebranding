@@ -6,6 +6,20 @@ Tracks UI changes made during the redesign phase. All changes are UI/styling onl
 
 ## Changes
 
+### Redesign: PLP page (CategoryHero, ProductCard, FilterPanel)
+
+Files: src/app/[locale]/plp/[url]/page.js, src/components/categoryHero.js, src/components/productCard.js, src/components/filterPanel.js
+
+The PLP route itself renders four things: the page's modular-block sections (already inherit the site's look automatically since they reuse already-redone components like CategoryBanner/Cards/Reviews/etc.), plus three page-specific pieces that hadn't been touched yet — restyled now, with all filtering/sorting/commerce logic (`isInFilter`, `sortProducts`, `RPCommerce` calls, jstag tracking) untouched.
+
+**CategoryHero** (`src/components/categoryHero.js`) — this was effectively the pre-redesign twin of CategoryBanner (same layout, same gray/cyan styling) and got the identical treatment: full-bleed image/text split, Ken-burns image entrance, gold pill sub-category chips, Cormorant italic headline, gold divider, Raleway description. Kept as an `<h1>` (unlike CategoryBanner's `h2` fix) since this genuinely is the page's main heading, with `textTransform: 'none'` to dodge the same global-uppercase-CSS bug fixed elsewhere. Preserved this component's own active-chip logic (`child.url === category.url`, rather than CategoryBanner's index-based highlight) and its `/${locale}/plp${child.url}` links exactly as they were.
+
+**ProductCard** (`src/components/productCard.js`) — image container background switched from `#e8e8e8` to `#f5f5f5` to match ProductFeature's product tiles, with the same hover treatment added (image scales to 105%, dark scrim + centered "View" label fade in). The prev/next image-carousel arrows (multi-image products) are kept but restyled from gray circular buttons to white circles with dark icons, still only visible on hover. Tags switched from gray pill badges to gold-bordered pills (ArticleBanner's tag style). Product name switched from bold uppercase sans to Cormorant italic; price from plain bold black to muted Montserrat with letter-spacing; the color-attribute/variant-count line restyled to muted Raleway. All carousel state/handlers and the underlying data (`item.media`, `item.attributes`, `item.variants`) are unchanged.
+
+**FilterPanel** (`src/components/filterPanel.js`) — the slide-out drawer switched from a plain white/black/gray-200 panel to the same white-panel-with-gold-accents convention used by PDP's Purchase slideout (`border-left: rgba(0,0,0,0.1)`, muted-to-dark close button on hover) rather than PDP's dark Variants slideout — chosen because this panel is form-heavy (radios/checkboxes) and sits on top of the PLP's own white background, closer in spirit to Profiles' already-light-themed form controls. Section headers (Sort By, each attribute, Tags, Brands) restyled to Montserrat uppercase with a gold chevron. Radio/checkbox inputs kept as native controls (not converted to Profiles-style pill toggles, since this list can run to dozens of options and native controls scale better for a long scrollable list) but recolored to gold via `accentColor`. Footer buttons: "Show Products" is now a solid gold pill, "Reset All" a gold-outline pill that fills on hover — same pattern as the PDP/Rewards primary/secondary button pair. All accordion state (`expandedSections`), filter/sort handlers, and props are untouched.
+
+**Page chrome** (`src/app/[locale]/plp/[url]/page.js`) — loading spinner switched from a cyan spinning ring + gray text to the gold spinner + all-caps Montserrat "Loading Products" label used on PDP. Results counter restyled from plain black text to a muted Montserrat all-caps caption. The floating "Filters and Sorting" button switched from a white/gray-bordered pill to a solid dark `#0a0a0a` pill with a gold icon/label, matching the site's floating-CTA treatment. Removed a leftover `console.log(entry)` that was logging the full PLP entry on every render.
+
 ### Update: CategoryBanner — CMS-driven background color
 
 File: src/components/categoryBanner.js
